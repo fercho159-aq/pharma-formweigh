@@ -14,9 +14,9 @@ export async function POST(request: Request) {
 
     // Register dispensado
     await query(
-      `INSERT INTO dispensados (id, "ordenId", "loteId", "operarioId", "materialNombre", "cantidadTarget", "cantidadReal", "toleranciaOk", paso)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [id, data.ordenId, data.loteId, resolvedUserId, data.materialNombre, data.cantidadTarget, data.cantidadReal, data.toleranciaOk ? true : false, data.paso]
+      `INSERT INTO dispensados (id, "ordenId", "faseId", "loteId", "operarioId", "materialNombre", "cantidadTarget", "cantidadReal", "toleranciaOk", paso)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [id, data.ordenId, data.faseId || null, data.loteId, resolvedUserId, data.materialNombre, data.cantidadTarget, data.cantidadReal, data.toleranciaOk ? true : false, data.paso]
     );
 
     // Discount from lot
@@ -41,6 +41,7 @@ export async function POST(request: Request) {
       cantidadReal: data.cantidadReal,
       toleranciaOk: data.toleranciaOk,
       paso: data.paso,
+      faseId: data.faseId || null,
     });
     return NextResponse.json({ ok: true, id });
   } catch (e: unknown) {

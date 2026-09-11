@@ -13,27 +13,59 @@ export async function GET(_request: Request, { params }: { params: Promise<{ ord
 
   if (!orden) return NextResponse.json({ error: "Orden no encontrada" }, { status: 404 });
 
+  // Get phases for the recipe
+  const fases = await query(
+    'SELECT * FROM fases WHERE "recetaId" = $1 ORDER BY orden',
+    [orden.recetaId]
+  ) as Array<{ id: string; nombre: string; orden: number; instrucciones: string | null }>;
+
+  // Get all ingredientes for the recipe
   const ingredientes = await query(`
     SELECT i.*, m.nombre as "materialNombre", m.codigo as "materialCodigo", m.unidad as "materialUnidad"
     FROM ingredientes i
     JOIN materiales m ON i."materialId" = m.id
     WHERE i."recetaId" = $1
     ORDER BY i.orden
-  `, [orden.recetaId]) as Array<{ id: string; orden: number; [key: string]: unknown }>;
+  `, [orden.recetaId]) as Array<{ id: string; faseId: string; orden: number; [key: string]: unknown }>;
 
   // Check which have been dispensed
   const dispensados = await query(
-    'SELECT paso, "cantidadReal" FROM dispensados WHERE "ordenId" = $1',
+    'SELECT paso, "cantidadReal", "faseId" FROM dispensados WHERE "ordenId" = $1',
     [ordenId]
-  ) as Array<{ paso: number; cantidadReal: number }>;
+  ) as Array<{ paso: number; cantidadReal: number; faseId: string | null }>;
 
   const dispensadoMap = new Map(dispensados.map((d) => [d.paso, d.cantidadReal]));
 
-  const ingredientesConEstado = ingredientes.map((ing) => ({
-    ...ing,
-    dispensado: dispensadoMap.has(ing.orden),
-    dispensadoReal: dispensadoMap.get(ing.orden),
-  }));
+  // Get phase signatures
+  const firmas = await query(
+    `SELECT ff.*, u.nombre as "supervisorNombre"
+     FROM firmas_fase ff
+     JOIN usuarios u ON ff."supervisorId" = u.id
+     WHERE ff."ordenId" = $1`,
+    [ordenId]
+  ) as Array<{ faseId: string; supervisorNombre: string; timestamp: string }>;
 
-  return NextResponse.json({ ...orden, ingredientes: ingredientesConEstado });
+  const firmaMap = new Map(firmas.map((f) => [f.faseId, { supervisorNombre: f.supervisorNombre, timestamp: f.timestamp }]));
+
+  // Group ingredientes by phase
+  const fasesConDatos = fases.map((fase) => {
+    const faseIngredientes = ingredientes
+      .filter((ing) => ing.faseId === fase.id)
+      .map((ing) => ({
+        ...ing,
+        dispensado: dispensadoMap.has(ing.orden),
+        dispensadoReal: dispensadoMap.get(ing.orden),
+      }));
+
+    return {
+      id: fase.id,
+      nombre: fase.nombre,
+      orden: fase.orden,
+      instrucciones: fase.instrucciones,
+      firma: firmaMap.get(fase.id) || null,
+      ingredientes: faseIngredientes,
+    };
+  });
+
+  return NextResponse.json({ ...orden, fases: fasesConDatos });
 }

@@ -72,9 +72,18 @@ async function initTables() {
       "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
     );
 
+    CREATE TABLE IF NOT EXISTS fases (
+      id TEXT PRIMARY KEY,
+      "recetaId" TEXT NOT NULL REFERENCES recetas(id) ON DELETE CASCADE,
+      nombre TEXT NOT NULL,
+      orden INTEGER NOT NULL,
+      instrucciones TEXT
+    );
+
     CREATE TABLE IF NOT EXISTS ingredientes (
       id TEXT PRIMARY KEY,
       "recetaId" TEXT NOT NULL REFERENCES recetas(id) ON DELETE CASCADE,
+      "faseId" TEXT REFERENCES fases(id) ON DELETE CASCADE,
       "materialId" TEXT NOT NULL REFERENCES materiales(id),
       orden INTEGER NOT NULL,
       "cantidadTarget" REAL NOT NULL,
@@ -99,6 +108,7 @@ async function initTables() {
     CREATE TABLE IF NOT EXISTS dispensados (
       id TEXT PRIMARY KEY,
       "ordenId" TEXT NOT NULL REFERENCES ordenes_produccion(id),
+      "faseId" TEXT,
       "loteId" TEXT NOT NULL REFERENCES lotes(id),
       "operarioId" TEXT NOT NULL REFERENCES usuarios(id),
       "materialNombre" TEXT NOT NULL,
@@ -108,6 +118,15 @@ async function initTables() {
       paso INTEGER NOT NULL,
       "firmaElectronica" TEXT,
       "supervisorId" TEXT,
+      timestamp TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+
+    CREATE TABLE IF NOT EXISTS firmas_fase (
+      id TEXT PRIMARY KEY,
+      "ordenId" TEXT NOT NULL REFERENCES ordenes_produccion(id),
+      "faseId" TEXT NOT NULL REFERENCES fases(id),
+      "supervisorId" TEXT NOT NULL REFERENCES usuarios(id),
+      "firmaElectronica" TEXT NOT NULL,
       timestamp TIMESTAMPTZ NOT NULL DEFAULT now()
     );
 
@@ -148,6 +167,14 @@ async function initTables() {
     );
 
     await seedDemoData();
+  }
+
+  // Migrate existing recipes: create default phase for recipes without phases
+  const existingRecipes = await pool.query("SELECT id, nombre FROM recetas WHERE id NOT IN (SELECT DISTINCT \"recetaId\" FROM fases)");
+  for (const recipe of existingRecipes.rows) {
+    const faseId = generateId();
+    await pool.query('INSERT INTO fases (id, "recetaId", nombre, orden) VALUES ($1, $2, $3, $4)', [faseId, recipe.id, 'Dispensado', 1]);
+    await pool.query('UPDATE ingredientes SET "faseId" = $1 WHERE "recetaId" = $2', [faseId, recipe.id]);
   }
 }
 
@@ -193,17 +220,30 @@ async function seedDemoData() {
     `INSERT INTO recetas (id, codigo, nombre, descripcion, rendimiento, "unidadRendimiento") VALUES ($1, $2, $3, $4, $5, $6)`,
     [r1, "REC-PCT-500", "Tableta Paracetamol 500mg", "Formulación estándar de tabletas de paracetamol 500mg", 10000, "tabletas"]
   );
+
+  // Recipe 1 phases
+  const r1f1 = generateId();
+  await pool.query(
+    'INSERT INTO fases (id, "recetaId", nombre, orden) VALUES ($1, $2, $3, $4)',
+    [r1f1, r1, "Dispensado de activos", 1]
+  );
+  const r1f2 = generateId();
+  await pool.query(
+    'INSERT INTO fases (id, "recetaId", nombre, orden) VALUES ($1, $2, $3, $4)',
+    [r1f2, r1, "Mezclado y lubricación", 2]
+  );
+
   const ingR1 = [
-    { mat: materiales[0].id, orden: 1, cant: 5.0, tMin: -1, tMax: 1, inst: "Pesar con precisión. Verificar identidad visual.", peligroso: false },
-    { mat: materiales[1].id, orden: 2, cant: 3.5, tMin: -2, tMax: 2, inst: "Tamizar antes de pesar (malla 40).", peligroso: false },
-    { mat: materiales[3].id, orden: 3, cant: 1.0, tMin: -3, tMax: 3, inst: null, peligroso: false },
-    { mat: materiales[4].id, orden: 4, cant: 0.1, tMin: -5, tMax: 5, inst: "Usar mascarilla. Polvo muy fino.", peligroso: true },
-    { mat: materiales[2].id, orden: 5, cant: 0.05, tMin: -5, tMax: 5, inst: "Agregar al final.", peligroso: false },
+    { faseId: r1f1, mat: materiales[0].id, orden: 1, cant: 5.0, tMin: -1, tMax: 1, inst: "Pesar con precisión. Verificar identidad visual.", peligroso: false },
+    { faseId: r1f1, mat: materiales[1].id, orden: 2, cant: 3.5, tMin: -2, tMax: 2, inst: "Tamizar antes de pesar (malla 40).", peligroso: false },
+    { faseId: r1f2, mat: materiales[3].id, orden: 3, cant: 1.0, tMin: -3, tMax: 3, inst: null, peligroso: false },
+    { faseId: r1f2, mat: materiales[4].id, orden: 4, cant: 0.1, tMin: -5, tMax: 5, inst: "Usar mascarilla. Polvo muy fino.", peligroso: true },
+    { faseId: r1f2, mat: materiales[2].id, orden: 5, cant: 0.05, tMin: -5, tMax: 5, inst: "Agregar al final.", peligroso: false },
   ];
   for (const i of ingR1) {
     await pool.query(
-      `INSERT INTO ingredientes (id, "recetaId", "materialId", orden, "cantidadTarget", "toleranciaMin", "toleranciaMax", instrucciones, peligroso) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [generateId(), r1, i.mat, i.orden, i.cant, i.tMin, i.tMax, i.inst, i.peligroso]
+      `INSERT INTO ingredientes (id, "recetaId", "faseId", "materialId", orden, "cantidadTarget", "toleranciaMin", "toleranciaMax", instrucciones, peligroso) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [generateId(), r1, i.faseId, i.mat, i.orden, i.cant, i.tMin, i.tMax, i.inst, i.peligroso]
     );
   }
 
@@ -212,16 +252,29 @@ async function seedDemoData() {
     `INSERT INTO recetas (id, codigo, nombre, descripcion, rendimiento, "unidadRendimiento") VALUES ($1, $2, $3, $4, $5, $6)`,
     [r2, "REC-IBU-400", "Tableta Ibuprofeno 400mg", "Formulación de tabletas recubiertas de ibuprofeno 400mg", 5000, "tabletas"]
   );
+
+  // Recipe 2 phases
+  const r2f1 = generateId();
+  await pool.query(
+    'INSERT INTO fases (id, "recetaId", nombre, orden) VALUES ($1, $2, $3, $4)',
+    [r2f1, r2, "Dispensado principal", 1]
+  );
+  const r2f2 = generateId();
+  await pool.query(
+    'INSERT INTO fases (id, "recetaId", nombre, orden) VALUES ($1, $2, $3, $4)',
+    [r2f2, r2, "Granulación", 2]
+  );
+
   const ingR2 = [
-    { mat: materiales[5].id, orden: 1, cant: 2.0, tMin: -1, tMax: 1, inst: "Verificar certificado de análisis.", peligroso: false },
-    { mat: materiales[6].id, orden: 2, cant: 1.5, tMin: -2, tMax: 2, inst: null, peligroso: false },
-    { mat: materiales[7].id, orden: 3, cant: 0.3, tMin: -3, tMax: 3, inst: "Disolver en agua purificada.", peligroso: false },
-    { mat: materiales[2].id, orden: 4, cant: 0.04, tMin: -5, tMax: 5, inst: "Lubricante - agregar al final.", peligroso: false },
+    { faseId: r2f1, mat: materiales[5].id, orden: 1, cant: 2.0, tMin: -1, tMax: 1, inst: "Verificar certificado de análisis.", peligroso: false },
+    { faseId: r2f1, mat: materiales[6].id, orden: 2, cant: 1.5, tMin: -2, tMax: 2, inst: null, peligroso: false },
+    { faseId: r2f2, mat: materiales[7].id, orden: 3, cant: 0.3, tMin: -3, tMax: 3, inst: "Disolver en agua purificada.", peligroso: false },
+    { faseId: r2f2, mat: materiales[2].id, orden: 4, cant: 0.04, tMin: -5, tMax: 5, inst: "Lubricante - agregar al final.", peligroso: false },
   ];
   for (const i of ingR2) {
     await pool.query(
-      `INSERT INTO ingredientes (id, "recetaId", "materialId", orden, "cantidadTarget", "toleranciaMin", "toleranciaMax", instrucciones, peligroso) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [generateId(), r2, i.mat, i.orden, i.cant, i.tMin, i.tMax, i.inst, i.peligroso]
+      `INSERT INTO ingredientes (id, "recetaId", "faseId", "materialId", orden, "cantidadTarget", "toleranciaMin", "toleranciaMax", instrucciones, peligroso) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [generateId(), r2, i.faseId, i.mat, i.orden, i.cant, i.tMin, i.tMax, i.inst, i.peligroso]
     );
   }
 

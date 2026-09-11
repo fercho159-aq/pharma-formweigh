@@ -11,6 +11,7 @@ interface Receta {
   rendimiento: number;
   unidadRendimiento: string;
   activa: boolean;
+  numFases: number;
   numIngredientes: number;
 }
 
@@ -30,6 +31,12 @@ interface IngredienteForm {
   peligroso: boolean;
 }
 
+interface FaseForm {
+  nombre: string;
+  instrucciones: string;
+  ingredientes: IngredienteForm[];
+}
+
 export default function RecetasPage() {
   const [recetas, setRecetas] = useState<Receta[]>([]);
   const [materiales, setMateriales] = useState<Material[]>([]);
@@ -43,7 +50,7 @@ export default function RecetasPage() {
     rendimiento: "",
     unidadRendimiento: "kg",
   });
-  const [ingredientes, setIngredientes] = useState<IngredienteForm[]>([]);
+  const [fases, setFases] = useState<FaseForm[]>([]);
 
   useEffect(() => {
     loadData();
@@ -60,19 +67,40 @@ export default function RecetasPage() {
     setLoading(false);
   }
 
-  function addIngrediente() {
-    setIngredientes([
-      ...ingredientes,
-      { materialId: "", cantidadTarget: "", toleranciaMin: "-2", toleranciaMax: "2", instrucciones: "", peligroso: false },
-    ]);
+  function addFase() {
+    setFases([...fases, { nombre: "", instrucciones: "", ingredientes: [] }]);
   }
 
-  function removeIngrediente(idx: number) {
-    setIngredientes(ingredientes.filter((_, i) => i !== idx));
+  function removeFase(idx: number) {
+    setFases(fases.filter((_, i) => i !== idx));
   }
 
-  function updateIngrediente(idx: number, field: string, value: string | boolean) {
-    setIngredientes(ingredientes.map((ing, i) => (i === idx ? { ...ing, [field]: value } : ing)));
+  function updateFase(idx: number, field: string, value: string) {
+    setFases(fases.map((f, i) => (i === idx ? { ...f, [field]: value } : f)));
+  }
+
+  function addIngredienteToFase(faseIdx: number) {
+    setFases(fases.map((f, i) =>
+      i === faseIdx
+        ? { ...f, ingredientes: [...f.ingredientes, { materialId: "", cantidadTarget: "", toleranciaMin: "-2", toleranciaMax: "2", instrucciones: "", peligroso: false }] }
+        : f
+    ));
+  }
+
+  function removeIngredienteFromFase(faseIdx: number, ingIdx: number) {
+    setFases(fases.map((f, i) =>
+      i === faseIdx
+        ? { ...f, ingredientes: f.ingredientes.filter((_, j) => j !== ingIdx) }
+        : f
+    ));
+  }
+
+  function updateIngredienteInFase(faseIdx: number, ingIdx: number, field: string, value: string | boolean) {
+    setFases(fases.map((f, i) =>
+      i === faseIdx
+        ? { ...f, ingredientes: f.ingredientes.map((ing, j) => j === ingIdx ? { ...ing, [field]: value } : ing) }
+        : f
+    ));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -83,18 +111,22 @@ export default function RecetasPage() {
       body: JSON.stringify({
         ...form,
         rendimiento: parseFloat(form.rendimiento),
-        ingredientes: ingredientes.map((ing, idx) => ({
-          ...ing,
-          orden: idx + 1,
-          cantidadTarget: parseFloat(ing.cantidadTarget),
-          toleranciaMin: parseFloat(ing.toleranciaMin),
-          toleranciaMax: parseFloat(ing.toleranciaMax),
+        fases: fases.map((fase, fIdx) => ({
+          nombre: fase.nombre,
+          instrucciones: fase.instrucciones || null,
+          ingredientes: fase.ingredientes.map((ing, idx) => ({
+            ...ing,
+            orden: idx + 1,
+            cantidadTarget: parseFloat(ing.cantidadTarget),
+            toleranciaMin: parseFloat(ing.toleranciaMin),
+            toleranciaMax: parseFloat(ing.toleranciaMax),
+          })),
         })),
       }),
     });
     if (res.ok) {
       setForm({ codigo: "", nombre: "", descripcion: "", rendimiento: "", unidadRendimiento: "kg" });
-      setIngredientes([]);
+      setFases([]);
       setShowForm(false);
       loadData();
     }
@@ -149,63 +181,108 @@ export default function RecetasPage() {
             <textarea value={form.descripcion} onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" rows={2} />
           </div>
 
-          {/* Ingredientes */}
+          {/* Fases de Fabricación */}
           <div className="border-t pt-4">
             <div className="flex justify-between items-center mb-3">
-              <h4 className="font-medium">Ingredientes ({ingredientes.length})</h4>
-              <button type="button" onClick={addIngrediente} className="text-blue-600 text-sm font-medium hover:underline cursor-pointer">
-                + Agregar Ingrediente
+              <h4 className="font-medium">Fases de Fabricación ({fases.length})</h4>
+              <button type="button" onClick={addFase} className="text-blue-600 text-sm font-medium hover:underline cursor-pointer">
+                + Agregar Fase
               </button>
             </div>
 
-            {ingredientes.map((ing, idx) => (
-              <div key={idx} className="bg-gray-50 rounded-lg p-4 mb-3 relative">
-                <button type="button" onClick={() => removeIngrediente(idx)} className="absolute top-2 right-2 text-red-400 hover:text-red-600 cursor-pointer text-lg">&times;</button>
-                <p className="text-xs font-semibold text-gray-500 mb-2">Paso {idx + 1}</p>
-                <div className="grid grid-cols-4 gap-3">
-                  <div className="col-span-2">
-                    <label className="block text-xs text-gray-600 mb-1">Material</label>
-                    <select value={ing.materialId} onChange={(e) => updateIngrediente(idx, "materialId", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" required>
-                      <option value="">Seleccionar...</option>
-                      {materiales.map((m) => (
-                        <option key={m.id} value={m.id}>{m.nombre} ({m.unidad})</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">Cantidad</label>
-                    <input type="number" step="0.001" value={ing.cantidadTarget} onChange={(e) => updateIngrediente(idx, "cantidadTarget", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" required />
-                  </div>
-                  <div className="flex gap-2">
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">Tol. Min %</label>
-                      <input type="number" step="0.1" value={ing.toleranciaMin} onChange={(e) => updateIngrediente(idx, "toleranciaMin", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">Tol. Max %</label>
-                      <input type="number" step="0.1" value={ing.toleranciaMax} onChange={(e) => updateIngrediente(idx, "toleranciaMax", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" />
-                    </div>
-                  </div>
+            {fases.length === 0 && (
+              <div className="text-center py-6 text-gray-400 border-2 border-dashed rounded-lg">
+                <p className="text-sm">Agrega al menos una fase de fabricación</p>
+                <p className="text-xs mt-1">Cada fase contiene los materiales a dispensar en ese paso del proceso</p>
+              </div>
+            )}
+
+            {fases.map((fase, fIdx) => (
+              <div key={fIdx} className="border-2 border-blue-200 rounded-xl mb-4 overflow-hidden">
+                {/* Fase Header */}
+                <div className="bg-blue-50 px-4 py-3 flex items-center gap-3">
+                  <span className="bg-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">{fIdx + 1}</span>
+                  <input
+                    value={fase.nombre}
+                    onChange={(e) => updateFase(fIdx, "nombre", e.target.value)}
+                    className="flex-1 px-3 py-1.5 border rounded-lg text-sm font-medium"
+                    placeholder="Nombre de la fase (ej: Dispensado de activos)"
+                    required
+                  />
+                  <button type="button" onClick={() => removeFase(fIdx)} className="text-red-400 hover:text-red-600 cursor-pointer text-lg font-bold">&times;</button>
                 </div>
-                <div className="grid grid-cols-2 gap-3 mt-2">
+
+                <div className="p-4 space-y-3">
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">Instrucciones</label>
-                    <input value={ing.instrucciones} onChange={(e) => updateIngrediente(idx, "instrucciones", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" placeholder="Agregar lentamente..." />
+                    <label className="block text-xs text-gray-600 mb-1">Instrucciones de la fase (opcional)</label>
+                    <input value={fase.instrucciones} onChange={(e) => updateFase(fIdx, "instrucciones", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" placeholder="Instrucciones generales para esta fase..." />
                   </div>
-                  <div className="flex items-end">
-                    <label className="flex items-center gap-2 text-sm cursor-pointer">
-                      <input type="checkbox" checked={ing.peligroso} onChange={(e) => updateIngrediente(idx, "peligroso", e.target.checked)} className="rounded" />
-                      Material Peligroso
-                    </label>
+
+                  {/* Ingredientes de esta fase */}
+                  <div className="flex justify-between items-center">
+                    <p className="text-xs font-semibold text-gray-500 uppercase">Materiales ({fase.ingredientes.length})</p>
+                    <button type="button" onClick={() => addIngredienteToFase(fIdx)} className="text-blue-600 text-xs font-medium hover:underline cursor-pointer">
+                      + Agregar Material
+                    </button>
                   </div>
+
+                  {fase.ingredientes.map((ing, ingIdx) => (
+                    <div key={ingIdx} className="bg-gray-50 rounded-lg p-3 relative">
+                      <button type="button" onClick={() => removeIngredienteFromFase(fIdx, ingIdx)} className="absolute top-2 right-2 text-red-400 hover:text-red-600 cursor-pointer">&times;</button>
+                      <p className="text-xs font-semibold text-gray-400 mb-2">Material {ingIdx + 1}</p>
+                      <div className="grid grid-cols-4 gap-3">
+                        <div className="col-span-2">
+                          <label className="block text-xs text-gray-600 mb-1">Material</label>
+                          <select value={ing.materialId} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "materialId", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" required>
+                            <option value="">Seleccionar...</option>
+                            {materiales.map((m) => (
+                              <option key={m.id} value={m.id}>{m.nombre} ({m.unidad})</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">Cantidad</label>
+                          <input type="number" step="0.001" value={ing.cantidadTarget} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "cantidadTarget", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" required />
+                        </div>
+                        <div className="flex gap-2">
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Tol -</label>
+                            <input type="number" step="0.1" value={ing.toleranciaMin} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "toleranciaMin", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Tol +</label>
+                            <input type="number" step="0.1" value={ing.toleranciaMax} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "toleranciaMax", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 mt-2">
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">Instrucciones</label>
+                          <input value={ing.instrucciones} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "instrucciones", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" placeholder="Agregar lentamente..." />
+                        </div>
+                        <div className="flex items-end">
+                          <label className="flex items-center gap-2 text-sm cursor-pointer">
+                            <input type="checkbox" checked={ing.peligroso} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "peligroso", e.target.checked)} className="rounded" />
+                            Peligroso
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {fase.ingredientes.length === 0 && (
+                    <div className="text-center py-3 text-gray-400 border border-dashed rounded-lg text-xs">
+                      Agrega materiales a esta fase
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
           </div>
 
           <div className="flex gap-2">
-            <button type="submit" className="bg-blue-700 text-white px-6 py-2 rounded-lg font-medium cursor-pointer">Guardar Receta</button>
-            <button type="button" onClick={() => { setShowForm(false); setIngredientes([]); }} className="text-gray-500 px-4 py-2 cursor-pointer">Cancelar</button>
+            <button type="submit" disabled={fases.length === 0} className="bg-blue-700 text-white px-6 py-2 rounded-lg font-medium cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed">Guardar Receta</button>
+            <button type="button" onClick={() => { setShowForm(false); setFases([]); }} className="text-gray-500 px-4 py-2 cursor-pointer">Cancelar</button>
           </div>
         </form>
       )}
@@ -221,6 +298,7 @@ export default function RecetasPage() {
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Nombre</th>
                 <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Versión</th>
                 <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Rendimiento</th>
+                <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Fases</th>
                 <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Ingredientes</th>
                 <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Estado</th>
               </tr>
@@ -235,6 +313,7 @@ export default function RecetasPage() {
                   </td>
                   <td className="px-4 py-3 text-center text-sm">v{r.version}</td>
                   <td className="px-4 py-3 text-right text-sm">{r.rendimiento} {r.unidadRendimiento}</td>
+                  <td className="px-4 py-3 text-center text-sm">{r.numFases}</td>
                   <td className="px-4 py-3 text-center text-sm">{r.numIngredientes}</td>
                   <td className="px-4 py-3 text-center">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${r.activa ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
@@ -244,7 +323,7 @@ export default function RecetasPage() {
                 </tr>
               ))}
               {recetas.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">No hay recetas registradas</td></tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400">No hay recetas registradas</td></tr>
               )}
             </tbody>
           </table>

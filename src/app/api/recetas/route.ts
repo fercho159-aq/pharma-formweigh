@@ -4,8 +4,9 @@ import { getSession } from "@/lib/auth";
 
 export async function GET() {
   const recetas = await query(`
-    SELECT r.*, COUNT(i.id) as "numIngredientes"
+    SELECT r.*, COUNT(DISTINCT f.id) as "numFases", COUNT(i.id) as "numIngredientes"
     FROM recetas r
+    LEFT JOIN fases f ON f."recetaId" = r.id
     LEFT JOIN ingredientes i ON i."recetaId" = r.id
     GROUP BY r.id, r.codigo, r.nombre, r.version, r.descripcion, r.rendimiento, r."unidadRendimiento", r.activa, r."createdAt", r."updatedAt"
     ORDER BY r.nombre
@@ -28,16 +29,25 @@ export async function POST(request: Request) {
       [id, data.codigo, data.nombre, data.descripcion || null, data.rendimiento, data.unidadRendimiento]
     );
 
-    for (const ing of data.ingredientes || []) {
-      const ingId = generateId();
+    let totalIngredientes = 0;
+    for (const [faseIndex, fase] of (data.fases || []).entries()) {
+      const faseId = generateId();
       await query(
-        `INSERT INTO ingredientes (id, "recetaId", "materialId", orden, "cantidadTarget", "toleranciaMin", "toleranciaMax", instrucciones, peligroso)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-        [ingId, id, ing.materialId, ing.orden, ing.cantidadTarget, ing.toleranciaMin, ing.toleranciaMax, ing.instrucciones || null, ing.peligroso ? true : false]
+        `INSERT INTO fases (id, "recetaId", nombre, orden, instrucciones) VALUES ($1, $2, $3, $4, $5)`,
+        [faseId, id, fase.nombre, faseIndex + 1, fase.instrucciones || null]
       );
+      for (const ing of fase.ingredientes || []) {
+        const ingId = generateId();
+        await query(
+          `INSERT INTO ingredientes (id, "recetaId", "faseId", "materialId", orden, "cantidadTarget", "toleranciaMin", "toleranciaMax", instrucciones, peligroso)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+          [ingId, id, faseId, ing.materialId, ing.orden, ing.cantidadTarget, ing.toleranciaMin, ing.toleranciaMax, ing.instrucciones || null, ing.peligroso ? true : false]
+        );
+        totalIngredientes++;
+      }
     }
 
-    await registrarAuditoria(user.id, "CREAR_RECETA", "recetas", id, { nombre: data.nombre, codigo: data.codigo, ingredientes: data.ingredientes?.length || 0 });
+    await registrarAuditoria(user.id, "CREAR_RECETA", "recetas", id, { nombre: data.nombre, codigo: data.codigo, fases: data.fases?.length || 0, ingredientes: totalIngredientes });
     return NextResponse.json({ id });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Error";

@@ -18,13 +18,14 @@ export default function LoginPage() {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
       body: JSON.stringify({ email, password }),
     });
 
     const data = await res.json();
     if (data.ok) {
-      router.push("/");
-      router.refresh();
+      window.location.href = "/";
+      return;
     } else {
       setError(data.error || "Credenciales inválidas");
     }

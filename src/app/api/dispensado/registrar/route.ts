@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDb, generateId, registrarAuditoria } from "@/lib/db";
+import { getDb, generateId, registrarAuditoria, resolveUserId } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
 export async function POST(request: Request) {
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     db.prepare(
       `INSERT INTO dispensados (id, ordenId, loteId, operarioId, materialNombre, cantidadTarget, cantidadReal, toleranciaOk, paso)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run(id, data.ordenId, data.loteId, user.id, data.materialNombre, data.cantidadTarget, data.cantidadReal, data.toleranciaOk ? 1 : 0, data.paso);
+    ).run(id, data.ordenId, data.loteId, resolveUserId(user.id, user.email), data.materialNombre, data.cantidadTarget, data.cantidadReal, data.toleranciaOk ? 1 : 0, data.paso);
 
     // Discount from lot
     db.prepare("UPDATE lotes SET cantidad = cantidad - ? WHERE id = ?").run(data.cantidadReal, data.loteId);

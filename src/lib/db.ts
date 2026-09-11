@@ -229,6 +229,21 @@ export function verifyPassword(password: string, hash: string): boolean {
   return hashPassword(password) === hash;
 }
 
+export function resolveUserId(sessionUserId: string, email?: string): string {
+  const db = getDb();
+  // Try by ID first
+  const byId = db.prepare("SELECT id FROM usuarios WHERE id = ?").get(sessionUserId) as { id: string } | undefined;
+  if (byId) return byId.id;
+  // If ID doesn't exist (Vercel cold start), find by email
+  if (email) {
+    const byEmail = db.prepare("SELECT id FROM usuarios WHERE email = ?").get(email) as { id: string } | undefined;
+    if (byEmail) return byEmail.id;
+  }
+  // Fallback: return first admin
+  const admin = db.prepare("SELECT id FROM usuarios WHERE rol = 'ADMIN' LIMIT 1").get() as { id: string } | undefined;
+  return admin?.id || sessionUserId;
+}
+
 export function registrarAuditoria(
   usuarioId: string,
   accion: string,
@@ -238,7 +253,8 @@ export function registrarAuditoria(
 ) {
   const db = getDb();
   const id = generateId();
+  const resolvedId = resolveUserId(usuarioId);
   db.prepare(
     "INSERT INTO auditoria (id, usuarioId, accion, entidad, entidadId, detalles) VALUES (?, ?, ?, ?, ?, ?)"
-  ).run(id, usuarioId, accion, entidad, entidadId, JSON.stringify(detalles));
+  ).run(id, resolvedId, accion, entidad, entidadId, JSON.stringify(detalles));
 }

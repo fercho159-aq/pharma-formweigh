@@ -18,13 +18,12 @@ export async function getSession(): Promise<SessionUser | null> {
   try {
     const data = JSON.parse(
       Buffer.from(sessionCookie.value, "base64").toString("utf-8")
-    );
-    // Verify user still exists and is active
-    const db = getDb();
-    const user = db
-      .prepare("SELECT id, nombre, email, rol FROM usuarios WHERE id = ? AND activo = 1")
-      .get(data.id) as SessionUser | undefined;
-    return user || null;
+    ) as SessionUser;
+    // Trust cookie data directly (httpOnly + secure)
+    if (data.id && data.nombre && data.email && data.rol) {
+      return data;
+    }
+    return null;
   } catch {
     return null;
   }

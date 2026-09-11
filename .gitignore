@@ -36,6 +36,15 @@ yarn-error.log*
 # vercel
 .vercel
 
+# sqlite db
+*.db
+*.db-shm
+*.db-wal
+
+# ffmpeg binaries
+ffmpeg
+ffprobe
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

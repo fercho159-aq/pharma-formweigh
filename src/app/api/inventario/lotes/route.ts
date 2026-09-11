@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server";
-import { getDb, generateId, registrarAuditoria } from "@/lib/db";
+import { query, generateId, registrarAuditoria } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
 export async function GET() {
-  const db = getDb();
-  const lotes = db.prepare(`
-    SELECT l.*, m.nombre as materialNombre
+  const lotes = await query(`
+    SELECT l.*, m.nombre as "materialNombre"
     FROM lotes l
-    JOIN materiales m ON l.materialId = m.id
-    ORDER BY l.createdAt DESC
-  `).all();
+    JOIN materiales m ON l."materialId" = m.id
+    ORDER BY l."createdAt" DESC
+  `);
   return NextResponse.json(lotes);
 }
 
@@ -18,16 +17,16 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   const data = await request.json();
-  const db = getDb();
   const id = generateId();
 
   try {
-    db.prepare(
-      `INSERT INTO lotes (id, numero, materialId, cantidad, cantidadInicial, fechaRecepcion, fechaCaducidad, proveedor, certificado)
-       VALUES (?, ?, ?, ?, ?, datetime('now'), ?, ?, ?)`
-    ).run(id, data.numero, data.materialId, data.cantidad, data.cantidad, data.fechaCaducidad, data.proveedor, data.certificado || null);
+    await query(
+      `INSERT INTO lotes (id, numero, "materialId", cantidad, "cantidadInicial", "fechaRecepcion", "fechaCaducidad", proveedor, certificado)
+       VALUES ($1, $2, $3, $4, $5, now(), $6, $7, $8)`,
+      [id, data.numero, data.materialId, data.cantidad, data.cantidad, data.fechaCaducidad, data.proveedor, data.certificado || null]
+    );
 
-    registrarAuditoria(user.id, "RECEPCION_LOTE", "lotes", id, {
+    await registrarAuditoria(user.id, "RECEPCION_LOTE", "lotes", id, {
       numero: data.numero,
       materialId: data.materialId,
       cantidad: data.cantidad,

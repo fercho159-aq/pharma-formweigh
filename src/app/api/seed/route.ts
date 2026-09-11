@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
-import { getDb, generateId, hashPassword } from "@/lib/db";
+import { query, queryOne, generateId, hashPassword } from "@/lib/db";
 
 export async function POST() {
-  const db = getDb();
-
   // Check if seed already ran
-  const matCount = db.prepare("SELECT COUNT(*) as c FROM materiales").get() as { c: number };
-  if (matCount.c > 0) {
+  const matCount = await queryOne("SELECT COUNT(*) as c FROM materiales") as { c: string };
+  if (parseInt(matCount.c) > 0) {
     return NextResponse.json({ msg: "Datos ya existen. Seed omitido." });
   }
 
-  const transaction = db.transaction(() => {
+  try {
     // === MATERIALES ===
     const materiales = [
       { id: generateId(), codigo: "MAT-PAR-001", nombre: "Paracetamol (Acetaminofén)", descripcion: "Principio activo analgésico y antipirético", unidad: "kg", stockMinimo: 5 },
@@ -24,8 +22,10 @@ export async function POST() {
     ];
 
     for (const m of materiales) {
-      db.prepare("INSERT INTO materiales (id, codigo, nombre, descripcion, unidad, stockMinimo) VALUES (?, ?, ?, ?, ?, ?)")
-        .run(m.id, m.codigo, m.nombre, m.descripcion, m.unidad, m.stockMinimo);
+      await query(
+        'INSERT INTO materiales (id, codigo, nombre, descripcion, unidad, "stockMinimo") VALUES ($1, $2, $3, $4, $5, $6)',
+        [m.id, m.codigo, m.nombre, m.descripcion, m.unidad, m.stockMinimo]
+      );
     }
 
     // === LOTES ===
@@ -46,16 +46,18 @@ export async function POST() {
     ];
 
     for (const l of lotes) {
-      db.prepare(
-        "INSERT INTO lotes (id, numero, materialId, cantidad, cantidadInicial, fechaRecepcion, fechaCaducidad, proveedor, estado) VALUES (?, ?, ?, ?, ?, datetime('now'), ?, ?, ?)"
-      ).run(l.id, l.numero, l.materialId, l.cantidad, l.cantidad, l.fechaCaducidad, l.proveedor, l.estado);
+      await query(
+        'INSERT INTO lotes (id, numero, "materialId", cantidad, "cantidadInicial", "fechaRecepcion", "fechaCaducidad", proveedor, estado) VALUES ($1, $2, $3, $4, $5, now(), $6, $7, $8)',
+        [l.id, l.numero, l.materialId, l.cantidad, l.cantidad, l.fechaCaducidad, l.proveedor, l.estado]
+      );
     }
 
     // === RECETAS ===
     const receta1Id = generateId();
-    db.prepare(
-      "INSERT INTO recetas (id, codigo, nombre, descripcion, rendimiento, unidadRendimiento) VALUES (?, ?, ?, ?, ?, ?)"
-    ).run(receta1Id, "REC-PCT-500", "Tableta Paracetamol 500mg", "Formulación estándar de tabletas de paracetamol 500mg. Lote de 10,000 tabletas.", 10000, "tabletas");
+    await query(
+      'INSERT INTO recetas (id, codigo, nombre, descripcion, rendimiento, "unidadRendimiento") VALUES ($1, $2, $3, $4, $5, $6)',
+      [receta1Id, "REC-PCT-500", "Tableta Paracetamol 500mg", "Formulación estándar de tabletas de paracetamol 500mg. Lote de 10,000 tabletas.", 10000, "tabletas"]
+    );
 
     const ingredientesR1 = [
       { materialId: materiales[0].id, orden: 1, cantidadTarget: 5.0, toleranciaMin: -1, toleranciaMax: 1, instrucciones: "Pesar con precisión. Verificar identidad visual del polvo blanco cristalino.", peligroso: false },
@@ -66,15 +68,17 @@ export async function POST() {
     ];
 
     for (const ing of ingredientesR1) {
-      db.prepare(
-        "INSERT INTO ingredientes (id, recetaId, materialId, orden, cantidadTarget, toleranciaMin, toleranciaMax, instrucciones, peligroso) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-      ).run(generateId(), receta1Id, ing.materialId, ing.orden, ing.cantidadTarget, ing.toleranciaMin, ing.toleranciaMax, ing.instrucciones, ing.peligroso ? 1 : 0);
+      await query(
+        'INSERT INTO ingredientes (id, "recetaId", "materialId", orden, "cantidadTarget", "toleranciaMin", "toleranciaMax", instrucciones, peligroso) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+        [generateId(), receta1Id, ing.materialId, ing.orden, ing.cantidadTarget, ing.toleranciaMin, ing.toleranciaMax, ing.instrucciones, ing.peligroso]
+      );
     }
 
     const receta2Id = generateId();
-    db.prepare(
-      "INSERT INTO recetas (id, codigo, nombre, descripcion, rendimiento, unidadRendimiento) VALUES (?, ?, ?, ?, ?, ?)"
-    ).run(receta2Id, "REC-IBU-400", "Tableta Ibuprofeno 400mg", "Formulación de tabletas recubiertas de ibuprofeno 400mg.", 5000, "tabletas");
+    await query(
+      'INSERT INTO recetas (id, codigo, nombre, descripcion, rendimiento, "unidadRendimiento") VALUES ($1, $2, $3, $4, $5, $6)',
+      [receta2Id, "REC-IBU-400", "Tableta Ibuprofeno 400mg", "Formulación de tabletas recubiertas de ibuprofeno 400mg.", 5000, "tabletas"]
+    );
 
     const ingredientesR2 = [
       { materialId: materiales[5].id, orden: 1, cantidadTarget: 2.0, toleranciaMin: -1, toleranciaMax: 1, instrucciones: "Verificar certificado de análisis. Polvo blanco cristalino.", peligroso: false },
@@ -84,15 +88,17 @@ export async function POST() {
     ];
 
     for (const ing of ingredientesR2) {
-      db.prepare(
-        "INSERT INTO ingredientes (id, recetaId, materialId, orden, cantidadTarget, toleranciaMin, toleranciaMax, instrucciones, peligroso) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-      ).run(generateId(), receta2Id, ing.materialId, ing.orden, ing.cantidadTarget, ing.toleranciaMin, ing.toleranciaMax, ing.instrucciones, ing.peligroso ? 1 : 0);
+      await query(
+        'INSERT INTO ingredientes (id, "recetaId", "materialId", orden, "cantidadTarget", "toleranciaMin", "toleranciaMax", instrucciones, peligroso) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+        [generateId(), receta2Id, ing.materialId, ing.orden, ing.cantidadTarget, ing.toleranciaMin, ing.toleranciaMax, ing.instrucciones, ing.peligroso]
+      );
     }
 
     const receta3Id = generateId();
-    db.prepare(
-      "INSERT INTO recetas (id, codigo, nombre, descripcion, rendimiento, unidadRendimiento) VALUES (?, ?, ?, ?, ?, ?)"
-    ).run(receta3Id, "REC-SUSP-PAR", "Suspensión Pediátrica Paracetamol", "Suspensión oral pediátrica 120mg/5mL.", 100, "L");
+    await query(
+      'INSERT INTO recetas (id, codigo, nombre, descripcion, rendimiento, "unidadRendimiento") VALUES ($1, $2, $3, $4, $5, $6)',
+      [receta3Id, "REC-SUSP-PAR", "Suspensión Pediátrica Paracetamol", "Suspensión oral pediátrica 120mg/5mL.", 100, "L"]
+    );
 
     const ingredientesR3 = [
       { materialId: materiales[0].id, orden: 1, cantidadTarget: 2.4, toleranciaMin: -1, toleranciaMax: 1, instrucciones: "Pesar con balanza analítica. Verificar pureza >= 99.5%", peligroso: false },
@@ -100,30 +106,28 @@ export async function POST() {
     ];
 
     for (const ing of ingredientesR3) {
-      db.prepare(
-        "INSERT INTO ingredientes (id, recetaId, materialId, orden, cantidadTarget, toleranciaMin, toleranciaMax, instrucciones, peligroso) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-      ).run(generateId(), receta3Id, ing.materialId, ing.orden, ing.cantidadTarget, ing.toleranciaMin, ing.toleranciaMax, ing.instrucciones, ing.peligroso ? 1 : 0);
+      await query(
+        'INSERT INTO ingredientes (id, "recetaId", "materialId", orden, "cantidadTarget", "toleranciaMin", "toleranciaMax", instrucciones, peligroso) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+        [generateId(), receta3Id, ing.materialId, ing.orden, ing.cantidadTarget, ing.toleranciaMin, ing.toleranciaMax, ing.instrucciones, ing.peligroso]
+      );
     }
 
-    // === ÓRDENES DE PRODUCCIÓN ===
-    const orden1Id = generateId();
-    db.prepare(
-      "INSERT INTO ordenes_produccion (id, numero, recetaId, loteProducto, cantidad, estado, prioridad) VALUES (?, ?, ?, ?, ?, ?, ?)"
-    ).run(orden1Id, "ORD-00001", receta1Id, "PROD-PCT-2024-001", 1, "PENDIENTE", 1);
+    // === ORDENES DE PRODUCCION ===
+    await query(
+      'INSERT INTO ordenes_produccion (id, numero, "recetaId", "loteProducto", cantidad, estado, prioridad) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+      [generateId(), "ORD-00001", receta1Id, "PROD-PCT-2024-001", 1, "PENDIENTE", 1]
+    );
 
-    const orden2Id = generateId();
-    db.prepare(
-      "INSERT INTO ordenes_produccion (id, numero, recetaId, loteProducto, cantidad, estado, prioridad) VALUES (?, ?, ?, ?, ?, ?, ?)"
-    ).run(orden2Id, "ORD-00002", receta1Id, "PROD-PCT-2024-002", 2, "PENDIENTE", 0);
+    await query(
+      'INSERT INTO ordenes_produccion (id, numero, "recetaId", "loteProducto", cantidad, estado, prioridad) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+      [generateId(), "ORD-00002", receta1Id, "PROD-PCT-2024-002", 2, "PENDIENTE", 0]
+    );
 
-    const orden3Id = generateId();
-    db.prepare(
-      "INSERT INTO ordenes_produccion (id, numero, recetaId, loteProducto, cantidad, estado, prioridad) VALUES (?, ?, ?, ?, ?, ?, ?)"
-    ).run(orden3Id, "ORD-00003", receta3Id, "PROD-SUSP-2024-001", 0.5, "PENDIENTE", 0);
-  });
+    await query(
+      'INSERT INTO ordenes_produccion (id, numero, "recetaId", "loteProducto", cantidad, estado, prioridad) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+      [generateId(), "ORD-00003", receta3Id, "PROD-SUSP-2024-001", 0.5, "PENDIENTE", 0]
+    );
 
-  try {
-    transaction();
     return NextResponse.json({ ok: true, msg: "Seed completado: 8 materiales, 9 lotes, 3 recetas, 3 órdenes" });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Error";

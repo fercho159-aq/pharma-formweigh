@@ -1,0 +1,313 @@
+% =====================================================================
+%  CUERPO DEL MANUAL DEL ADMINISTRADOR - PharmaWeigh
+% =====================================================================
+
+\seccion{1. Acceso al sistema}
+
+\tablaAcceso
+
+\vspace{8pt}
+
+Como administrador tienes acceso \textbf{completo} a todos los módulos del sistema.
+Puedes hacer todo lo que hace un supervisor y operario, además de gestionar usuarios.
+
+% =====================================================================
+\seccion{2. Arquitectura del sistema}
+
+PharmaWeigh es una aplicación web que corre en cualquier navegador moderno.
+
+\subseccion{2.1 Componentes}
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=0.8cm and 2cm,
+    every node/.style={font=\small},
+    comp/.style={draw=pharmaazul, fill=pharmaazul!8, rounded corners=6pt,
+        minimum width=3.5cm, minimum height=1.2cm, align=center, text width=3.3cm},
+    hw/.style={draw=pharmagreen, fill=pharmagreen!8, rounded corners=6pt,
+        minimum width=3.5cm, minimum height=1.2cm, align=center, text width=3.3cm},
+    flecha/.style={-{Stealth[length=6pt]}, thick, color=gristexto}
+]
+\node[comp] (web) {Aplicación Web\\Next.js + React};
+\node[comp, right=of web] (api) {API REST\\Servidor Node.js};
+\node[comp, right=of api] (db) {Base de Datos\\PostgreSQL};
+\node[hw, below=of web] (nav) {Navegador\\Chrome / Edge};
+\node[hw, below=of api] (barcode) {Lector Barcode\\USB HID};
+\node[hw, below=of db] (bascula) {Báscula\\(entrada manual)};
+\draw[flecha] (nav) -- (web);
+\draw[flecha] (web) -- (api);
+\draw[flecha] (api) -- (db);
+\draw[flecha] (barcode) -- (nav);
+\draw[flecha] (bascula) -- (nav);
+\end{tikzpicture}
+\end{center}
+
+\subseccion{2.2 Módulos del sistema}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}l l >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Módulo} & \textbf{Ruta} & \textbf{Descripción} \\
+\midrule
+Dashboard    & \cd{/}            & KPIs, alertas, actividad reciente \\
+Dispensado   & \cd{/dispensado}   & Estación de pesaje guiado \\
+Recetas      & \cd{/recetas}     & Formulaciones y sus ingredientes \\
+Órdenes      & \cd{/ordenes}     & Órdenes de producción \\
+Inventario   & \cd{/inventario}  & Materiales, lotes, recepción \\
+Auditoría    & \cd{/auditoria}   & Log inmutable de acciones \\
+Usuarios     & \cd{/usuarios}    & Gestión de cuentas y roles \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% =====================================================================
+\seccion{3. Gestión de usuarios}
+
+Solo el administrador puede crear, activar y desactivar usuarios.
+
+\subseccion{3.1 Crear un usuario}
+
+\begin{enumerate}
+    \item Ve a \menu{Usuarios} y haz clic en \boton{+ Nuevo Usuario}.
+    \item Llena los campos:
+        \begin{itemize}
+            \item \campo{Nombre}: nombre completo del empleado.
+            \item \campo{Email}: correo único para acceso.
+            \item \campo{Contraseña}: contraseña inicial (el usuario debe cambiarla).
+            \item \campo{Rol}: determina los permisos.
+            \item \campo{Badge}: código de barras del gafete (opcional).
+        \end{itemize}
+    \item Haz clic en \boton{Crear Usuario}.
+\end{enumerate}
+
+\subseccion{3.2 Roles y permisos}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Rol} & \textbf{Permisos} \\
+\midrule
+\textbf{ADMIN} &
+    Todo lo que hace el supervisor, más:
+    crear/desactivar usuarios, acceso completo a configuración. \\
+\textbf{SUPERVISOR} &
+    Crear recetas y órdenes.
+    Aprobar/rechazar lotes.
+    Firmar dispensados.
+    Crear materiales y registrar lotes nuevos.
+    Consultar auditoría completa. \\
+\textbf{OPERARIO} &
+    Ejecutar dispensado (pesar materiales).
+    Consultar inventario, órdenes y recetas (solo lectura).
+    No puede crear ni aprobar nada. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{cajaInfo}[Principio de segregación de funciones]
+El operario que pesa \textbf{no puede firmar} su propio trabajo.
+El que aprueba un lote \textbf{puede ser diferente} del que lo recibe.
+Esto cumple con las Buenas Prácticas de Manufactura (BPM/GMP).
+\end{cajaInfo}
+
+% =====================================================================
+\seccion{4. Dashboard}
+
+El dashboard muestra en tiempo real:
+
+\begin{itemize}
+    \item \textbf{Fila superior (4 tarjetas):}
+        \begin{enumerate}
+            \item Órdenes Pendientes (amarillo)
+            \item En Proceso (azul)
+            \item Dispensados Hoy (verde)
+            \item Lotes en Cuarentena (naranja)
+        \end{enumerate}
+    \item \textbf{Fila secundaria:} Total de materiales, recetas activas, órdenes completadas, lotes por caducar.
+    \item \textbf{Últimas Órdenes:} Lista de las 5 órdenes más recientes con estado.
+    \item \textbf{Actividad Reciente:} Últimos 8 registros de auditoría.
+\end{itemize}
+
+% =====================================================================
+\seccion{5. Inventario completo}
+
+\subseccion{5.1 Materiales}
+
+Cada material tiene:
+\begin{itemize}
+    \item \campo{Código de barras}: identificador único para escáner (ej: \codigo{MAT-PAR-001}).
+    \item \campo{Nombre}: nombre del ingrediente/materia prima.
+    \item \campo{Unidad}: kg, g, L, mL, mg, unidad.
+    \item \campo{Stock Mínimo}: umbral de alerta. Si el stock baja, se resalta en rojo.
+\end{itemize}
+
+\subseccion{5.2 Lotes}
+
+Cada lote de materia prima pasa por este flujo de estados:
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=1.5cm,
+    every node/.style={font=\small},
+    estado/.style={draw, rounded corners=8pt, minimum width=2.5cm,
+        minimum height=0.9cm, align=center, font=\small\bfseries},
+    flecha/.style={-{Stealth[length=5pt]}, thick}
+]
+\node[estado, fill=pharmayellow!20, draw=pharmayellow] (cuarentena) {CUARENTENA};
+\node[estado, fill=pharmagreen!20, draw=pharmagreen, right=of cuarentena] (aprobado) {APROBADO};
+\node[estado, fill=pharmared!20, draw=pharmared, below=of cuarentena] (rechazado) {RECHAZADO};
+\node[estado, fill=gray!20, draw=gray, below=of aprobado] (agotado) {AGOTADO};
+
+\draw[flecha, color=pharmagreen] (cuarentena) -- node[above,font=\footnotesize\color{gristexto}]{Supervisor aprueba} (aprobado);
+\draw[flecha, color=pharmared] (cuarentena) -- node[left,font=\footnotesize\color{gristexto}]{Supervisor rechaza} (rechazado);
+\draw[flecha, color=gray] (aprobado) -- node[right,font=\footnotesize\color{gristexto}]{Se consume todo} (agotado);
+\end{tikzpicture}
+\end{center}
+
+\subseccion{5.3 Recepción}
+
+La recepción de material usa el \textbf{lector de código de barras}:
+\begin{enumerate}
+    \item Escanear el código del material $\rightarrow$ el sistema lo identifica.
+    \item Llenar datos del lote (número, cantidad, proveedor, caducidad).
+    \item El lote entra automáticamente en \cuarentena.
+    \item Un supervisor lo revisa y lo aprueba o rechaza.
+\end{enumerate}
+
+% =====================================================================
+\seccion{6. Recetas y formulaciones}
+
+Las recetas definen qué materiales y en qué cantidades se necesitan para producir un lote.
+
+\begin{cajaTip}[Estructura de una receta]
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\textbf{Código}       & Identificador único (ej: \codigo{REC-PCT-500}) \\
+\textbf{Nombre}       & Nombre del producto (ej: Tableta Paracetamol 500mg) \\
+\textbf{Rendimiento}  & Cantidad que produce (ej: 10,000 tabletas) \\
+\textbf{Ingredientes} & Lista ordenada de materiales con cantidades y tolerancias \\
+\end{tabularx}
+\end{cajaTip}
+
+Cada ingrediente tiene:
+\begin{itemize}
+    \item \textbf{Orden de dispensado}: se respeta estrictamente. No se puede saltar.
+    \item \textbf{Cantidad target}: peso exacto requerido.
+    \item \textbf{Tolerancia} ($\pm$ porcentaje): rango aceptable.
+    \item \textbf{Instrucciones}: texto que ve el operario en pantalla.
+    \item \textbf{Material peligroso}: muestra alerta roja durante dispensado.
+\end{itemize}
+
+% =====================================================================
+\seccion{7. Órdenes de producción}
+
+Una orden vincula una receta con un lote de producto final.
+
+\begin{itemize}
+    \item \textbf{Número}: autogenerado (\codigo{ORD-00001}, \codigo{ORD-00002}, ...).
+    \item \textbf{Receta}: la formulación a seguir.
+    \item \textbf{Lote del producto}: identificador del lote que se va a fabricar.
+    \item \textbf{Cantidad}: multiplicador sobre la receta base (1x = normal, 2x = doble).
+    \item \textbf{Prioridad}: Normal (0), Alta (1), Urgente (2). Las urgentes aparecen primero.
+\end{itemize}
+
+% =====================================================================
+\seccion{8. Dispensado}
+
+El módulo central del sistema. Ver el Manual del Operario para el flujo detallado.
+
+Como administrador, debes saber que:
+\begin{itemize}
+    \item El sistema \textbf{bloquea automáticamente} el pesaje fuera de tolerancia.
+    \item Cada dispensado requiere \textbf{firma electrónica} de un supervisor.
+    \item Todo queda registrado en la auditoría.
+    \item El inventario se descuenta automáticamente al confirmar cada peso.
+\end{itemize}
+
+% =====================================================================
+\seccion{9. Auditoría y cumplimiento}
+
+\subseccion{9.1 Registro inmutable}
+
+El log de auditoría captura \textbf{toda acción} del sistema:
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Acción} & \textbf{Se registra cuando...} \\
+\midrule
+LOGIN / LOGOUT        & Un usuario entra o sale del sistema \\
+CREAR\_MATERIAL       & Se da de alta una nueva materia prima \\
+RECEPCION\_LOTE       & Se registra un lote de materia prima \\
+CAMBIAR\_ESTADO\_LOTE & Un supervisor aprueba o rechaza un lote \\
+CREAR\_RECETA         & Se crea una nueva formulación \\
+CREAR\_ORDEN          & Se genera una orden de producción \\
+DISPENSAR             & Un operario pesa un material \\
+FIRMAR\_DISPENSADO    & Un supervisor firma electrónicamente \\
+COMPLETAR\_DISPENSADO & Se cierra una orden de dispensado \\
+CREAR\_USUARIO        & Se crea una nueva cuenta \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subseccion{9.2 Cumplimiento 21 CFR Part 11}
+
+El sistema cumple con los requisitos clave de la norma FDA:
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Requisito} & \textbf{Implementación en PharmaWeigh} \\
+\midrule
+Registros electrónicos & Toda acción genera un registro inmutable con timestamp \\
+Firmas electrónicas    & El supervisor firma con email + contraseña (vinculante) \\
+Audit trail            & Log completo, no editable, no borrable \\
+Control de acceso      & Tres roles con permisos diferenciados \\
+Integridad de datos    & Base de datos con transacciones ACID \\
+Trazabilidad           & Rastreo completo: material $\rightarrow$ lote $\rightarrow$ orden $\rightarrow$ operario \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% =====================================================================
+\seccion{10. Hardware requerido}
+
+\subseccion{10.1 Equipo mínimo}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X l@{}}
+\toprule
+\textbf{Equipo} & \textbf{Especificación} & \textbf{Costo aprox.} \\
+\midrule
+Computadora / Tablet & Cualquier equipo con navegador Chrome & Variable \\
+Lector código barras & USB 1D, inalámbrico o con cable & \$350--800 MXN \\
+Báscula              & USB o serial (opcional, entrada manual) & \$500--5,000 MXN \\
+Conexión a internet  & Para acceder al sistema en la nube & Existente \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subseccion{10.2 Lector de código de barras}
+
+El lector USB actúa como un \textbf{teclado}. No requiere drivers ni software adicional.
+Al escanear un código, envía los caracteres seguidos de Enter.
+
+\begin{cajaNota}
+Compatible con cualquier lector USB 1D o 2D. Se recomienda un lector inalámbrico
+para mayor comodidad en la estación de pesaje. El sistema funciona igualmente
+escribiendo los códigos manualmente.
+\end{cajaNota}
+
+% =====================================================================
+\seccion{11. Acceso web}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{URL de producción}  & \cd{https://pharma-formweigh.vercel.app} \\
+\textbf{Repositorio}        & \cd{https://github.com/fercho159-aq/pharma-formweigh} \\
+\textbf{Tecnología}         & Next.js 16 + React + PostgreSQL \\
+\textbf{Hosting}            & Vercel (serverless) \\
+\textbf{Base de datos}      & Neon PostgreSQL (nube) \\
+\bottomrule
+\end{tabularx}
+\end{center}

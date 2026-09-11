@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDb, registrarAuditoria, verifyPassword } from "@/lib/db";
+import { query, queryOne, registrarAuditoria, verifyPassword } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
 export async function POST(request: Request) {
@@ -7,12 +7,12 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   const { ordenId, email, password } = await request.json();
-  const db = getDb();
 
   // Verify supervisor credentials
-  const supervisor = db.prepare(
-    "SELECT id, nombre, password, rol FROM usuarios WHERE email = ? AND activo = 1"
-  ).get(email) as { id: string; nombre: string; password: string; rol: string } | undefined;
+  const supervisor = await queryOne(
+    "SELECT id, nombre, password, rol FROM usuarios WHERE email = $1 AND activo = true",
+    [email]
+  ) as { id: string; nombre: string; password: string; rol: string } | null;
 
   if (!supervisor) {
     return NextResponse.json({ ok: false, error: "Supervisor no encontrado" });
@@ -27,21 +27,23 @@ export async function POST(request: Request) {
   }
 
   // Update all dispensados for this order with firma
-  db.prepare(
-    "UPDATE dispensados SET firmaElectronica = ?, supervisorId = ? WHERE ordenId = ?"
-  ).run(`Firmado por ${supervisor.nombre} (${email})`, supervisor.id, ordenId);
+  await query(
+    'UPDATE dispensados SET "firmaElectronica" = $1, "supervisorId" = $2 WHERE "ordenId" = $3',
+    [`Firmado por ${supervisor.nombre} (${email})`, supervisor.id, ordenId]
+  );
 
   // Update order status
-  db.prepare(
-    "UPDATE ordenes_produccion SET estado = 'DISPENSADO', updatedAt = datetime('now') WHERE id = ?"
-  ).run(ordenId);
+  await query(
+    `UPDATE ordenes_produccion SET estado = 'DISPENSADO', "updatedAt" = now() WHERE id = $1`,
+    [ordenId]
+  );
 
-  registrarAuditoria(supervisor.id, "FIRMAR_DISPENSADO", "ordenes_produccion", ordenId, {
+  await registrarAuditoria(supervisor.id, "FIRMAR_DISPENSADO", "ordenes_produccion", ordenId, {
     supervisorNombre: supervisor.nombre,
     operarioId: user.id,
   });
 
-  registrarAuditoria(user.id, "COMPLETAR_DISPENSADO", "ordenes_produccion", ordenId, {
+  await registrarAuditoria(user.id, "COMPLETAR_DISPENSADO", "ordenes_produccion", ordenId, {
     firmadoPor: supervisor.nombre,
   });
 

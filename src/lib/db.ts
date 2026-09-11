@@ -1,25 +1,29 @@
-import Database from "better-sqlite3";
-import path from "path";
+import { Pool } from "pg";
 import { randomBytes, createHash } from "crypto";
 
-const DB_PATH = process.env.VERCEL
-  ? path.join("/tmp", "pharma.db")
-  : path.join(process.cwd(), "pharma.db");
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
 
-let _db: Database.Database | null = null;
+let _initialized = false;
 
-export function getDb(): Database.Database {
-  if (!_db) {
-    _db = new Database(DB_PATH);
-    _db.pragma("journal_mode = WAL");
-    _db.pragma("foreign_keys = ON");
-    initTables(_db);
+export async function query(text: string, params?: unknown[]) {
+  if (!_initialized) {
+    await initTables();
+    _initialized = true;
   }
-  return _db;
+  const res = await pool.query(text, params);
+  return res.rows;
 }
 
-function initTables(db: Database.Database) {
-  db.exec(`
+export async function queryOne(text: string, params?: unknown[]) {
+  const rows = await query(text, params);
+  return rows[0] || null;
+}
+
+async function initTables() {
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS usuarios (
       id TEXT PRIMARY KEY,
       nombre TEXT NOT NULL,
@@ -27,8 +31,8 @@ function initTables(db: Database.Database) {
       password TEXT NOT NULL,
       rol TEXT NOT NULL DEFAULT 'OPERARIO',
       badge TEXT UNIQUE,
-      activo INTEGER NOT NULL DEFAULT 1,
-      createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+      activo BOOLEAN NOT NULL DEFAULT true,
+      "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
     );
 
     CREATE TABLE IF NOT EXISTS materiales (
@@ -37,23 +41,22 @@ function initTables(db: Database.Database) {
       nombre TEXT NOT NULL,
       descripcion TEXT,
       unidad TEXT NOT NULL,
-      stockMinimo REAL NOT NULL DEFAULT 0,
-      activo INTEGER NOT NULL DEFAULT 1
+      "stockMinimo" REAL NOT NULL DEFAULT 0,
+      activo BOOLEAN NOT NULL DEFAULT true
     );
 
     CREATE TABLE IF NOT EXISTS lotes (
       id TEXT PRIMARY KEY,
       numero TEXT UNIQUE NOT NULL,
-      materialId TEXT NOT NULL,
+      "materialId" TEXT NOT NULL REFERENCES materiales(id),
       cantidad REAL NOT NULL,
-      cantidadInicial REAL NOT NULL,
-      fechaRecepcion TEXT NOT NULL,
-      fechaCaducidad TEXT NOT NULL,
+      "cantidadInicial" REAL NOT NULL,
+      "fechaRecepcion" TIMESTAMPTZ NOT NULL,
+      "fechaCaducidad" TIMESTAMPTZ NOT NULL,
       proveedor TEXT NOT NULL,
       estado TEXT NOT NULL DEFAULT 'CUARENTENA',
       certificado TEXT,
-      createdAt TEXT NOT NULL DEFAULT (datetime('now')),
-      FOREIGN KEY (materialId) REFERENCES materiales(id)
+      "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
     );
 
     CREATE TABLE IF NOT EXISTS recetas (
@@ -63,97 +66,92 @@ function initTables(db: Database.Database) {
       version INTEGER NOT NULL DEFAULT 1,
       descripcion TEXT,
       rendimiento REAL NOT NULL,
-      unidadRendimiento TEXT NOT NULL,
-      activa INTEGER NOT NULL DEFAULT 1,
-      createdAt TEXT NOT NULL DEFAULT (datetime('now')),
-      updatedAt TEXT NOT NULL DEFAULT (datetime('now'))
+      "unidadRendimiento" TEXT NOT NULL,
+      activa BOOLEAN NOT NULL DEFAULT true,
+      "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+      "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
     );
 
     CREATE TABLE IF NOT EXISTS ingredientes (
       id TEXT PRIMARY KEY,
-      recetaId TEXT NOT NULL,
-      materialId TEXT NOT NULL,
+      "recetaId" TEXT NOT NULL REFERENCES recetas(id) ON DELETE CASCADE,
+      "materialId" TEXT NOT NULL REFERENCES materiales(id),
       orden INTEGER NOT NULL,
-      cantidadTarget REAL NOT NULL,
-      toleranciaMin REAL NOT NULL DEFAULT -2,
-      toleranciaMax REAL NOT NULL DEFAULT 2,
+      "cantidadTarget" REAL NOT NULL,
+      "toleranciaMin" REAL NOT NULL DEFAULT -2,
+      "toleranciaMax" REAL NOT NULL DEFAULT 2,
       instrucciones TEXT,
-      peligroso INTEGER NOT NULL DEFAULT 0,
-      FOREIGN KEY (recetaId) REFERENCES recetas(id) ON DELETE CASCADE,
-      FOREIGN KEY (materialId) REFERENCES materiales(id)
+      peligroso BOOLEAN NOT NULL DEFAULT false
     );
 
     CREATE TABLE IF NOT EXISTS ordenes_produccion (
       id TEXT PRIMARY KEY,
       numero TEXT UNIQUE NOT NULL,
-      recetaId TEXT NOT NULL,
-      loteProducto TEXT NOT NULL,
+      "recetaId" TEXT NOT NULL REFERENCES recetas(id),
+      "loteProducto" TEXT NOT NULL,
       cantidad REAL NOT NULL DEFAULT 1,
       estado TEXT NOT NULL DEFAULT 'PENDIENTE',
       prioridad INTEGER NOT NULL DEFAULT 0,
-      createdAt TEXT NOT NULL DEFAULT (datetime('now')),
-      updatedAt TEXT NOT NULL DEFAULT (datetime('now')),
-      FOREIGN KEY (recetaId) REFERENCES recetas(id)
+      "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+      "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now()
     );
 
     CREATE TABLE IF NOT EXISTS dispensados (
       id TEXT PRIMARY KEY,
-      ordenId TEXT NOT NULL,
-      loteId TEXT NOT NULL,
-      operarioId TEXT NOT NULL,
-      materialNombre TEXT NOT NULL,
-      cantidadTarget REAL NOT NULL,
-      cantidadReal REAL NOT NULL,
-      toleranciaOk INTEGER NOT NULL,
+      "ordenId" TEXT NOT NULL REFERENCES ordenes_produccion(id),
+      "loteId" TEXT NOT NULL REFERENCES lotes(id),
+      "operarioId" TEXT NOT NULL REFERENCES usuarios(id),
+      "materialNombre" TEXT NOT NULL,
+      "cantidadTarget" REAL NOT NULL,
+      "cantidadReal" REAL NOT NULL,
+      "toleranciaOk" BOOLEAN NOT NULL,
       paso INTEGER NOT NULL,
-      firmaElectronica TEXT,
-      supervisorId TEXT,
-      timestamp TEXT NOT NULL DEFAULT (datetime('now')),
-      FOREIGN KEY (ordenId) REFERENCES ordenes_produccion(id),
-      FOREIGN KEY (loteId) REFERENCES lotes(id),
-      FOREIGN KEY (operarioId) REFERENCES usuarios(id)
+      "firmaElectronica" TEXT,
+      "supervisorId" TEXT,
+      timestamp TIMESTAMPTZ NOT NULL DEFAULT now()
     );
 
     CREATE TABLE IF NOT EXISTS auditoria (
       id TEXT PRIMARY KEY,
-      usuarioId TEXT NOT NULL,
+      "usuarioId" TEXT NOT NULL REFERENCES usuarios(id),
       accion TEXT NOT NULL,
       entidad TEXT NOT NULL,
-      entidadId TEXT NOT NULL,
+      "entidadId" TEXT NOT NULL,
       detalles TEXT NOT NULL DEFAULT '{}',
       ip TEXT,
-      timestamp TEXT NOT NULL DEFAULT (datetime('now')),
-      FOREIGN KEY (usuarioId) REFERENCES usuarios(id)
+      timestamp TIMESTAMPTZ NOT NULL DEFAULT now()
     );
   `);
 
   // Seed admin user if no users exist
-  const count = db.prepare("SELECT COUNT(*) as c FROM usuarios").get() as { c: number };
-  if (count.c === 0) {
+  const res = await pool.query("SELECT COUNT(*) as c FROM usuarios");
+  if (parseInt(res.rows[0].c) === 0) {
     const adminId = generateId();
     const hashedPassword = hashPassword("admin123");
-    db.prepare(
-      "INSERT INTO usuarios (id, nombre, email, password, rol, badge) VALUES (?, ?, ?, ?, ?, ?)"
-    ).run(adminId, "Administrador", "admin@pharma.com", hashedPassword, "ADMIN", "BADGE-ADMIN-001");
+    await pool.query(
+      `INSERT INTO usuarios (id, nombre, email, password, rol, badge) VALUES ($1, $2, $3, $4, $5, $6)`,
+      [adminId, "Administrador", "admin@pharma.com", hashedPassword, "ADMIN", "BADGE-ADMIN-001"]
+    );
 
     const supId = generateId();
     const supPassword = hashPassword("super123");
-    db.prepare(
-      "INSERT INTO usuarios (id, nombre, email, password, rol, badge) VALUES (?, ?, ?, ?, ?, ?)"
-    ).run(supId, "Supervisor García", "supervisor@pharma.com", supPassword, "SUPERVISOR", "BADGE-SUP-001");
+    await pool.query(
+      `INSERT INTO usuarios (id, nombre, email, password, rol, badge) VALUES ($1, $2, $3, $4, $5, $6)`,
+      [supId, "Supervisor García", "supervisor@pharma.com", supPassword, "SUPERVISOR", "BADGE-SUP-001"]
+    );
 
     const opId = generateId();
     const opPassword = hashPassword("oper123");
-    db.prepare(
-      "INSERT INTO usuarios (id, nombre, email, password, rol, badge) VALUES (?, ?, ?, ?, ?, ?)"
-    ).run(opId, "Operario López", "operario@pharma.com", opPassword, "OPERARIO", "BADGE-OP-001");
+    await pool.query(
+      `INSERT INTO usuarios (id, nombre, email, password, rol, badge) VALUES ($1, $2, $3, $4, $5, $6)`,
+      [opId, "Operario López", "operario@pharma.com", opPassword, "OPERARIO", "BADGE-OP-001"]
+    );
 
-    // Auto-seed demo data
-    seedDemoData(db);
+    await seedDemoData();
   }
 }
 
-function seedDemoData(db: Database.Database) {
+async function seedDemoData() {
   const materiales = [
     { id: generateId(), codigo: "MAT-PAR-001", nombre: "Paracetamol (Acetaminofén)", descripcion: "Principio activo analgésico y antipirético", unidad: "kg", stockMinimo: 5 },
     { id: generateId(), codigo: "MAT-CEL-002", nombre: "Celulosa Microcristalina", descripcion: "Excipiente diluyente y aglutinante", unidad: "kg", stockMinimo: 10 },
@@ -165,10 +163,13 @@ function seedDemoData(db: Database.Database) {
     { id: generateId(), codigo: "MAT-PVP-008", nombre: "Povidona (PVP K30)", descripcion: "Aglutinante húmedo", unidad: "kg", stockMinimo: 3 },
   ];
   for (const m of materiales) {
-    db.prepare("INSERT INTO materiales (id, codigo, nombre, descripcion, unidad, stockMinimo) VALUES (?, ?, ?, ?, ?, ?)").run(m.id, m.codigo, m.nombre, m.descripcion, m.unidad, m.stockMinimo);
+    await pool.query(
+      `INSERT INTO materiales (id, codigo, nombre, descripcion, unidad, "stockMinimo") VALUES ($1, $2, $3, $4, $5, $6)`,
+      [m.id, m.codigo, m.nombre, m.descripcion, m.unidad, m.stockMinimo]
+    );
   }
 
-  const futureDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+  const futureDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
   const lotes = [
     { id: generateId(), numero: "LOT-PAR-2024-001", materialId: materiales[0].id, cantidad: 25, proveedor: "Farmaquímicos SA", fechaCaducidad: futureDate, estado: "APROBADO" },
     { id: generateId(), numero: "LOT-PAR-2024-002", materialId: materiales[0].id, cantidad: 10, proveedor: "Química Global", fechaCaducidad: futureDate, estado: "APROBADO" },
@@ -181,40 +182,61 @@ function seedDemoData(db: Database.Database) {
     { id: generateId(), numero: "LOT-PVP-2024-001", materialId: materiales[7].id, cantidad: 8, proveedor: "PolymerPharma", fechaCaducidad: futureDate, estado: "APROBADO" },
   ];
   for (const l of lotes) {
-    db.prepare("INSERT INTO lotes (id, numero, materialId, cantidad, cantidadInicial, fechaRecepcion, fechaCaducidad, proveedor, estado) VALUES (?, ?, ?, ?, ?, datetime('now'), ?, ?, ?)").run(l.id, l.numero, l.materialId, l.cantidad, l.cantidad, l.fechaCaducidad, l.proveedor, l.estado);
+    await pool.query(
+      `INSERT INTO lotes (id, numero, "materialId", cantidad, "cantidadInicial", "fechaRecepcion", "fechaCaducidad", proveedor, estado) VALUES ($1, $2, $3, $4, $5, now(), $6, $7, $8)`,
+      [l.id, l.numero, l.materialId, l.cantidad, l.cantidad, l.fechaCaducidad, l.proveedor, l.estado]
+    );
   }
 
-  // Receta 1: Paracetamol 500mg
   const r1 = generateId();
-  db.prepare("INSERT INTO recetas (id, codigo, nombre, descripcion, rendimiento, unidadRendimiento) VALUES (?, ?, ?, ?, ?, ?)").run(r1, "REC-PCT-500", "Tableta Paracetamol 500mg", "Formulación estándar de tabletas de paracetamol 500mg", 10000, "tabletas");
+  await pool.query(
+    `INSERT INTO recetas (id, codigo, nombre, descripcion, rendimiento, "unidadRendimiento") VALUES ($1, $2, $3, $4, $5, $6)`,
+    [r1, "REC-PCT-500", "Tableta Paracetamol 500mg", "Formulación estándar de tabletas de paracetamol 500mg", 10000, "tabletas"]
+  );
   const ingR1 = [
-    { mat: materiales[0].id, orden: 1, cant: 5.0, tMin: -1, tMax: 1, inst: "Pesar con precisión. Verificar identidad visual.", peligroso: 0 },
-    { mat: materiales[1].id, orden: 2, cant: 3.5, tMin: -2, tMax: 2, inst: "Tamizar antes de pesar (malla 40).", peligroso: 0 },
-    { mat: materiales[3].id, orden: 3, cant: 1.0, tMin: -3, tMax: 3, inst: null, peligroso: 0 },
-    { mat: materiales[4].id, orden: 4, cant: 0.1, tMin: -5, tMax: 5, inst: "Usar mascarilla. Polvo muy fino.", peligroso: 1 },
-    { mat: materiales[2].id, orden: 5, cant: 0.05, tMin: -5, tMax: 5, inst: "Agregar al final.", peligroso: 0 },
+    { mat: materiales[0].id, orden: 1, cant: 5.0, tMin: -1, tMax: 1, inst: "Pesar con precisión. Verificar identidad visual.", peligroso: false },
+    { mat: materiales[1].id, orden: 2, cant: 3.5, tMin: -2, tMax: 2, inst: "Tamizar antes de pesar (malla 40).", peligroso: false },
+    { mat: materiales[3].id, orden: 3, cant: 1.0, tMin: -3, tMax: 3, inst: null, peligroso: false },
+    { mat: materiales[4].id, orden: 4, cant: 0.1, tMin: -5, tMax: 5, inst: "Usar mascarilla. Polvo muy fino.", peligroso: true },
+    { mat: materiales[2].id, orden: 5, cant: 0.05, tMin: -5, tMax: 5, inst: "Agregar al final.", peligroso: false },
   ];
   for (const i of ingR1) {
-    db.prepare("INSERT INTO ingredientes (id, recetaId, materialId, orden, cantidadTarget, toleranciaMin, toleranciaMax, instrucciones, peligroso) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(generateId(), r1, i.mat, i.orden, i.cant, i.tMin, i.tMax, i.inst, i.peligroso);
+    await pool.query(
+      `INSERT INTO ingredientes (id, "recetaId", "materialId", orden, "cantidadTarget", "toleranciaMin", "toleranciaMax", instrucciones, peligroso) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [generateId(), r1, i.mat, i.orden, i.cant, i.tMin, i.tMax, i.inst, i.peligroso]
+    );
   }
 
-  // Receta 2: Ibuprofeno 400mg
   const r2 = generateId();
-  db.prepare("INSERT INTO recetas (id, codigo, nombre, descripcion, rendimiento, unidadRendimiento) VALUES (?, ?, ?, ?, ?, ?)").run(r2, "REC-IBU-400", "Tableta Ibuprofeno 400mg", "Formulación de tabletas recubiertas de ibuprofeno 400mg", 5000, "tabletas");
+  await pool.query(
+    `INSERT INTO recetas (id, codigo, nombre, descripcion, rendimiento, "unidadRendimiento") VALUES ($1, $2, $3, $4, $5, $6)`,
+    [r2, "REC-IBU-400", "Tableta Ibuprofeno 400mg", "Formulación de tabletas recubiertas de ibuprofeno 400mg", 5000, "tabletas"]
+  );
   const ingR2 = [
-    { mat: materiales[5].id, orden: 1, cant: 2.0, tMin: -1, tMax: 1, inst: "Verificar certificado de análisis.", peligroso: 0 },
-    { mat: materiales[6].id, orden: 2, cant: 1.5, tMin: -2, tMax: 2, inst: null, peligroso: 0 },
-    { mat: materiales[7].id, orden: 3, cant: 0.3, tMin: -3, tMax: 3, inst: "Disolver en agua purificada.", peligroso: 0 },
-    { mat: materiales[2].id, orden: 4, cant: 0.04, tMin: -5, tMax: 5, inst: "Lubricante - agregar al final.", peligroso: 0 },
+    { mat: materiales[5].id, orden: 1, cant: 2.0, tMin: -1, tMax: 1, inst: "Verificar certificado de análisis.", peligroso: false },
+    { mat: materiales[6].id, orden: 2, cant: 1.5, tMin: -2, tMax: 2, inst: null, peligroso: false },
+    { mat: materiales[7].id, orden: 3, cant: 0.3, tMin: -3, tMax: 3, inst: "Disolver en agua purificada.", peligroso: false },
+    { mat: materiales[2].id, orden: 4, cant: 0.04, tMin: -5, tMax: 5, inst: "Lubricante - agregar al final.", peligroso: false },
   ];
   for (const i of ingR2) {
-    db.prepare("INSERT INTO ingredientes (id, recetaId, materialId, orden, cantidadTarget, toleranciaMin, toleranciaMax, instrucciones, peligroso) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(generateId(), r2, i.mat, i.orden, i.cant, i.tMin, i.tMax, i.inst, i.peligroso);
+    await pool.query(
+      `INSERT INTO ingredientes (id, "recetaId", "materialId", orden, "cantidadTarget", "toleranciaMin", "toleranciaMax", instrucciones, peligroso) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [generateId(), r2, i.mat, i.orden, i.cant, i.tMin, i.tMax, i.inst, i.peligroso]
+    );
   }
 
-  // Órdenes
-  db.prepare("INSERT INTO ordenes_produccion (id, numero, recetaId, loteProducto, cantidad, estado, prioridad) VALUES (?, ?, ?, ?, ?, ?, ?)").run(generateId(), "ORD-00001", r1, "PROD-PCT-2024-001", 1, "PENDIENTE", 1);
-  db.prepare("INSERT INTO ordenes_produccion (id, numero, recetaId, loteProducto, cantidad, estado, prioridad) VALUES (?, ?, ?, ?, ?, ?, ?)").run(generateId(), "ORD-00002", r1, "PROD-PCT-2024-002", 2, "PENDIENTE", 0);
-  db.prepare("INSERT INTO ordenes_produccion (id, numero, recetaId, loteProducto, cantidad, estado, prioridad) VALUES (?, ?, ?, ?, ?, ?, ?)").run(generateId(), "ORD-00003", r2, "PROD-IBU-2024-001", 1, "PENDIENTE", 1);
+  await pool.query(
+    `INSERT INTO ordenes_produccion (id, numero, "recetaId", "loteProducto", cantidad, estado, prioridad) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+    [generateId(), "ORD-00001", r1, "PROD-PCT-2024-001", 1, "PENDIENTE", 1]
+  );
+  await pool.query(
+    `INSERT INTO ordenes_produccion (id, numero, "recetaId", "loteProducto", cantidad, estado, prioridad) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+    [generateId(), "ORD-00002", r1, "PROD-PCT-2024-002", 2, "PENDIENTE", 0]
+  );
+  await pool.query(
+    `INSERT INTO ordenes_produccion (id, numero, "recetaId", "loteProducto", cantidad, estado, prioridad) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+    [generateId(), "ORD-00003", r2, "PROD-IBU-2024-001", 1, "PENDIENTE", 1]
+  );
 }
 
 export function generateId(): string {
@@ -229,32 +251,28 @@ export function verifyPassword(password: string, hash: string): boolean {
   return hashPassword(password) === hash;
 }
 
-export function resolveUserId(sessionUserId: string, email?: string): string {
-  const db = getDb();
-  // Try by ID first
-  const byId = db.prepare("SELECT id FROM usuarios WHERE id = ?").get(sessionUserId) as { id: string } | undefined;
+export async function resolveUserId(sessionUserId: string, email?: string): Promise<string> {
+  const byId = await queryOne("SELECT id FROM usuarios WHERE id = $1", [sessionUserId]);
   if (byId) return byId.id;
-  // If ID doesn't exist (Vercel cold start), find by email
   if (email) {
-    const byEmail = db.prepare("SELECT id FROM usuarios WHERE email = ?").get(email) as { id: string } | undefined;
+    const byEmail = await queryOne("SELECT id FROM usuarios WHERE email = $1", [email]);
     if (byEmail) return byEmail.id;
   }
-  // Fallback: return first admin
-  const admin = db.prepare("SELECT id FROM usuarios WHERE rol = 'ADMIN' LIMIT 1").get() as { id: string } | undefined;
+  const admin = await queryOne("SELECT id FROM usuarios WHERE rol = 'ADMIN' LIMIT 1");
   return admin?.id || sessionUserId;
 }
 
-export function registrarAuditoria(
+export async function registrarAuditoria(
   usuarioId: string,
   accion: string,
   entidad: string,
   entidadId: string,
   detalles: Record<string, unknown> = {}
 ) {
-  const db = getDb();
   const id = generateId();
-  const resolvedId = resolveUserId(usuarioId);
-  db.prepare(
-    "INSERT INTO auditoria (id, usuarioId, accion, entidad, entidadId, detalles) VALUES (?, ?, ?, ?, ?, ?)"
-  ).run(id, resolvedId, accion, entidad, entidadId, JSON.stringify(detalles));
+  const resolvedId = await resolveUserId(usuarioId);
+  await query(
+    `INSERT INTO auditoria (id, "usuarioId", accion, entidad, "entidadId", detalles) VALUES ($1, $2, $3, $4, $5, $6)`,
+    [id, resolvedId, accion, entidad, entidadId, JSON.stringify(detalles)]
+  );
 }

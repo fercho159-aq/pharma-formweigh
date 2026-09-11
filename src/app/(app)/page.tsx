@@ -1,33 +1,32 @@
 import { getSession } from "@/lib/auth";
-import { getDb } from "@/lib/db";
+import { query, queryOne } from "@/lib/db";
 import Link from "next/link";
 
 export default async function DashboardPage() {
   const user = await getSession();
-  const db = getDb();
 
-  const ordenesPendientes = db.prepare("SELECT COUNT(*) as c FROM ordenes_produccion WHERE estado = 'PENDIENTE'").get() as { c: number };
-  const ordenesEnProceso = db.prepare("SELECT COUNT(*) as c FROM ordenes_produccion WHERE estado = 'EN_PROCESO'").get() as { c: number };
-  const ordenesCompletadas = db.prepare("SELECT COUNT(*) as c FROM ordenes_produccion WHERE estado IN ('DISPENSADO', 'COMPLETADA')").get() as { c: number };
-  const totalMateriales = db.prepare("SELECT COUNT(*) as c FROM materiales WHERE activo = 1").get() as { c: number };
-  const lotesCuarentena = db.prepare("SELECT COUNT(*) as c FROM lotes WHERE estado = 'CUARENTENA'").get() as { c: number };
-  const lotesPorCaducar = db.prepare("SELECT COUNT(*) as c FROM lotes WHERE estado = 'APROBADO' AND fechaCaducidad <= datetime('now', '+30 days')").get() as { c: number };
-  const recetasActivas = db.prepare("SELECT COUNT(*) as c FROM recetas WHERE activa = 1").get() as { c: number };
-  const dispensadosHoy = db.prepare("SELECT COUNT(*) as c FROM dispensados WHERE date(timestamp) = date('now')").get() as { c: number };
+  const ordenesPendientes = await queryOne("SELECT COUNT(*) as c FROM ordenes_produccion WHERE estado = 'PENDIENTE'") as { c: string };
+  const ordenesEnProceso = await queryOne("SELECT COUNT(*) as c FROM ordenes_produccion WHERE estado = 'EN_PROCESO'") as { c: string };
+  const ordenesCompletadas = await queryOne("SELECT COUNT(*) as c FROM ordenes_produccion WHERE estado IN ('DISPENSADO', 'COMPLETADA')") as { c: string };
+  const totalMateriales = await queryOne("SELECT COUNT(*) as c FROM materiales WHERE activo = true") as { c: string };
+  const lotesCuarentena = await queryOne("SELECT COUNT(*) as c FROM lotes WHERE estado = 'CUARENTENA'") as { c: string };
+  const lotesPorCaducar = await queryOne(`SELECT COUNT(*) as c FROM lotes WHERE estado = 'APROBADO' AND "fechaCaducidad" <= now() + interval '30 days'`) as { c: string };
+  const recetasActivas = await queryOne("SELECT COUNT(*) as c FROM recetas WHERE activa = true") as { c: string };
+  const dispensadosHoy = await queryOne("SELECT COUNT(*) as c FROM dispensados WHERE date(timestamp) = CURRENT_DATE") as { c: string };
 
-  const ultimasOrdenes = db.prepare(`
-    SELECT op.*, r.nombre as recetaNombre
+  const ultimasOrdenes = await query(`
+    SELECT op.*, r.nombre as "recetaNombre"
     FROM ordenes_produccion op
-    JOIN recetas r ON op.recetaId = r.id
-    ORDER BY op.createdAt DESC LIMIT 5
-  `).all() as Array<{ id: string; numero: string; recetaNombre: string; estado: string; createdAt: string; loteProducto: string }>;
+    JOIN recetas r ON op."recetaId" = r.id
+    ORDER BY op."createdAt" DESC LIMIT 5
+  `) as Array<{ id: string; numero: string; recetaNombre: string; estado: string; createdAt: string; loteProducto: string }>;
 
-  const ultimaAuditoria = db.prepare(`
-    SELECT a.*, u.nombre as usuarioNombre
+  const ultimaAuditoria = await query(`
+    SELECT a.*, u.nombre as "usuarioNombre"
     FROM auditoria a
-    JOIN usuarios u ON a.usuarioId = u.id
+    JOIN usuarios u ON a."usuarioId" = u.id
     ORDER BY a.timestamp DESC LIMIT 8
-  `).all() as Array<{ id: string; accion: string; entidad: string; usuarioNombre: string; timestamp: string }>;
+  `) as Array<{ id: string; accion: string; entidad: string; usuarioNombre: string; timestamp: string }>;
 
   const estadoColor: Record<string, string> = {
     PENDIENTE: "bg-yellow-100 text-yellow-800",

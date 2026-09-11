@@ -1,23 +1,22 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { queryOne } from "@/lib/db";
 
 export async function POST(request: Request) {
   const { codigoLote, materialId, cantidadRequerida } = await request.json();
-  const db = getDb();
 
-  const lote = db.prepare(`
-    SELECT l.*, m.nombre as materialNombre
+  const lote = await queryOne(`
+    SELECT l.*, m.nombre as "materialNombre"
     FROM lotes l
-    JOIN materiales m ON l.materialId = m.id
-    WHERE l.numero = ?
-  `).get(codigoLote) as {
+    JOIN materiales m ON l."materialId" = m.id
+    WHERE l.numero = $1
+  `, [codigoLote]) as {
     id: string;
     materialId: string;
     materialNombre: string;
     cantidad: number;
     estado: string;
     fechaCaducidad: string;
-  } | undefined;
+  } | null;
 
   if (!lote) {
     return NextResponse.json({ ok: false, error: "Lote no encontrado. Verifica el código de barras." });

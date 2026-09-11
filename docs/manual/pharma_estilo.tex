@@ -1,0 +1,160 @@
+% Estilo compartido de los manuales de PharmaWeigh.
+% Cada manual lo carga con \input{pharma_estilo} y define antes
+% \manualTitulo, \manualPerfil, \manualRol.
+% Compilar con xelatex (fuentes por fontspec).
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla,es-noindentfirst]{babel}
+\usepackage{lmodern}
+\renewcommand*\familydefault{\sfdefault}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{ragged2e}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, shapes.geometric}
+
+\geometry{letterpaper, top=2.4cm, bottom=2cm, left=2cm, right=2cm}
+\setlength{\headheight}{34pt}
+\addtolength{\topmargin}{-12pt}
+
+% ── Paleta PharmaWeigh ──────────────────────────────────────────────
+\definecolor{pharmaazul}{HTML}{1E40AF}      % acento principal
+\definecolor{pharmablue}{HTML}{2563EB}       % botones y highlights
+\definecolor{pharmalight}{HTML}{3B82F6}      % links y secundarios
+\definecolor{pharmagreen}{HTML}{16A34A}      % éxito / aprobado
+\definecolor{pharmayellow}{HTML}{D97706}     % advertencia / cuarentena
+\definecolor{pharmared}{HTML}{DC2626}        % error / rechazado / peligro
+\definecolor{pharmaslate}{HTML}{1E293B}      % sidebar / fondo oscuro
+\definecolor{tinta}{HTML}{0F172A}            % texto principal
+\definecolor{grisfondo}{HTML}{F1F5F9}        % fondo claro
+\definecolor{gristexto}{HTML}{64748B}        % texto secundario
+\definecolor{grislinea}{HTML}{CBD5E1}        % líneas y bordes
+
+\hypersetup{colorlinks=true, linkcolor=pharmalight, urlcolor=pharmalight}
+
+% ── Header / Footer ────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{%
+    \raisebox{-4pt}{\tikz\draw[fill=pharmablue,draw=none,rounded corners=3pt]
+        (0,0) rectangle (0.7cm,0.7cm)
+        node[midway,white,font=\bfseries\footnotesize] {PW};}%
+    \hspace{6pt}\footnotesize\color{gristexto}\textbf{PharmaWeigh}}
+\fancyhead[R]{\footnotesize\color{gristexto}\manualTitulo\ --- \manualPerfil}
+\fancyfoot[C]{\footnotesize\color{gristexto}\thepage}
+\renewcommand{\headrulewidth}{0.6pt}
+\renewcommand{\headrule}{\hbox to\headwidth{%
+    \color{pharmaazul}\leaders\hrule height \headrulewidth\hfill}}
+
+% ── Secciones ───────────────────────────────────────────────────────
+\newcommand{\seccion}[1]{%
+    \vspace{4pt}
+    {\large\bfseries\color{tinta}#1}\par\vspace{2pt}
+    {\color{pharmaazul}\rule{\linewidth}{1.2pt}}\par
+    \vspace{6pt}
+}
+\newcommand{\subseccion}[1]{%
+    \vspace{8pt}
+    \noindent{\bfseries\color{pharmaslate}#1}\par
+    \vspace{3pt}
+}
+
+% ── Cajas de aviso ──────────────────────────────────────────────────
+\newtcolorbox{cajaNota}{
+    colback=grisfondo, colframe=gristexto!50, rounded corners,
+    boxrule=1pt, left=10pt, right=10pt, top=6pt, bottom=6pt }
+\newtcolorbox{cajaOjo}{
+    colback=pharmared!7, colframe=pharmared, rounded corners,
+    boxrule=1.2pt, left=10pt, right=10pt, top=6pt, bottom=6pt,
+    fontupper=\color{pharmared!80!black} }
+\newtcolorbox{cajaInfo}[1][]{
+    colback=grisfondo, colframe=pharmaazul, fonttitle=\bfseries\color{white},
+    colbacktitle=pharmaazul, title=#1, rounded corners,
+    boxrule=1pt, left=8pt, right=8pt, top=6pt, bottom=6pt }
+\newtcolorbox{cajaTip}[1][]{
+    colback=pharmagreen!6, colframe=pharmagreen, fonttitle=\bfseries\color{white},
+    colbacktitle=pharmagreen, title=#1, rounded corners,
+    boxrule=1pt, left=8pt, right=8pt, top=6pt, bottom=6pt }
+\newtcolorbox{cajaPeligro}[1][MATERIAL PELIGROSO]{
+    colback=pharmared!8, colframe=pharmared, fonttitle=\bfseries\color{white},
+    colbacktitle=pharmared, title=#1, rounded corners,
+    boxrule=1.5pt, left=8pt, right=8pt, top=6pt, bottom=6pt }
+\newtcolorbox{cajaCuarentena}[1][CUARENTENA]{
+    colback=pharmayellow!8, colframe=pharmayellow, fonttitle=\bfseries\color{white},
+    colbacktitle=pharmayellow, title=#1, rounded corners,
+    boxrule=1.2pt, left=8pt, right=8pt, top=6pt, bottom=6pt }
+
+% ── Listas ──────────────────────────────────────────────────────────
+\setlist[itemize]{leftmargin=16pt, itemsep=3pt, topsep=3pt}
+\setlist[enumerate]{leftmargin=20pt, itemsep=5pt, topsep=4pt}
+\renewcommand{\arraystretch}{1.3}
+
+% ── Atajos ──────────────────────────────────────────────────────────
+\newcommand{\cd}[1]{{\ttfamily\small #1}}
+\newcommand{\boton}[1]{{\bfseries\color{pharmablue}[#1]}}
+\newcommand{\menu}[1]{{\bfseries\color{pharmaslate}#1}}
+\newcommand{\campo}[1]{{\itshape\color{gristexto}#1}}
+\newcommand{\codigo}[1]{{\ttfamily\footnotesize\colorbox{grisfondo}{\color{tinta}\,#1\,}}}
+
+% Estados de lote
+\newcommand{\aprobado}{{\bfseries\color{pharmagreen}APROBADO}}
+\newcommand{\cuarentena}{{\bfseries\color{pharmayellow}CUARENTENA}}
+\newcommand{\rechazado}{{\bfseries\color{pharmared}RECHAZADO}}
+\newcommand{\agotado}{{\bfseries\color{gristexto}AGOTADO}}
+
+% Estados de orden
+\newcommand{\pendiente}{{\bfseries\color{pharmayellow}PENDIENTE}}
+\newcommand{\enproceso}{{\bfseries\color{pharmalight}EN PROCESO}}
+\newcommand{\dispensado}{{\bfseries\color{pharmagreen}DISPENSADO}}
+\newcommand{\completada}{{\bfseries\color{pharmagreen!80!black}COMPLETADA}}
+
+% Semáforo
+\newcommand{\semaverde}{\tikz\draw[fill=pharmagreen,draw=pharmagreen!70!black] (0,0) circle (5pt);}
+\newcommand{\semaamarillo}{\tikz\draw[fill=pharmayellow,draw=pharmayellow!70!black] (0,0) circle (5pt);}
+\newcommand{\semarojo}{\tikz\draw[fill=pharmared,draw=pharmared!70!black] (0,0) circle (5pt);}
+
+% ── Portada ─────────────────────────────────────────────────────────
+\newcommand{\portada}[2]{%
+\thispagestyle{empty}
+\begin{center}
+    \vspace*{30pt}
+    {\tikz\draw[fill=pharmablue,draw=none,rounded corners=8pt]
+        (0,0) rectangle (2cm,2cm)
+        node[midway,white,font=\bfseries\Large] {PW};}\\[16pt]
+    {\Huge\bfseries\color{tinta}PharmaWeigh}\\[6pt]
+    {\large\color{gristexto}Sistema de Control de Producción y Calidad Farmacéutica}\\[20pt]
+    {\color{pharmaazul}\rule{0.6\linewidth}{2pt}}\\[20pt]
+    {\LARGE\bfseries\color{tinta}\manualTitulo}\\[8pt]
+    {\normalsize\color{gristexto}#1}\\[16pt]
+    {\large\bfseries\color{pharmaslate}\usuarioNombre}\\[4pt]
+    {\normalsize\color{gristexto}Rol: \manualRol}\\[4pt]
+    {\footnotesize\color{gristexto}#2}\\[4pt]
+    {\footnotesize\color{gristexto}Septiembre de 2026}\\[14pt]
+    {\color{pharmaazul}\rule{0.4\linewidth}{1.2pt}}\\[20pt]
+    \begin{cajaNota}
+    \footnotesize Este documento es confidencial y de uso interno.
+    Contiene credenciales personales de acceso al sistema.
+    No compartir ni reproducir sin autorización.
+    \end{cajaNota}
+\end{center}
+\newpage }
+
+% ── Tabla de acceso ─────────────────────────────────────────────────
+\providecommand{\perfilTexto}{Operario: ejecutas el pesaje y dispensado de materiales.}
+\newcommand{\tablaAcceso}{%
+\noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.28\linewidth} X@{}}
+\toprule
+\textbf{URL del sistema} & \cd{https://pharma-formweigh.vercel.app} \\
+\textbf{Tu usuario} & \cd{\usuarioEmail} \\
+\textbf{Tu contraseña} & \cd{\usuarioClave} \\
+\textbf{Tu perfil} & \perfilTexto \\
+\bottomrule
+\end{tabularx}}

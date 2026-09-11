@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
-import { getDb, generateId, hashPassword, registrarAuditoria } from "@/lib/db";
+import { query, generateId, hashPassword, registrarAuditoria } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
 export async function GET() {
-  const db = getDb();
-  const usuarios = db.prepare(
-    "SELECT id, nombre, email, rol, badge, activo, createdAt FROM usuarios ORDER BY nombre"
-  ).all();
+  const usuarios = await query(
+    'SELECT id, nombre, email, rol, badge, activo, "createdAt" FROM usuarios ORDER BY nombre'
+  );
   return NextResponse.json(usuarios);
 }
 
@@ -16,16 +15,16 @@ export async function POST(request: Request) {
   if (user.rol !== "ADMIN") return NextResponse.json({ error: "Solo admin" }, { status: 403 });
 
   const data = await request.json();
-  const db = getDb();
   const id = generateId();
   const hashedPw = hashPassword(data.password);
 
   try {
-    db.prepare(
-      "INSERT INTO usuarios (id, nombre, email, password, rol, badge) VALUES (?, ?, ?, ?, ?, ?)"
-    ).run(id, data.nombre, data.email, hashedPw, data.rol, data.badge || null);
+    await query(
+      "INSERT INTO usuarios (id, nombre, email, password, rol, badge) VALUES ($1, $2, $3, $4, $5, $6)",
+      [id, data.nombre, data.email, hashedPw, data.rol, data.badge || null]
+    );
 
-    registrarAuditoria(user.id, "CREAR_USUARIO", "usuarios", id, { nombre: data.nombre, rol: data.rol });
+    await registrarAuditoria(user.id, "CREAR_USUARIO", "usuarios", id, { nombre: data.nombre, rol: data.rol });
 
     return NextResponse.json({ id });
   } catch (e: unknown) {

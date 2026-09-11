@@ -1,19 +1,12 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+// use prisma-next
 
 model Usuario {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   nombre    String
   email     String   @unique
   password  String
-  rol       String   @default("OPERARIO") // ADMIN, SUPERVISOR, OPERARIO
-  badge     String?  @unique // código de barras del badge
+  rol       String   @default("OPERARIO")
+  badge     String?  @unique
   activo    Boolean  @default(true)
   createdAt DateTime @default(now())
 
@@ -22,11 +15,11 @@ model Usuario {
 }
 
 model Material {
-  id          String  @id @default(cuid())
-  codigo      String  @unique // código de barras
+  id          String  @id @default(uuid())
+  codigo      String  @unique
   nombre      String
   descripcion String?
-  unidad      String // kg, g, L, mL
+  unidad      String
   stockMinimo Float
   activo      Boolean @default(true)
 
@@ -35,69 +28,69 @@ model Material {
 }
 
 model Lote {
-  id              String   @id @default(cuid())
-  numero          String   @unique // número de lote (código de barras)
+  id              String   @id @default(uuid())
+  numero          String   @unique
   materialId      String
   material        Material @relation(fields: [materialId], references: [id])
-  cantidad        Float // cantidad actual
+  cantidad        Float
   cantidadInicial Float
   fechaRecepcion  DateTime
   fechaCaducidad  DateTime
   proveedor       String
-  estado          String   @default("CUARENTENA") // CUARENTENA, APROBADO, RECHAZADO, AGOTADO, CADUCADO
-  certificado     String? // referencia al certificado de análisis
+  estado          String   @default("CUARENTENA")
+  certificado     String?
   createdAt       DateTime @default(now())
 
   dispensados Dispensado[]
 }
 
 model Receta {
-  id                String   @id @default(cuid())
+  id                String   @id @default(uuid())
   codigo            String   @unique
   nombre            String
   version           Int      @default(1)
   descripcion       String?
-  rendimiento       Float // cantidad que produce
+  rendimiento       Float
   unidadRendimiento String
   activa            Boolean  @default(true)
   createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  updatedAt         DateTime @default(now())
 
   ingredientes Ingrediente[]
   ordenes      OrdenProduccion[]
 }
 
 model Ingrediente {
-  id            String  @id @default(cuid())
+  id            String   @id @default(uuid())
   recetaId      String
-  receta        Receta  @relation(fields: [recetaId], references: [id], onDelete: Cascade)
+  receta        Receta   @relation(fields: [recetaId], references: [id], onDelete: Cascade)
   materialId    String
   material      Material @relation(fields: [materialId], references: [id])
-  orden         Int // orden de dispensado
-  cantidadTarget Float // cantidad objetivo
-  toleranciaMin Float // % tolerancia mínima (ej: -2)
-  toleranciaMax Float // % tolerancia máxima (ej: +2)
+  orden         Int
+  cantidadTarget Float
+  toleranciaMin Float
+  toleranciaMax Float
   instrucciones String?
   peligroso     Boolean @default(false)
 }
 
 model OrdenProduccion {
-  id           String   @id @default(cuid())
+  id           String   @id @default(uuid())
   numero       String   @unique
   recetaId     String
   receta       Receta   @relation(fields: [recetaId], references: [id])
-  loteProducto String // lote del producto final
-  cantidad     Float // multiplicador vs receta
-  estado       String   @default("PENDIENTE") // PENDIENTE, EN_PROCESO, DISPENSADO, EN_PRODUCCION, COMPLETADA, CANCELADA
+  loteProducto String
+  cantidad     Float
+  estado       String   @default("PENDIENTE")
   prioridad    Int      @default(0)
   createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  updatedAt    DateTime @default(now())
 
   dispensados Dispensado[]
 }
 
 model Dispensado {
-  id               String   @id @default(cuid())
+  id               String   @id @default(uuid())
   ordenId          String
   orden            OrdenProduccion @relation(fields: [ordenId], references: [id])
   loteId           String
@@ -109,19 +102,19 @@ model Dispensado {
   cantidadReal     Float
   toleranciaOk     Boolean
   paso             Int
-  firmaElectronica String? // supervisor password hash for approval
+  firmaElectronica String?
   supervisorId     String?
   timestamp        DateTime @default(now())
 }
 
 model Auditoria {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   usuarioId String
   usuario   Usuario  @relation(fields: [usuarioId], references: [id])
-  accion    String // LOGIN, CREAR_RECETA, DISPENSAR, APROBAR_LOTE, etc.
-  entidad   String // tabla afectada
-  entidadId String // ID del registro
-  detalles  String // JSON snapshot del cambio
+  accion    String
+  entidad   String
+  entidadId String
+  detalles  String
   ip        String?
   timestamp DateTime @default(now())
 }

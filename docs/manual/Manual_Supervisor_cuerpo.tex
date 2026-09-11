@@ -1,0 +1,214 @@
+% =====================================================================
+%  CUERPO DEL MANUAL DEL SUPERVISOR - PharmaWeigh
+% =====================================================================
+
+\seccion{1. Acceso al sistema}
+
+\tablaAcceso
+
+\vspace{8pt}
+
+Ingresa en \cd{https://pharma-formweigh.vercel.app} con tus credenciales.
+Como supervisor tienes acceso a todos los módulos del operario, más las funciones
+de aprobación de lotes, creación de recetas y firma electrónica.
+
+% =====================================================================
+\seccion{2. Gestión de inventario}
+
+\subseccion{2.1 Aprobar o rechazar lotes}
+
+Cuando llega materia prima a la planta, se registra con estado \cuarentena.
+Es tu responsabilidad aprobar o rechazar los lotes después de la revisión de calidad.
+
+\begin{enumerate}
+    \item Ve a \menu{Inventario} $\rightarrow$ pestaña \menu{Lotes}.
+    \item Identifica los lotes con estado \cuarentena.
+    \item Revisa el certificado de análisis del proveedor.
+    \item Haz clic en \boton{Aprobar} o \boton{Rechazar} según corresponda.
+\end{enumerate}
+
+\begin{cajaOjo}
+\textbf{Un lote rechazado o en cuarentena NO puede usarse para dispensado.}
+El sistema bloqueará cualquier intento de escanear un lote no aprobado durante
+el proceso de pesaje. Esta validación es automática y no puede saltarse.
+\end{cajaOjo}
+
+\begin{cajaInfo}[Registro automático]
+Cada cambio de estado de un lote se registra en la auditoría con tu nombre,
+la fecha/hora, el estado anterior y el nuevo estado. Este registro es inmutable.
+\end{cajaInfo}
+
+\subseccion{2.2 Recepción de material nuevo}
+
+\begin{enumerate}
+    \item Ve a \menu{Inventario} $\rightarrow$ pestaña \menu{Recepción}.
+    \item Escanea el \textbf{código de barras del material} con la pistola.
+    \item El sistema muestra el nombre del material encontrado.
+    \item Llena los datos del nuevo lote:
+        \begin{itemize}
+            \item \campo{Número de Lote} --- el identificador del proveedor
+            \item \campo{Cantidad} --- peso o volumen recibido
+            \item \campo{Proveedor} --- nombre del proveedor
+            \item \campo{Fecha de Caducidad}
+            \item \campo{Certificado de Análisis} (referencia)
+        \end{itemize}
+    \item Haz clic en \boton{Registrar Lote (Cuarentena)}.
+    \item El lote se crea automáticamente en estado \cuarentena.
+\end{enumerate}
+
+\subseccion{2.3 Alertas de inventario}
+
+Revisa regularmente:
+\begin{itemize}
+    \item \textbf{Materiales con stock bajo:} aparecen resaltados en rojo en la tabla de materiales.
+    \item \textbf{Lotes próximos a caducar:} el dashboard muestra cuántos lotes caducan en 30 días.
+    \item \textbf{Lotes en cuarentena:} no olvides aprobarlos para que estén disponibles.
+\end{itemize}
+
+% =====================================================================
+\seccion{3. Gestión de recetas}
+
+Como supervisor puedes crear y editar recetas (formulaciones).
+
+\subseccion{3.1 Crear una receta nueva}
+
+\begin{enumerate}
+    \item Ve a \menu{Recetas} y haz clic en \boton{+ Nueva Receta}.
+    \item Llena los datos generales:
+        \begin{itemize}
+            \item \campo{Código}: identificador único (ej: \codigo{REC-PCT-500})
+            \item \campo{Nombre}: nombre descriptivo
+            \item \campo{Rendimiento}: cantidad que produce la receta
+            \item \campo{Unidad de Rendimiento}: kg, tabletas, L, etc.
+        \end{itemize}
+    \item Agrega ingredientes con \boton{+ Agregar Ingrediente}:
+        \begin{itemize}
+            \item \campo{Material}: selecciona de la lista de materiales registrados
+            \item \campo{Cantidad}: peso/volumen exacto requerido
+            \item \campo{Tolerancia Mín/Máx \%}: rango aceptable (ej: $-2\%$ / $+2\%$)
+            \item \campo{Instrucciones}: texto que verá el operario en pantalla
+            \item \campo{Material Peligroso}: activa la alerta roja en dispensado
+        \end{itemize}
+    \item El \textbf{orden de los ingredientes} define el orden de dispensado.
+    \item Haz clic en \boton{Guardar Receta}.
+\end{enumerate}
+
+\begin{cajaTip}[Tolerancias]
+Las tolerancias se expresan en porcentaje del target:
+\begin{itemize}
+    \item $\pm 1\%$ para principios activos (alta precisión)
+    \item $\pm 2\%$ a $\pm 3\%$ para excipientes
+    \item $\pm 5\%$ a $\pm 10\%$ para componentes menores (lubricantes, deslizantes)
+\end{itemize}
+El semáforo \semarojo{} bloquea la confirmación si el peso cae fuera de estos rangos.
+\end{cajaTip}
+
+% =====================================================================
+\seccion{4. Órdenes de producción}
+
+\subseccion{4.1 Crear una orden}
+
+\begin{enumerate}
+    \item Ve a \menu{Órdenes} y haz clic en \boton{+ Nueva Orden}.
+    \item Selecciona la \campo{Receta} a producir.
+    \item Define el \campo{Lote del Producto Final} (ej: \codigo{PROD-PCT-2024-003}).
+    \item Define la \campo{Cantidad} (multiplicador sobre la receta base).
+    \item Define la \campo{Prioridad}: Normal, Alta o Urgente.
+    \item Haz clic en \boton{Crear Orden}.
+\end{enumerate}
+
+\subseccion{4.2 Estados de una orden}
+
+\begin{center}
+\begin{tabularx}{0.85\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Estado} & \textbf{Significado} \\
+\midrule
+\pendiente   & Creada, esperando que un operario inicie el dispensado. \\
+\enproceso   & El operario está dispensando los ingredientes. \\
+\dispensado  & Todos los ingredientes pesados y firmados por supervisor. \\
+\completada  & Producción terminada. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% =====================================================================
+\seccion{5. Firma electrónica de dispensados}
+
+Esta es una de tus responsabilidades más críticas. Cuando un operario termina
+de dispensar todos los ingredientes de una orden, el sistema te solicita tu firma.
+
+\begin{enumerate}
+    \item El operario te llama a su estación cuando aparece la pantalla de firma.
+    \item \textbf{Verifica visualmente} que los contenedores correspondan.
+    \item Revisa el \textbf{Resumen de pasos} en pantalla: verifica que todos los
+          pesos estén dentro de tolerancia (palomitas verdes).
+    \item Ingresa tu \campo{email} y tu \campo{contraseña}.
+    \item Haz clic en \boton{Firmar y Aprobar}.
+\end{enumerate}
+
+\begin{cajaOjo}
+\textbf{Tu firma es legalmente vinculante.} Al firmar certificas que:
+\begin{itemize}
+    \item Los materiales dispensados son correctos.
+    \item Los pesos están dentro de las tolerancias aprobadas.
+    \item El proceso se ejecutó siguiendo las BPM (Buenas Prácticas de Manufactura).
+\end{itemize}
+\textbf{NO firmes sin verificar.}
+\end{cajaOjo}
+
+% =====================================================================
+\seccion{6. Auditoría}
+
+Desde \menu{Auditoría} puedes consultar el registro completo de todas las
+acciones del sistema.
+
+\subseccion{6.1 Filtros disponibles}
+\begin{itemize}
+    \item \campo{Por acción}: LOGIN, CREAR\_RECETA, DISPENSAR, FIRMAR\_DISPENSADO, etc.
+    \item \campo{Por usuario}: filtrar acciones de un operario específico.
+\end{itemize}
+
+\subseccion{6.2 Información registrada}
+Cada entrada de auditoría contiene:
+\begin{itemize}
+    \item \textbf{Fecha y hora exacta} del evento.
+    \item \textbf{Usuario} que ejecutó la acción y su rol.
+    \item \textbf{Tipo de acción} (color codificado).
+    \item \textbf{Entidad afectada} (tabla de la base de datos).
+    \item \textbf{Detalles} del cambio (valores anteriores y nuevos).
+\end{itemize}
+
+\begin{cajaInfo}[21 CFR Part 11 --- Auditoría]
+El log de auditoría es \textbf{inmutable}. No puede ser borrado, editado ni
+desactivado. Esto cumple con los requisitos de la FDA para registros electrónicos.
+En caso de inspección, este log es la evidencia principal de trazabilidad.
+\end{cajaInfo}
+
+% =====================================================================
+\seccion{7. Gestión de usuarios}
+
+Desde \menu{Usuarios} puedes consultar los usuarios del sistema.
+Solo el \textbf{ADMIN} puede crear nuevos usuarios.
+
+Si necesitas un nuevo operario o cambiar una contraseña, contacta al administrador.
+
+% =====================================================================
+\seccion{8. Preguntas frecuentes}
+
+\subseccion{¿Puedo modificar una receta que ya tiene órdenes?}
+Sí, pero se recomienda crear una nueva versión. Las órdenes existentes
+mantienen la receta con la que fueron creadas.
+
+\subseccion{¿Qué pasa si un operario dispensa fuera de tolerancia?}
+El sistema lo bloquea automáticamente. El botón ``Confirmar Peso'' queda
+deshabilitado y aparece un aviso rojo.
+
+\subseccion{¿Puedo ver quién dispensó cada lote?}
+Sí. En \menu{Auditoría} filtra por acción ``DISPENSAR''. Cada registro
+muestra el operario, el material, el peso real vs.\ target, y si estuvo
+dentro de tolerancia.
+
+\subseccion{¿Cómo agrego un material nuevo?}
+Ve a \menu{Inventario} $\rightarrow$ pestaña \menu{Materiales} $\rightarrow$
+\boton{+ Nuevo Material}. Define el código de barras, nombre, unidad y stock mínimo.

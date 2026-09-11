@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDb, generateId, registrarAuditoria, resolveUserId } from "@/lib/db";
+import { query, queryOne, generateId, registrarAuditoria, resolveUserId } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
 export async function POST(request: Request) {
@@ -7,32 +7,34 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   const data = await request.json();
-  const db = getDb();
   const id = generateId();
 
-  const transaction = db.transaction(() => {
+  try {
+    const resolvedUserId = await resolveUserId(user.id, user.email);
+
     // Register dispensado
-    db.prepare(
-      `INSERT INTO dispensados (id, ordenId, loteId, operarioId, materialNombre, cantidadTarget, cantidadReal, toleranciaOk, paso)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run(id, data.ordenId, data.loteId, resolveUserId(user.id, user.email), data.materialNombre, data.cantidadTarget, data.cantidadReal, data.toleranciaOk ? 1 : 0, data.paso);
+    await query(
+      `INSERT INTO dispensados (id, "ordenId", "loteId", "operarioId", "materialNombre", "cantidadTarget", "cantidadReal", "toleranciaOk", paso)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [id, data.ordenId, data.loteId, resolvedUserId, data.materialNombre, data.cantidadTarget, data.cantidadReal, data.toleranciaOk ? true : false, data.paso]
+    );
 
     // Discount from lot
-    db.prepare("UPDATE lotes SET cantidad = cantidad - ? WHERE id = ?").run(data.cantidadReal, data.loteId);
+    await query("UPDATE lotes SET cantidad = cantidad - $1 WHERE id = $2", [data.cantidadReal, data.loteId]);
 
     // Check if lot is depleted
-    const lote = db.prepare("SELECT cantidad FROM lotes WHERE id = ?").get(data.loteId) as { cantidad: number };
+    const lote = await queryOne("SELECT cantidad FROM lotes WHERE id = $1", [data.loteId]) as { cantidad: number };
     if (lote.cantidad <= 0) {
-      db.prepare("UPDATE lotes SET estado = 'AGOTADO' WHERE id = ?").run(data.loteId);
+      await query("UPDATE lotes SET estado = 'AGOTADO' WHERE id = $1", [data.loteId]);
     }
 
     // Update order status
-    db.prepare("UPDATE ordenes_produccion SET estado = 'EN_PROCESO', updatedAt = datetime('now') WHERE id = ? AND estado = 'PENDIENTE'").run(data.ordenId);
-  });
+    await query(
+      `UPDATE ordenes_produccion SET estado = 'EN_PROCESO', "updatedAt" = now() WHERE id = $1 AND estado = 'PENDIENTE'`,
+      [data.ordenId]
+    );
 
-  try {
-    transaction();
-    registrarAuditoria(user.id, "DISPENSAR", "dispensados", id, {
+    await registrarAuditoria(user.id, "DISPENSAR", "dispensados", id, {
       ordenId: data.ordenId,
       material: data.materialNombre,
       cantidadTarget: data.cantidadTarget,

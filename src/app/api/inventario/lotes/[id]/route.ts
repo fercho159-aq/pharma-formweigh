@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDb, registrarAuditoria } from "@/lib/db";
+import { query, queryOne, registrarAuditoria } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -9,14 +9,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   const { id } = await params;
   const data = await request.json();
-  const db = getDb();
 
-  const lote = db.prepare("SELECT * FROM lotes WHERE id = ?").get(id) as { estado: string } | undefined;
+  const lote = await queryOne("SELECT * FROM lotes WHERE id = $1", [id]) as { estado: string } | null;
   if (!lote) return NextResponse.json({ error: "Lote no encontrado" }, { status: 404 });
 
-  db.prepare("UPDATE lotes SET estado = ? WHERE id = ?").run(data.estado, id);
+  await query("UPDATE lotes SET estado = $1 WHERE id = $2", [data.estado, id]);
 
-  registrarAuditoria(user.id, "CAMBIAR_ESTADO_LOTE", "lotes", id, {
+  await registrarAuditoria(user.id, "CAMBIAR_ESTADO_LOTE", "lotes", id, {
     estadoAnterior: lote.estado,
     estadoNuevo: data.estado,
   });

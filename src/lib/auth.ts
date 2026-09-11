@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getDb, verifyPassword } from "./db";
+import { queryOne, verifyPassword } from "./db";
 
 export interface SessionUser {
   id: string;
@@ -30,10 +30,10 @@ export async function getSession(): Promise<SessionUser | null> {
 }
 
 export async function createSession(email: string, password: string): Promise<SessionUser | null> {
-  const db = getDb();
-  const user = db
-    .prepare("SELECT * FROM usuarios WHERE email = ? AND activo = 1")
-    .get(email) as (SessionUser & { password: string }) | undefined;
+  const user = await queryOne(
+    "SELECT * FROM usuarios WHERE email = $1 AND activo = true",
+    [email]
+  ) as (SessionUser & { password: string }) | null;
 
   if (!user || !verifyPassword(password, user.password)) {
     return null;

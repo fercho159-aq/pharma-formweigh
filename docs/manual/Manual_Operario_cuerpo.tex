@@ -1,0 +1,259 @@
+% =====================================================================
+%  CUERPO DEL MANUAL DEL OPERARIO - PharmaWeigh
+% =====================================================================
+
+\seccion{1. Acceso al sistema}
+
+\tablaAcceso
+
+\vspace{8pt}
+
+Para ingresar al sistema:
+\begin{enumerate}
+    \item Abre tu navegador web (Chrome recomendado).
+    \item Ve a la dirección \cd{https://pharma-formweigh.vercel.app}.
+    \item Ingresa tu \campo{email} y tu \campo{contraseña}.
+    \item Haz clic en \boton{Ingresar}.
+\end{enumerate}
+
+\begin{cajaNota}
+\textbf{Importante:} Nunca compartas tu contraseña. El sistema registra todas las acciones
+asociadas a tu usuario. Eres responsable de todo lo que se haga con tu cuenta.
+\end{cajaNota}
+
+% =====================================================================
+\seccion{2. Dashboard}
+
+Al ingresar verás el \textbf{Dashboard} con un resumen del estado de producción:
+
+\begin{itemize}
+    \item \textbf{Órdenes Pendientes:} Cantidad de órdenes que esperan ser dispensadas.
+    \item \textbf{En Proceso:} Órdenes que se están dispensando actualmente.
+    \item \textbf{Dispensados Hoy:} Cantidad de materiales dispensados en el día.
+    \item \textbf{Lotes en Cuarentena:} Lotes de materia prima que aún no han sido aprobados por calidad.
+\end{itemize}
+
+\begin{cajaTip}[Tip]
+Revisa el dashboard al inicio de tu turno para conocer las órdenes prioritarias del día.
+Las órdenes marcadas como \textbf{URGENTE} aparecen primero.
+\end{cajaTip}
+
+% =====================================================================
+\seccion{3. Estación de dispensado}
+
+Este es tu módulo principal de trabajo. Aquí ejecutas el pesaje de materias primas
+siguiendo las recetas de producción.
+
+\subseccion{3.1 Seleccionar una orden}
+
+\begin{enumerate}
+    \item En el menú lateral, haz clic en \menu{Dispensado}.
+    \item Verás las tarjetas de las órdenes pendientes, ordenadas por prioridad.
+    \item Cada tarjeta muestra:
+        \begin{itemize}
+            \item Número de orden (ej: \codigo{ORD-00001})
+            \item Nombre de la receta
+            \item Lote del producto final
+            \item Barra de progreso (pasos completados / total)
+        \end{itemize}
+    \item Haz clic en la orden que vas a dispensar.
+\end{enumerate}
+
+\subseccion{3.2 Flujo de dispensado paso a paso}
+
+Una vez dentro de la orden, el sistema te guía paso por paso a través de cada ingrediente
+de la receta. \textbf{No puedes saltarte pasos ni cambiar el orden.}
+
+Para \textbf{cada ingrediente} debes seguir este flujo:
+
+\vspace{6pt}
+\begin{center}
+\begin{tikzpicture}[
+    node distance=0.4cm and 1.8cm,
+    every node/.style={font=\footnotesize},
+    paso/.style={draw=pharmablue, fill=pharmablue!8, rounded corners=6pt,
+        minimum width=3cm, minimum height=1cm, align=center, text width=2.8cm},
+    flecha/.style={-{Stealth[length=6pt]}, thick, color=pharmablue}
+]
+\node[paso] (scan) {1. Escanear\\código de barras\\del lote};
+\node[paso, right=of scan] (pesar) {2. Pesar\\el material};
+\node[paso, right=of pesar] (confirmar) {3. Confirmar\\peso};
+\draw[flecha] (scan) -- (pesar);
+\draw[flecha] (pesar) -- (confirmar);
+\end{tikzpicture}
+\end{center}
+\vspace{6pt}
+
+\subseccion{3.3 Paso 1: Escanear el lote}
+
+\begin{enumerate}
+    \item La pantalla te muestra qué material necesitas, la cantidad objetivo (target)
+          y las tolerancias mínima y máxima permitidas.
+    \item Con tu \textbf{pistola de código de barras}, escanea la etiqueta del contenedor
+          del material (el \textbf{número de lote}).
+    \item El sistema valida automáticamente:
+        \begin{itemize}
+            \item ¿Es el material correcto? (no puedes usar Ibuprofeno si pide Paracetamol)
+            \item ¿El lote está \aprobado? (no acepta lotes en \cuarentena{} ni \rechazado)
+            \item ¿No está caducado?
+            \item ¿Tiene suficiente cantidad disponible?
+        \end{itemize}
+\end{enumerate}
+
+\begin{cajaOjo}
+\textbf{¡Ojo!} Si el sistema dice ``Material incorrecto'' o ``Lote en CUARENTENA'',
+\textbf{NO intentes forzar el dispensado}. Avisa a tu supervisor inmediatamente.
+El sistema bloqueará cualquier material que no cumpla las validaciones.
+\end{cajaOjo}
+
+\subseccion{3.4 Paso 2: Pesar el material}
+
+Una vez que el lote es validado, aparece la pantalla de pesaje con el \textbf{semáforo visual}:
+
+\vspace{6pt}
+\begin{center}
+\begin{tabularx}{0.85\linewidth}{@{}c >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Semáforo} & \textbf{Significado} \\
+\midrule
+\semarojo{} \textbf{Rojo}     & El peso está \textbf{fuera de tolerancia}. Está por debajo del mínimo o por encima del máximo. \textbf{No se puede confirmar.} \\[4pt]
+\semaamarillo{} \textbf{Amarillo} & El peso está \textbf{cerca del límite}. Se puede confirmar pero con precaución. Procura acercarte más al target. \\[4pt]
+\semaverde{} \textbf{Verde}    & El peso está \textbf{dentro de tolerancia}. Perfecto, puedes confirmar. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\vspace{6pt}
+
+La pantalla también muestra:
+\begin{itemize}
+    \item \textbf{Barra de progreso visual} con las zonas roja y verde.
+    \item Los valores exactos de \textbf{Mínimo}, \textbf{Target} y \textbf{Máximo}.
+    \item El porcentaje de tolerancia (ej: $\pm 1\%$, $\pm 5\%$).
+\end{itemize}
+
+\begin{cajaPeligro}
+Si el ingrediente está marcado como \textbf{MATERIAL PELIGROSO}, la pantalla mostrará
+una alerta roja con instrucciones especiales. \textbf{Sigue las instrucciones al pie de
+la letra.} Usa el equipo de protección personal indicado (mascarilla, guantes, etc.).
+\end{cajaPeligro}
+
+\subseccion{3.5 Paso 3: Confirmar peso}
+
+\begin{itemize}
+    \item Si el semáforo está en \semaverde{} \textbf{verde}: el botón dice
+          ``Confirmar Peso'' y está habilitado. Haz clic.
+    \item Si el semáforo está en \semaamarillo{} \textbf{amarillo}: el botón dice
+          ``Confirmar con Precaución''. Se permite pero intenta mejorar el peso.
+    \item Si el semáforo está en \semarojo{} \textbf{rojo}: el botón está
+          \textbf{BLOQUEADO}. Dice ``BLOQUEADO -- Ajuste el peso dentro de tolerancia''.
+          Aparece un aviso rojo que te dice exactamente qué hacer (agregar o retirar material).
+\end{itemize}
+
+\begin{cajaOjo}
+\textbf{El sistema NO permite confirmar un peso fuera de tolerancia.}
+Si necesitas dispensar más o menos de lo indicado, contacta a tu supervisor
+para que autorice una desviación.
+\end{cajaOjo}
+
+Al confirmar, el sistema:
+\begin{enumerate}
+    \item Registra el peso exacto dispensado.
+    \item Descuenta automáticamente la cantidad del lote.
+    \item Avanza al siguiente ingrediente.
+    \item Si era el último ingrediente, muestra ``Dispensado Completado''.
+\end{enumerate}
+
+\subseccion{3.6 Firma electrónica del supervisor}
+
+Al terminar todos los pasos, el sistema solicita la \textbf{firma electrónica}
+de un supervisor:
+
+\begin{enumerate}
+    \item Llama a tu supervisor a la estación de pesaje.
+    \item El supervisor ingresa su \campo{email} y su \campo{contraseña}.
+    \item El sistema verifica que sea un usuario con rol \textbf{SUPERVISOR} o \textbf{ADMIN}.
+    \item Si la firma es válida, la orden se marca como \dispensado.
+\end{enumerate}
+
+\begin{cajaInfo}[21 CFR Part 11]
+La firma electrónica tiene la misma validez legal que una firma manuscrita.
+Cada dispensado queda registrado con: quién pesó, qué pesó, cuánto pesó,
+a qué hora, y quién firmó. Este registro es \textbf{inmutable} y no puede ser
+borrado ni editado.
+\end{cajaInfo}
+
+% =====================================================================
+\seccion{4. Consultar inventario}
+
+Desde \menu{Inventario} puedes consultar (pero no modificar) los materiales y lotes:
+
+\subseccion{4.1 Pestaña Materiales}
+Lista de todas las materias primas con su stock actual. Los materiales con
+stock por debajo del mínimo aparecen \textbf{resaltados en rojo}.
+
+\subseccion{4.2 Pestaña Lotes}
+Lista de todos los lotes con su estado actual:
+\begin{itemize}
+    \item \aprobado{}: Listo para usar en dispensado.
+    \item \cuarentena{}: En espera de aprobación de calidad. \textbf{No se puede usar.}
+    \item \rechazado{}: Rechazado por calidad. \textbf{No se puede usar.}
+    \item \agotado{}: Cantidad agotada.
+\end{itemize}
+
+% =====================================================================
+\seccion{5. Consultar órdenes}
+
+Desde \menu{Órdenes} puedes ver el estado de todas las órdenes de producción.
+No puedes crear ni editar órdenes (eso lo hace el supervisor o admin).
+
+% =====================================================================
+\seccion{6. Códigos de barras de referencia}
+
+Estos son los códigos que debes escanear según el paso del dispensado:
+
+\vspace{6pt}
+\begin{center}
+\begin{tabularx}{0.9\linewidth}{@{}>{\ttfamily\small}l X l@{}}
+\toprule
+\textbf{Código de Lote} & \textbf{Material} & \textbf{Estado} \\
+\midrule
+LOT-PAR-2024-001 & Paracetamol (Acetaminofén) & \aprobado \\
+LOT-PAR-2024-002 & Paracetamol (Acetaminofén) & \aprobado \\
+LOT-CEL-2024-001 & Celulosa Microcristalina & \aprobado \\
+LOT-EST-2024-001 & Estearato de Magnesio & \aprobado \\
+LOT-ALM-2024-001 & Almidón de Maíz & \aprobado \\
+LOT-SIO-2024-001 & Dióxido de Silicio Coloidal & \aprobado \\
+LOT-IBU-2024-001 & Ibuprofeno & \aprobado \\
+LOT-LAC-2024-001 & Lactosa Monohidrato & \aprobado \\
+LOT-PVP-2024-001 & Povidona (PVP K30) & \aprobado \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{cajaTip}[Tip]
+La pistola de código de barras funciona como un teclado. Si la pistola no está
+disponible, puedes \textbf{escribir el código manualmente} y presionar \boton{Enter}.
+\end{cajaTip}
+
+% =====================================================================
+\seccion{7. Preguntas frecuentes}
+
+\subseccion{¿Qué hago si escaneo el lote equivocado?}
+El sistema te dirá ``Material incorrecto''. Simplemente escanea el lote correcto.
+No se registra nada hasta que confirmes el peso.
+
+\subseccion{¿Qué pasa si se me cae el material y el peso queda bajo?}
+No podrás confirmar con semáforo rojo. Agrega más material hasta alcanzar el rango
+permitido (entre mínimo y máximo).
+
+\subseccion{¿Puedo pausar un dispensado y continuar después?}
+Sí. El sistema guarda el progreso. Si sales y vuelves a entrar a la orden,
+continúa desde el último paso pendiente.
+
+\subseccion{¿Quién puede firmar mi dispensado?}
+Solo usuarios con rol \textbf{SUPERVISOR} o \textbf{ADMIN} pueden firmar.
+Un operario no puede firmar su propio trabajo.
+
+\subseccion{¿Puedo ver lo que ya dispensé?}
+Sí. En la parte inferior de la pantalla de dispensado hay un \textbf{Resumen de pasos}
+que muestra los ingredientes completados con palomita verde y el peso real registrado.

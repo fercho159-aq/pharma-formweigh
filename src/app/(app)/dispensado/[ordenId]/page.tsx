@@ -240,22 +240,14 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
 
     const data = await res.json();
     if (data.ok) {
-      // Check if there are more phases
-      const nextPhaseIdx = currentPhaseIdx + 1;
-      if (orden.fases[nextPhaseIdx]) {
-        // Move to next phase
-        setShowFirma(false);
-        setFirmaEmail("");
-        setFirmaPassword("");
-        setFirmaError("");
-        setFirmaLoading(false);
-        // Reload to get updated data then state will reinit
-        await loadOrden();
-      } else {
-        // All phases done
-        setAllCompleted(true);
-        setFirmaLoading(false);
-      }
+      // Reset firma form state
+      setShowFirma(false);
+      setFirmaEmail("");
+      setFirmaPassword("");
+      setFirmaError("");
+      setFirmaLoading(false);
+      // Reload data - initializeState will figure out the next phase or mark as completed
+      await loadOrden();
     } else {
       setFirmaError(data.error || "Error al firmar");
       setFirmaLoading(false);

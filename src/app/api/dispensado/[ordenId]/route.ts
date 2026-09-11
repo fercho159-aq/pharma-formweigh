@@ -34,7 +34,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ ord
     [ordenId]
   ) as Array<{ paso: number; cantidadReal: number; faseId: string | null }>;
 
-  const dispensadoMap = new Map(dispensados.map((d) => [d.paso, d.cantidadReal]));
+  // Key by faseId:paso to avoid collision across phases
+  const dispensadoMap = new Map(dispensados.map((d) => [`${d.faseId}:${d.paso}`, d.cantidadReal]));
 
   // Get phase signatures
   const firmas = await query(
@@ -53,8 +54,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ ord
       .filter((ing) => ing.faseId === fase.id)
       .map((ing) => ({
         ...ing,
-        dispensado: dispensadoMap.has(ing.orden),
-        dispensadoReal: dispensadoMap.get(ing.orden),
+        dispensado: dispensadoMap.has(`${fase.id}:${ing.orden}`),
+        dispensadoReal: dispensadoMap.get(`${fase.id}:${ing.orden}`),
       }));
 
     return {

@@ -49,6 +49,8 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
   const [firmaEmail, setFirmaEmail] = useState("");
   const [firmaPassword, setFirmaPassword] = useState("");
   const [firmaError, setFirmaError] = useState("");
+  const [firmaLoading, setFirmaLoading] = useState(false);
+  const [registrando, setRegistrando] = useState(false);
 
   useEffect(() => { loadOrden(); }, [ordenId]);
 
@@ -121,7 +123,8 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
 
   async function handleConfirmPeso() {
     const ing = getCurrentIngrediente();
-    if (!ing || !orden || !peso) return;
+    if (!ing || !orden || !peso || registrando) return;
+    setRegistrando(true);
 
     const target = ing.cantidadTarget * orden.cantidad;
     const min = target * (1 + ing.toleranciaMin / 100);
@@ -161,11 +164,13 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
         loadOrden();
       }
     }
+    setRegistrando(false);
   }
 
   async function handleFirma(e: React.FormEvent) {
     e.preventDefault();
     setFirmaError("");
+    setFirmaLoading(true);
 
     const res = await fetch(`/api/dispensado/firmar`, {
       method: "POST",
@@ -182,6 +187,7 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
       router.push("/dispensado");
     } else {
       setFirmaError(data.error || "Error al firmar");
+      setFirmaLoading(false);
     }
   }
 
@@ -263,8 +269,8 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
               <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
               <input type="password" value={firmaPassword} onChange={(e) => setFirmaPassword(e.target.value)} className="w-full px-4 py-3 border rounded-lg" required />
             </div>
-            <button type="submit" className="w-full bg-blue-700 text-white py-3 rounded-lg font-semibold hover:bg-blue-800 cursor-pointer">
-              Firmar y Aprobar
+            <button type="submit" disabled={firmaLoading} className="w-full bg-blue-700 text-white py-3 rounded-lg font-semibold hover:bg-blue-800 cursor-pointer disabled:bg-blue-400 disabled:cursor-wait">
+              {firmaLoading ? "Firmando..." : "Firmar y Aprobar"}
             </button>
           </form>
         </div>
@@ -400,7 +406,7 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
 
               <button
                 onClick={handleConfirmPeso}
-                disabled={!peso || pesoStatus === "none" || pesoStatus === "low" || pesoStatus === "high"}
+                disabled={!peso || pesoStatus === "none" || pesoStatus === "low" || pesoStatus === "high" || registrando}
                 className={`w-full py-4 rounded-lg font-bold text-lg transition-colors cursor-pointer ${
                   pesoStatus === "ok"
                     ? "bg-green-600 text-white hover:bg-green-700"
@@ -409,7 +415,9 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 } disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed`}
               >
-                {pesoStatus === "ok"
+                {registrando
+                  ? "Registrando..."
+                  : pesoStatus === "ok"
                   ? "Confirmar Peso"
                   : pesoStatus === "warning"
                   ? "Confirmar con Precaución"

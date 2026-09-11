@@ -50,7 +50,7 @@ export async function createSession(email: string, password: string): Promise<Se
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE, Buffer.from(JSON.stringify(sessionData)).toString("base64"), {
     httpOnly: true,
-    secure: false, // demo
+    secure: process.env.VERCEL ? true : false,
     sameSite: "lax",
     maxAge: 60 * 60 * 24, // 24 hours
     path: "/",

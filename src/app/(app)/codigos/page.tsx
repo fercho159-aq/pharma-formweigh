@@ -46,7 +46,11 @@ export default function CodigosPage() {
   const badges = [
     { codigo: "BADGE-ADMIN-001", nombre: "Administrador", rol: "ADMIN" },
     { codigo: "BADGE-SUP-001", nombre: "Supervisor García", rol: "SUPERVISOR" },
+    { codigo: "BADGE-DES-001", nombre: "Ing. Ramírez Desarrollo", rol: "DESARROLLO" },
+    { codigo: "BADGE-CAL-001", nombre: "QA Martínez Calidad", rol: "CALIDAD" },
+    { codigo: "BADGE-ALM-001", nombre: "Almacenista Torres", rol: "ALMACEN" },
     { codigo: "BADGE-OP-001", nombre: "Operario López", rol: "OPERARIO" },
+    { codigo: "BADGE-AUD-001", nombre: "Auditor Hernández", rol: "AUDITOR" },
   ];
 
   return (
@@ -107,7 +111,7 @@ export default function CodigosPage() {
                 title={b.nombre}
                 subtitle={`Rol: ${b.rol}`}
                 badge={b.rol}
-                badgeColor={b.rol === "ADMIN" ? "red" : b.rol === "SUPERVISOR" ? "blue" : "gray"}
+                badgeColor={b.rol === "ADMIN" ? "red" : b.rol === "SUPERVISOR" ? "blue" : b.rol === "DESARROLLO" ? "blue" : b.rol === "CALIDAD" ? "yellow" : b.rol === "ALMACEN" ? "green" : "gray"}
               />
             ))}
         </div>

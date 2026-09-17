@@ -166,6 +166,34 @@ async function initTables() {
       [opId, "Operario López", "operario@pharma.com", opPassword, "OPERARIO", "BADGE-OP-001"]
     );
 
+    const desId = generateId();
+    const desPassword = hashPassword("desarrollo123");
+    await pool.query(
+      `INSERT INTO usuarios (id, nombre, email, password, rol, badge) VALUES ($1, $2, $3, $4, $5, $6)`,
+      [desId, "Ing. Ramírez Desarrollo", "desarrollo@pharma.com", desPassword, "DESARROLLO", "BADGE-DES-001"]
+    );
+
+    const calId = generateId();
+    const calPassword = hashPassword("calidad123");
+    await pool.query(
+      `INSERT INTO usuarios (id, nombre, email, password, rol, badge) VALUES ($1, $2, $3, $4, $5, $6)`,
+      [calId, "QA Martínez Calidad", "calidad@pharma.com", calPassword, "CALIDAD", "BADGE-CAL-001"]
+    );
+
+    const almId = generateId();
+    const almPassword = hashPassword("almacen123");
+    await pool.query(
+      `INSERT INTO usuarios (id, nombre, email, password, rol, badge) VALUES ($1, $2, $3, $4, $5, $6)`,
+      [almId, "Almacenista Torres", "almacen@pharma.com", almPassword, "ALMACEN", "BADGE-ALM-001"]
+    );
+
+    const audId = generateId();
+    const audPassword = hashPassword("auditor123");
+    await pool.query(
+      `INSERT INTO usuarios (id, nombre, email, password, rol, badge) VALUES ($1, $2, $3, $4, $5, $6)`,
+      [audId, "Auditor Hernández", "auditor@pharma.com", audPassword, "AUDITOR", "BADGE-AUD-001"]
+    );
+
     await seedDemoData();
   }
 

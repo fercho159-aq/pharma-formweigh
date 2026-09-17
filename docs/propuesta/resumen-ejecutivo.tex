@@ -1,0 +1,144 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{lmodern}
+\renewcommand*\familydefault{\sfdefault}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{ragged2e}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+\usepackage{tikz}
+
+\geometry{letterpaper, top=2cm, bottom=2cm, left=2.5cm, right=2.5cm}
+
+\definecolor{pharmaazul}{HTML}{1E40AF}
+\definecolor{pharmablue}{HTML}{2563EB}
+\definecolor{pharmagreen}{HTML}{16A34A}
+\definecolor{tinta}{HTML}{0F172A}
+\definecolor{grisfondo}{HTML}{F1F5F9}
+\definecolor{gristexto}{HTML}{64748B}
+
+\hypersetup{colorlinks=true, linkcolor=pharmablue, urlcolor=pharmablue}
+
+\setlist[itemize]{leftmargin=16pt, itemsep=3pt}
+\renewcommand{\arraystretch}{1.4}
+
+\pagestyle{empty}
+
+\begin{document}
+
+% ── HEADER ──
+\begin{center}
+{\tikz\draw[fill=pharmablue,draw=none,rounded corners=6pt]
+    (0,0) rectangle (1.4cm,1.4cm)
+    node[midway,white,font=\bfseries\large] {PW};}\\[10pt]
+{\LARGE\bfseries\color{tinta}PharmaWeigh}\\[4pt]
+{\normalsize\color{gristexto}Sistema de Control de Producción y Calidad Farmacéutica}\\[6pt]
+{\color{pharmaazul}\rule{0.4\linewidth}{1.5pt}}\\[8pt]
+{\Large\bfseries\color{tinta}Resumen Ejecutivo}\\[2pt]
+{\footnotesize\color{gristexto}Septiembre 2026 --- MAW Soluciones}
+\end{center}
+
+\vspace{16pt}
+
+% ── QUÉ ES ──
+\begin{tcolorbox}[colback=grisfondo, colframe=pharmaazul, rounded corners, boxrule=1pt, left=12pt, right=12pt, top=8pt, bottom=8pt, fonttitle=\bfseries\color{white}, colbacktitle=pharmaazul, title=¿Qué es PharmaWeigh?]
+Software web para controlar el pesaje y dispensado de materias primas en plantas farmacéuticas. Guía al operario paso a paso con \textbf{pistola de código de barras}, \textbf{semáforo de pesaje} y \textbf{firma electrónica del supervisor}. Cumple con \textbf{21 CFR Part 11} de la FDA.
+\end{tcolorbox}
+
+\vspace{10pt}
+
+% ── PROBLEMA / SOLUCIÓN ──
+\noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}
+\textbf{\color{red!70!black}El problema} & \textbf{\color{pharmagreen}La solución} \\
+\midrule
+Errores de pesaje por factor humano & Semáforo visual que \textbf{bloquea} fuera de tolerancia \\
+Registros en papel sin trazabilidad & Audit trail digital inmutable \\
+Materiales equivocados o caducados & Validación automática con código de barras \\
+Sistemas tipo FormWeigh cuestan \$50,000+ USD & PharmaWeigh: fracción del costo \\
+\end{tabularx}
+
+\vspace{14pt}
+
+% ── MÓDULOS ──
+{\large\bfseries\color{tinta}Módulos del Sistema}\\[4pt]
+{\color{pharmaazul}\rule{\linewidth}{0.8pt}}
+
+\vspace{6pt}
+
+\noindent\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\textbf{Dashboard} & KPIs en tiempo real: órdenes, dispensados, alertas, actividad \\
+\textbf{Recetas por Fases} & Formulaciones con ingredientes, tolerancias, instrucciones y materiales peligrosos \\
+\textbf{Órdenes de Producción} & Crear, priorizar y rastrear órdenes con lote de producto final \\
+\textbf{Dispensado Guiado} & Flujo paso a paso: escanear lote $\rightarrow$ pesar con semáforo $\rightarrow$ confirmar $\rightarrow$ firma \\
+\textbf{Inventario y Lotes} & Recepción con barcode, estados (cuarentena/aprobado/rechazado), stock automático \\
+\textbf{Auditoría} & Log inmutable de todas las acciones --- 21 CFR Part 11 \\
+\textbf{Usuarios y Roles} & Admin, Supervisor, Operario con permisos diferenciados \\
+\textbf{Códigos de Barras} & Generación e impresión de etiquetas para materiales y lotes \\
+\end{tabularx}
+
+\vspace{14pt}
+
+% ── HARDWARE ──
+{\large\bfseries\color{tinta}Hardware por Estación de Pesaje}\\[4pt]
+{\color{pharmaazul}\rule{\linewidth}{0.8pt}}
+
+\vspace{6pt}
+
+\noindent\begin{tabularx}{\linewidth}{@{}l l r >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Equipo} & \textbf{Especificación} & \textbf{Costo aprox.} & \textbf{Nota} \\
+\midrule
+Tablet Android/iPad & 10'' con Chrome & \$3,000 MXN & Fija en la estación \\
+Pistola código barras & USB 1D inalámbrica & \$500 MXN & Sin drivers \\
+Báscula (opcional) & USB o serial & \$1,500 MXN & Integrable \\
+\midrule
+\multicolumn{2}{@{}l}{\textbf{Total por estación}} & \textbf{\$5,000 MXN} & \\
+\bottomrule
+\end{tabularx}
+
+\vspace{14pt}
+
+% ── DEMO ──
+\begin{tcolorbox}[colback=pharmagreen!8, colframe=pharmagreen, rounded corners, boxrule=1.2pt, left=12pt, right=12pt, top=8pt, bottom=8pt]
+\textbf{\color{pharmagreen}Demo en línea disponible:} \url{https://pharma-formweigh.vercel.app}\\[4pt]
+\begin{tabular}{@{}lll@{}}
+\textbf{Admin:} admin@pharma.com / admin123 &
+\textbf{Supervisor:} supervisor@pharma.com / super123 &
+\textbf{Operario:} operario@pharma.com / oper123
+\end{tabular}\\[4pt]
+Datos precargados: 8 materiales, 9 lotes, 3 recetas, 3 órdenes listas para dispensar.
+\end{tcolorbox}
+
+\vspace{10pt}
+
+% ── VENTAJAS ──
+{\large\bfseries\color{tinta}¿Por qué PharmaWeigh?}\\[4pt]
+{\color{pharmaazul}\rule{\linewidth}{0.8pt}}
+
+\vspace{6pt}
+
+\begin{itemize}
+\item \textbf{Acceso desde cualquier dispositivo} --- navegador web, sin instalar software.
+\item \textbf{Cero errores de pesaje} --- semáforo bloquea automáticamente fuera de tolerancia.
+\item \textbf{Trazabilidad completa} --- desde materia prima hasta producto terminado.
+\item \textbf{Cumplimiento regulatorio} --- 21 CFR Part 11, firmas electrónicas, audit trail.
+\item \textbf{Implementación rápida} --- en operación en semanas, no meses.
+\item \textbf{Costo accesible} --- fracción de lo que cuesta un FormWeigh o similar.
+\end{itemize}
+
+\vspace{14pt}
+
+\begin{center}
+{\footnotesize\color{gristexto}MAW Soluciones --- solucionesmaw@gmail.com}\\[2pt]
+{\footnotesize\color{gristexto}Documento confidencial. Septiembre 2026.}
+\end{center}
+
+\end{document}

@@ -1,0 +1,86 @@
+GUIÓN DE NARRACIÓN - VIDEO PHARMAWEIGH (2:30 min)
+Para usar en HeyGen: pegar cada bloque como script de cada escena.
+Voz: Español Latinoamericano, tono profesional.
+=================================================================
+
+ESCENA 1 - INTRO (0:00 - 0:10)
+---
+Te presentamos PharmaWeigh, el sistema de control de producción
+y calidad farmacéutica. En los próximos dos minutos te mostramos
+paso a paso cómo funciona.
+
+ESCENA 2 - LOGIN (0:10 - 0:25)
+---
+Paso uno: entrar al sistema. Cada usuario abre el navegador en su
+tablet o computadora y accede con su correo y contraseña. El sistema
+tiene tres roles: Administrador, Supervisor y Operario. Cada rol
+solo ve lo que le corresponde, y cada acción queda registrada con
+el nombre del usuario.
+
+ESCENA 3 - DASHBOARD (0:25 - 0:40)
+---
+Paso dos: el dashboard. Al entrar, el supervisor ve el resumen del
+día en tiempo real. Órdenes pendientes, órdenes en proceso,
+materiales dispensados y lotes en cuarentena. También ve la
+actividad reciente de todo el equipo. Todo desde su tablet.
+
+ESCENA 4 - SELECCIONAR ORDEN (0:40 - 0:55)
+---
+Paso tres: seleccionar la orden. El operario entra a la estación de
+dispensado y ve las órdenes pendientes ordenadas por prioridad. Cada
+orden muestra la receta, el lote del producto final, las fases de
+fabricación y una barra de progreso. El operario selecciona la orden
+y comienza el dispensado fase por fase.
+
+ESCENA 5 - ESCANEAR LOTE (0:55 - 1:12)
+---
+Paso cuatro: escanear el lote. El operario toma la pistola de código
+de barras USB y escanea la etiqueta del contenedor. El sistema valida
+automáticamente: que sea el material correcto, que el lote esté
+aprobado, que no esté caducado y que tenga suficiente cantidad. Si
+algo no cumple, el sistema bloquea el proceso y avisa al operario.
+La pistola USB funciona como teclado, no requiere drivers ni
+configuración especial.
+
+ESCENA 6 - SEMÁFORO DE PESAJE (1:12 - 1:30)
+---
+Paso cinco: pesar con semáforo. El operario ingresa el peso en la
+tablet y la pantalla muestra un semáforo visual. Verde significa que
+está dentro de tolerancia y puede confirmar. Amarillo indica que está
+cerca del límite y debe tener precaución. Rojo significa que está
+fuera de tolerancia y el botón de confirmar se bloquea
+automáticamente. Es imposible dispensar fuera del rango permitido.
+Cero errores humanos.
+
+ESCENA 7 - FIRMA ELECTRÓNICA (1:30 - 1:45)
+---
+Paso seis: firma del supervisor. Al completar cada fase, el
+supervisor va a la estación y firma desde la tablet con su correo
+y contraseña. La firma tiene validez legal conforme veintiuno CFR
+parte once de la FDA. El operario no puede firmar su propio trabajo.
+Quien pesa no firma, quien firma no pesa. Segregación de funciones.
+
+ESCENA 8 - INVENTARIO (1:45 - 2:00)
+---
+Paso siete: inventario y lotes. El supervisor gestiona las materias
+primas. Al recibir material, escanea el código con la pistola y
+registra el lote nuevo en cuarentena. Después de revisar el
+certificado de análisis, lo aprueba o rechaza. Solo los lotes
+aprobados pueden usarse para dispensar. El inventario se descuenta
+automáticamente al confirmar cada peso.
+
+ESCENA 9 - AUDITORÍA (2:00 - 2:17)
+---
+Paso ocho: auditoría total. El administrador ve el registro inmutable
+de todas las acciones del sistema. Quién hizo qué, cuándo, con qué
+datos. Quién firmó cada fase. Este registro no se puede borrar ni
+editar. Cumple con veintiuno CFR parte once de la FDA para registros
+electrónicos y firmas electrónicas. Trazabilidad completa desde la
+materia prima hasta el producto terminado.
+
+ESCENA 10 - CIERRE (2:17 - 2:30)
+---
+PharmaWeigh. Control de producción farmacéutica al alcance de tu
+planta. Tablet, pistola de barras, semáforo y firma electrónica.
+Producción segura y trazable. Solicita tu demo en
+pharma guión formweigh punto vercel punto app.

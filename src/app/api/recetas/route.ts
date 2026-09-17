@@ -17,7 +17,7 @@ export async function GET() {
 export async function POST(request: Request) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  if (user.rol === "OPERARIO") return NextResponse.json({ error: "Solo supervisor o admin" }, { status: 403 });
+  if (!["ADMIN", "SUPERVISOR", "DESARROLLO"].includes(user.rol)) return NextResponse.json({ error: "Solo desarrollo, supervisor o admin pueden crear recetas" }, { status: 403 });
 
   const data = await request.json();
   const id = generateId();

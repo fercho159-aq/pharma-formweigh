@@ -1,0 +1,182 @@
+\documentclass[11pt]{article}
+\def\manualTitulo{Resumen Ejecutivo}
+\def\manualPerfil{Dirección}
+\def\manualRol{Dirección General}
+\def\usuarioNombre{Laboratorios Best}
+\def\usuarioEmail{admin@pharma.com}
+\def\usuarioClave{---}
+\input{manual/pharma_estilo}
+\usepackage{multicol}
+
+\begin{document}
+
+% ── Portada personalizada ──
+\thispagestyle{empty}
+\begin{center}
+    \vspace*{20pt}
+    {\tikz\draw[fill=pharmablue,draw=none,rounded corners=8pt]
+        (0,0) rectangle (2cm,2cm)
+        node[midway,white,font=\bfseries\Large] {PW};}\\[16pt]
+    {\Huge\bfseries\color{tinta}PharmaWeigh}\\[6pt]
+    {\large\color{gristexto}Sistema de Control de Producción y Calidad Farmacéutica}\\[20pt]
+    {\color{pharmaazul}\rule{0.6\linewidth}{2pt}}\\[20pt]
+    {\LARGE\bfseries\color{tinta}Resumen Ejecutivo del Proyecto}\\[10pt]
+    {\large\color{gristexto}Solución integral de dispensado, formulación y trazabilidad}\\[20pt]
+    {\normalsize\color{gristexto}Preparado para: \textbf{Laboratorios Best}}\\[4pt]
+    {\normalsize\color{gristexto}Preparado por: \textbf{MAW Soluciones}}\\[4pt]
+    {\footnotesize\color{gristexto}Septiembre de 2026}\\[14pt]
+    {\color{pharmaazul}\rule{0.4\linewidth}{1.2pt}}\\[20pt]
+    \begin{cajaNota}
+    \footnotesize Documento confidencial. Propiedad intelectual de MAW Soluciones.
+    \end{cajaNota}
+\end{center}
+\newpage
+
+% ── Contenido ──
+\seccion{1. El Problema}
+
+La industria farmacéutica enfrenta desafíos críticos en el control de procesos de fabricación:
+
+\begin{itemize}
+    \item \textbf{Errores de pesaje} que comprometen la calidad del producto final
+    \item \textbf{Falta de trazabilidad} en el dispensado de materias primas
+    \item \textbf{Procesos manuales} propensos a error humano
+    \item \textbf{Cumplimiento regulatorio} (NOM, FDA 21 CFR Parte 11) que exige documentación rigurosa
+    \item \textbf{Costos elevados} de soluciones existentes en el mercado (los principales proveedores cotizan por encima de \textbf{\$1,800,000 MXN} IVA incluido)
+\end{itemize}
+
+\seccion{2. Nuestra Solución: PharmaWeigh}
+
+PharmaWeigh es un sistema web de última generación que digitaliza y controla todo el proceso de fabricación farmacéutica, desde la recepción de materias primas hasta el dispensado final con firma electrónica del supervisor.
+
+\subseccion{Arquitectura moderna}
+\begin{itemize}
+    \item Plataforma 100\% web --- accesible desde PC, tablet o celular
+    \item Base de datos PostgreSQL en la nube (Neon) --- sin servidores locales
+    \item Desplegado en Vercel --- alta disponibilidad y escalabilidad automática
+    \item Sin licencias de Windows Server ni SQL Server requeridas
+\end{itemize}
+
+\subseccion{Módulos del sistema}
+
+\begin{cajaTip}[Módulos incluidos sin costo adicional de licencia]
+\begin{multicols}{2}
+\begin{enumerate}
+    \item Gestión de recetas y formulaciones
+    \item Fases de fabricación configurables
+    \item Dispensado guiado con semáforo de tolerancias
+    \item Firma electrónica por fase
+    \item Control de inventario y lotes
+    \item Recepción de materias primas (cuarentena)
+    \item Gestión de usuarios y roles
+    \item Auditoría completa (trazabilidad)
+    \item Escaneo de códigos de barras por cámara
+    \item Generación de códigos de barras
+    \item Dashboard en tiempo real
+    \item Gestión de órdenes de producción
+\end{enumerate}
+\end{multicols}
+\end{cajaTip}
+
+\seccion{3. Comparativa vs. Soluciones del Mercado}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{4.5cm} >{\centering\arraybackslash}X >{\centering\arraybackslash}X@{}}
+\toprule
+\textbf{Característica} & \textbf{Software tradicional} & \textbf{PharmaWeigh} \\
+\midrule
+Software base & \$111,000 & \textbf{Incluido} \\
+Licencia 21 CFR Part 11 & \$127,000 & \textbf{Incluido} \\
+Licencia sustancias activas & \$50,600 & \textbf{Incluido} \\
+Licencia control de existencias & \$50,600 & \textbf{Incluido} \\
+Licencia entrada de mercancías & \$28,460 & \textbf{Incluido} \\
+Licencia cambio de pedidos & \$80,600 & \textbf{Incluido} \\
+Licencia dispensado y producción & \$129,000 & \textbf{Incluido} \\
+Licencia integración ERP & \$159,000 & \textbf{Incluido} \\
+Manual de validación & \$91,500 & \textbf{Incluido} \\
+\midrule
+\textbf{Total solo software} & \textbf{\$827,760} & \textbf{\$0 adicional} \\
+\midrule
+Requiere servidor local & Sí (Windows + SQL Server) & \textbf{No} (nube) \\
+Requiere terminal propietario & Sí (desde \$129,000) & \textbf{No} (cualquier pantalla) \\
+Acceso móvil & No nativo & \textbf{Sí} (cualquier navegador) \\
+Firma electrónica por fase & No & \textbf{Sí} \\
+Escaneo con cámara del celular & No & \textbf{Sí} \\
+Fases de fabricación & No nativo & \textbf{Sí} \\
+Soporte técnico & 3 meses promedio & \textbf{12 meses incluidos} \\
+Tiempo de entrega & 10--12 semanas promedio & \textbf{10 semanas} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\seccion{4. Funcionalidades Clave}
+
+\subseccion{4.1 Dispensado guiado por fases}
+El operario sigue un proceso paso a paso: cada fase de fabricación tiene sus propios materiales, tolerancias y validaciones. El sistema bloquea automáticamente pesos fuera de tolerancia y requiere firma electrónica del supervisor al completar cada fase.
+
+\subseccion{4.2 Verificación por código de barras}
+Cada material y lote se verifica mediante escaneo de código de barras antes de dispensar, eliminando errores de selección de materia prima. Compatible con pistola lectora o cámara del celular.
+
+\subseccion{4.3 Trazabilidad completa}
+Registro automático de todas las acciones: quién pesó, cuánto, cuándo, con qué lote, quién firmó. Generación de reportes de auditoría para cumplimiento regulatorio.
+
+\subseccion{4.4 Control de inventario inteligente}
+Gestión automática de existencias con descuento al dispensar, alertas de stock mínimo, control de fechas de caducidad, y flujo de cuarentena/aprobación/rechazo de lotes.
+
+\subseccion{4.5 Dashboard del supervisor}
+Vista en tiempo real de todos los procesos activos, fase actual de cada orden, progreso de dispensado, y acceso directo a cualquier proceso.
+
+\seccion{5. Ahorro Económico}
+
+\begin{center}
+\begin{tabularx}{0.85\linewidth}{@{}>{\raggedright\arraybackslash}X >{\raggedleft\arraybackslash}p{3.5cm}@{}}
+\toprule
+\textbf{Concepto} & \textbf{Monto MXN} \\
+\midrule
+Precio promedio de soluciones equivalentes (IVA incluido) & \$1,883,331.92 \\
+Cotización MAW Soluciones (IVA incluido) & \$1,600,832.13 \\
+\midrule
+\textbf{Ahorro total} & \textbf{\$282,499.79} \\
+\textbf{Porcentaje de ahorro} & \textbf{15\%} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{cajaInfo}[Nota importante]
+El ahorro real puede ser mayor si el laboratorio ya cuenta con básculas o balanzas compatibles. PharmaWeigh se integra con cualquier báscula que tenga interfaz RS232, USB o Ethernet, lo que permite reutilizar equipo existente.
+\end{cajaInfo}
+
+\seccion{6. Implementación}
+
+\begin{enumerate}
+    \item \textbf{Semana 1--2:} Levantamiento de requerimientos y especificaciones del cliente
+    \item \textbf{Semana 3--4:} Configuración del sistema y personalización de recetas/procesos
+    \item \textbf{Semana 5--6:} Adquisición e instalación de hardware (básculas, lectores, impresoras)
+    \item \textbf{Semana 7--8:} Integración, pruebas integrales y validación IQ/OQ
+    \item \textbf{Semana 9:} Capacitación a usuarios (operadores, supervisores, administradores)
+    \item \textbf{Semana 10:} Puesta en marcha y soporte post-arranque
+\end{enumerate}
+
+\begin{cajaTip}[Tiempo de implementación]
+\textbf{10 semanas} desde la recepción del anticipo hasta la puesta en marcha completa.
+\end{cajaTip}
+
+\seccion{7. Soporte y Garantía}
+
+\begin{itemize}
+    \item \textbf{12 meses} de soporte técnico incluido (vs. 3 meses de Mettler Toledo)
+    \item Actualizaciones de software sin costo durante la vigencia del soporte
+    \item Soporte remoto y en sitio
+    \item Capacitación adicional disponible bajo demanda
+\end{itemize}
+
+\vfill
+\begin{center}
+{\color{pharmaazul}\rule{0.4\linewidth}{1.2pt}}\\[10pt]
+{\large\bfseries\color{tinta}MAW Soluciones}\\[4pt]
+{\normalsize\color{gristexto}Desarrollo de Software y Tecnología}\\[4pt]
+{\footnotesize\color{gristexto}contacto@mawsoluciones.com | mawsoluciones.com}
+\end{center}
+
+\end{document}

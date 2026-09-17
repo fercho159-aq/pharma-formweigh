@@ -44,7 +44,11 @@ export default function UsuariosPage() {
   const rolColor: Record<string, string> = {
     ADMIN: "bg-red-100 text-red-700",
     SUPERVISOR: "bg-blue-100 text-blue-700",
+    DESARROLLO: "bg-purple-100 text-purple-700",
+    CALIDAD: "bg-amber-100 text-amber-700",
+    ALMACEN: "bg-teal-100 text-teal-700",
     OPERARIO: "bg-green-100 text-green-700",
+    AUDITOR: "bg-gray-100 text-gray-700",
   };
 
   return (
@@ -79,6 +83,10 @@ export default function UsuariosPage() {
               <select value={form.rol} onChange={(e) => setForm((f) => ({ ...f, rol: e.target.value }))} className="w-full px-3 py-2 border rounded-lg">
                 <option value="OPERARIO">Operario</option>
                 <option value="SUPERVISOR">Supervisor</option>
+                <option value="DESARROLLO">Desarrollo</option>
+                <option value="CALIDAD">Calidad</option>
+                <option value="ALMACEN">Almacén</option>
+                <option value="AUDITOR">Auditor</option>
                 <option value="ADMIN">Administrador</option>
               </select>
             </div>

@@ -1,0 +1,13 @@
+PharmaWeigh. Sistema de control de producción y calidad farmacéutica. Te mostramos cómo funciona en un minuto.
+
+El operario entra al sistema desde su tablet con su usuario y contraseña. Cada rol ve solo lo que le corresponde: administrador, supervisor u operario.
+
+En el dashboard, el supervisor monitorea órdenes pendientes, dispensados del día y lotes en cuarentena, todo en tiempo real.
+
+El operario selecciona la orden pendiente y comienza el dispensado. Con la pistola de código de barras escanea el lote del material. El sistema valida automáticamente que sea el material correcto, que esté aprobado y que no esté caducado.
+
+Después ingresa el peso. Un semáforo visual indica verde si está dentro de tolerancia, amarillo si está cerca del límite, y rojo si está fuera de rango. Con rojo, el botón se bloquea. Es imposible dispensar fuera de tolerancia.
+
+Al terminar cada fase, el supervisor firma electrónicamente desde su tablet. Quien pesa no firma. Cumplimiento total con veintiuno CFR parte once.
+
+Todas las acciones quedan en un registro inmutable de auditoría. PharmaWeigh. Producción segura y trazable. Solicita tu demo.

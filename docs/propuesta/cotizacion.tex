@@ -1,0 +1,197 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{lmodern}
+\renewcommand*\familydefault{\sfdefault}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{ragged2e}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{amssymb}
+
+\geometry{letterpaper, top=2cm, bottom=2cm, left=2.5cm, right=2.5cm}
+
+\definecolor{pharmaazul}{HTML}{1E40AF}
+\definecolor{pharmablue}{HTML}{2563EB}
+\definecolor{pharmagreen}{HTML}{16A34A}
+\definecolor{tinta}{HTML}{0F172A}
+\definecolor{grisfondo}{HTML}{F1F5F9}
+\definecolor{gristexto}{HTML}{64748B}
+
+\hypersetup{colorlinks=true, linkcolor=pharmablue, urlcolor=pharmablue}
+\renewcommand{\arraystretch}{1.4}
+\pagestyle{empty}
+
+\begin{document}
+
+% ── HEADER ──
+\begin{center}
+{\tikz\draw[fill=pharmablue,draw=none,rounded corners=6pt]
+    (0,0) rectangle (1.4cm,1.4cm)
+    node[midway,white,font=\bfseries\large] {PW};}\\[10pt]
+{\LARGE\bfseries\color{tinta}PharmaWeigh}\\[4pt]
+{\normalsize\color{gristexto}Sistema de Control de Producción y Calidad Farmacéutica}\\[6pt]
+{\color{pharmaazul}\rule{0.4\linewidth}{1.5pt}}\\[8pt]
+{\Large\bfseries\color{tinta}Cotización de Implementación}\\[2pt]
+{\footnotesize\color{gristexto}COT-PW-2026-001 --- Septiembre 2026 --- MAW Soluciones}
+\end{center}
+
+\vspace{16pt}
+
+% ── DATOS DEL CLIENTE ──
+\noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.22\linewidth} X@{}}
+\toprule
+\textbf{Cliente} & \rule{8cm}{0.4pt} \\
+\textbf{Contacto} & \rule{8cm}{0.4pt} \\
+\textbf{Fecha} & Septiembre 2026 \\
+\textbf{Vigencia} & 30 días naturales \\
+\bottomrule
+\end{tabularx}
+
+\vspace{16pt}
+
+% ── ALCANCE ──
+{\large\bfseries\color{tinta}1. Alcance de la Implementación}\\[4pt]
+{\color{pharmaazul}\rule{\linewidth}{0.8pt}}
+
+\vspace{6pt}
+
+\noindent\begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash}p{0.6cm} >{\raggedright\arraybackslash}X c@{}}
+\toprule
+\textbf{No.} & \textbf{Concepto} & \textbf{Incluido} \\
+\midrule
+1 & Sistema PharmaWeigh completo (todos los módulos) & $\checkmark$ \\
+2 & Configuración de recetas/formulaciones del cliente & $\checkmark$ \\
+3 & Alta de materiales y códigos de barras & $\checkmark$ \\
+4 & Creación de usuarios y roles & $\checkmark$ \\
+5 & Capacitación presencial (operarios, supervisores, admin) & $\checkmark$ \\
+6 & Manuales personalizados por rol (PDF) & $\checkmark$ \\
+7 & Video demo operativo con narración & $\checkmark$ \\
+8 & Generación de etiquetas de código de barras & $\checkmark$ \\
+9 & Despliegue en nube (hosting 12 meses) & $\checkmark$ \\
+10 & Soporte técnico remoto (12 meses) & $\checkmark$ \\
+\bottomrule
+\end{tabularx}
+
+\vspace{16pt}
+
+% ── INVERSIÓN ──
+{\large\bfseries\color{tinta}2. Inversión}\\[4pt]
+{\color{pharmaazul}\rule{\linewidth}{0.8pt}}
+
+\vspace{6pt}
+
+\noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X r@{}}
+\toprule
+\textbf{Concepto} & \textbf{Monto (MXN + IVA)} \\
+\midrule
+\multicolumn{2}{@{}l}{\textbf{\color{pharmaazul}Implementación (pago único)}} \\
+\quad Desarrollo y configuración del sistema & \$\rule{3cm}{0.4pt} \\
+\quad Capacitación presencial (hasta 3 sesiones) & \$\rule{3cm}{0.4pt} \\
+\quad Manuales y video personalizados & \$\rule{3cm}{0.4pt} \\
+\quad Alta de datos iniciales (materiales, recetas, usuarios) & \$\rule{3cm}{0.4pt} \\
+\midrule
+\textbf{Subtotal implementación} & \textbf{\$\rule{3cm}{0.4pt}} \\
+\midrule
+\multicolumn{2}{@{}l}{\textbf{\color{pharmaazul}Mensualidad (recurrente)}} \\
+\quad Hosting en nube (disponibilidad 99.9\%) & \$\rule{3cm}{0.4pt} \\
+\quad Soporte técnico remoto & \$\rule{3cm}{0.4pt} \\
+\quad Actualizaciones y mejoras & \$\rule{3cm}{0.4pt} \\
+\midrule
+\textbf{Total mensual} & \textbf{\$\rule{3cm}{0.4pt}/mes} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{6pt}
+
+\begin{tcolorbox}[colback=grisfondo, colframe=gristexto!40, rounded corners, boxrule=0.8pt, left=10pt, right=10pt, top=6pt, bottom=6pt]
+\footnotesize\color{gristexto}
+\textbf{Nota:} Los precios no incluyen hardware (tablets, pistolas de barras, básculas).
+El costo estimado de hardware por estación es de \$5,000 MXN (ver Resumen Ejecutivo).
+\end{tcolorbox}
+
+\vspace{14pt}
+
+% ── FORMA DE PAGO ──
+{\large\bfseries\color{tinta}3. Forma de Pago}\\[4pt]
+{\color{pharmaazul}\rule{\linewidth}{0.8pt}}
+
+\vspace{6pt}
+
+\noindent\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Pago} & \textbf{Descripción} \\
+\midrule
+50\% anticipo & Al firmar la cotización. Inicia desarrollo y configuración. \\
+50\% contra entrega & Al completar capacitación y puesta en marcha. \\
+\midrule
+Mensualidad & A partir del mes siguiente a la puesta en marcha. \\
+\bottomrule
+\end{tabularx}
+
+\vspace{14pt}
+
+% ── CALENDARIO ──
+{\large\bfseries\color{tinta}4. Calendario Estimado}\\[4pt]
+{\color{pharmaazul}\rule{\linewidth}{0.8pt}}
+
+\vspace{6pt}
+
+\noindent\begin{tabularx}{\linewidth}{@{}l l >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Semana} & \textbf{Fase} & \textbf{Actividades} \\
+\midrule
+1 & Levantamiento & Reunión inicial, definición de recetas, materiales y flujos \\
+2--3 & Configuración & Alta de datos, personalización, pruebas internas \\
+4 & Capacitación & Sesiones con operarios, supervisores y admin \\
+4 & Puesta en marcha & Go-live con acompañamiento en sitio \\
+\bottomrule
+\end{tabularx}
+
+\vspace{14pt}
+
+% ── COMPARATIVA ──
+{\large\bfseries\color{tinta}5. Comparativa de Mercado}\\[4pt]
+{\color{pharmaazul}\rule{\linewidth}{0.8pt}}
+
+\vspace{6pt}
+
+\noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X c c c@{}}
+\toprule
+\textbf{Característica} & \textbf{FormWeigh} & \textbf{SAP/MES} & \textbf{PharmaWeigh} \\
+\midrule
+Costo de licencia & \$50,000+ USD & \$100,000+ USD & Accesible \\
+Tiempo de implementación & 3--6 meses & 6--12 meses & 4 semanas \\
+Semáforo de pesaje & $\checkmark$ & Parcial & $\checkmark$ \\
+Código de barras & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+Firma electrónica & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+21 CFR Part 11 & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+Acceso desde tablet & Limitado & No & $\checkmark$ \\
+Personalización & Costosa & Muy costosa & Incluida \\
+Soporte en español & Extra & Extra & Incluido \\
+\bottomrule
+\end{tabularx}
+
+\vspace{20pt}
+
+% ── FIRMAS ──
+\noindent\begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash}X >{\centering\arraybackslash}X@{}}
+\rule{6cm}{0.4pt} & \rule{6cm}{0.4pt} \\
+\textbf{MAW Soluciones} & \textbf{Cliente} \\
+Nombre y firma & Nombre y firma \\
+\end{tabularx}
+
+\vspace{16pt}
+
+\begin{center}
+{\footnotesize\color{gristexto}MAW Soluciones --- solucionesmaw@gmail.com --- Septiembre 2026}
+\end{center}
+
+\end{document}

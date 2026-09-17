@@ -18,8 +18,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Supervisor no encontrado" });
   }
 
-  if (supervisor.rol !== "SUPERVISOR" && supervisor.rol !== "ADMIN") {
-    return NextResponse.json({ ok: false, error: "Solo un SUPERVISOR o ADMIN puede firmar" });
+  if (!["SUPERVISOR", "ADMIN", "CALIDAD"].includes(supervisor.rol)) {
+    return NextResponse.json({ ok: false, error: "Solo un SUPERVISOR, CALIDAD o ADMIN puede firmar" });
   }
 
   if (!verifyPassword(password, supervisor.password)) {

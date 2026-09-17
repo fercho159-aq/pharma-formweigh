@@ -15,6 +15,7 @@ export async function GET() {
 export async function POST(request: Request) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  if (!["ADMIN", "SUPERVISOR", "ALMACEN"].includes(user.rol)) return NextResponse.json({ error: "Solo almacén, supervisor o admin pueden registrar lotes" }, { status: 403 });
 
   const data = await request.json();
   const id = generateId();

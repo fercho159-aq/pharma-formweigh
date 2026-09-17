@@ -5,7 +5,7 @@ import { getSession } from "@/lib/auth";
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  if (user.rol === "OPERARIO") return NextResponse.json({ error: "Solo supervisor o admin" }, { status: 403 });
+  if (!["ADMIN", "SUPERVISOR", "CALIDAD", "ALMACEN"].includes(user.rol)) return NextResponse.json({ error: "Solo supervisor, calidad, almacén o admin" }, { status: 403 });
 
   const { id } = await params;
   const data = await request.json();

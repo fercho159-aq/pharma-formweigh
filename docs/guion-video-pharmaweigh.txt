@@ -49,16 +49,16 @@ tablet y la pantalla muestra un semáforo visual. Verde significa que
 está dentro de tolerancia y puede confirmar. Amarillo indica que está
 cerca del límite y debe tener precaución. Rojo significa que está
 fuera de tolerancia y el botón de confirmar se bloquea
-automáticamente. Es imposible dispensar fuera del rango permitido.
-Cero errores humanos.
+automáticamente. El sistema rechaza cualquier pesaje fuera del
+rango permitido.
 
 ESCENA 7 - FIRMA ELECTRÓNICA (1:30 - 1:45)
 ---
 Paso seis: firma del supervisor. Al completar cada fase, el
 supervisor va a la estación y firma desde la tablet con su correo
-y contraseña. La firma tiene validez legal conforme veintiuno CFR
-parte once de la FDA. El operario no puede firmar su propio trabajo.
-Quien pesa no firma, quien firma no pesa. Segregación de funciones.
+y contraseña. El operario no puede firmar su propio trabajo: firma
+un supervisor, calidad o el administrador, y cada firma queda en la
+bitácora con fecha, hora y usuario.
 
 ESCENA 8 - INVENTARIO (1:45 - 2:00)
 ---
@@ -74,13 +74,13 @@ ESCENA 9 - AUDITORÍA (2:00 - 2:17)
 Paso ocho: auditoría total. El administrador ve el registro inmutable
 de todas las acciones del sistema. Quién hizo qué, cuándo, con qué
 datos. Quién firmó cada fase. Este registro no se puede borrar ni
-editar. Cumple con veintiuno CFR parte once de la FDA para registros
-electrónicos y firmas electrónicas. Trazabilidad completa desde la
-materia prima hasta el producto terminado.
+editar: la base de datos rechaza cualquier cambio. Trazabilidad del
+dispensado: qué lote de materia prima entró en cada orden, quién lo
+pesó y quién firmó.
 
 ESCENA 10 - CIERRE (2:17 - 2:30)
 ---
 PharmaWeigh. Control de producción farmacéutica al alcance de tu
 planta. Tablet, pistola de barras, semáforo y firma electrónica.
 Producción segura y trazable. Solicita tu demo en
-pharma guión formweigh punto vercel punto app.
+pharmaweigh punto appsoluciones punto duckdns punto org.

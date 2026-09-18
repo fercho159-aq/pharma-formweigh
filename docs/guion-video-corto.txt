@@ -8,6 +8,6 @@ El operario selecciona la orden pendiente y comienza el dispensado. Con la pisto
 
 Después ingresa el peso. Un semáforo visual indica verde si está dentro de tolerancia, amarillo si está cerca del límite, y rojo si está fuera de rango. Con rojo, el botón se bloquea. Es imposible dispensar fuera de tolerancia.
 
-Al terminar cada fase, el supervisor firma electrónicamente desde su tablet. Quien pesa no firma. Cumplimiento total con veintiuno CFR parte once.
+Al terminar cada fase, el supervisor firma electrónicamente desde su tablet. El operario que pesa no puede firmar.
 
 Todas las acciones quedan en un registro inmutable de auditoría. PharmaWeigh. Producción segura y trazable. Solicita tu demo.

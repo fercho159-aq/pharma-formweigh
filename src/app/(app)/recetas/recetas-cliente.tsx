@@ -179,20 +179,20 @@ export default function RecetasCliente({ rol }: { rol: string }) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Código</label>
-              <input value={form.codigo} onChange={(e) => setForm((f) => ({ ...f, codigo: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" placeholder="REC-001" required />
+              <label htmlFor="receta-codigo" className="block text-sm font-medium text-gray-700 mb-1">Código</label>
+              <input id="receta-codigo" name="codigo" autoComplete="off" value={form.codigo} onChange={(e) => setForm((f) => ({ ...f, codigo: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" placeholder="REC-001" required />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-              <input value={form.nombre} onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" placeholder="Tableta Paracetamol 500mg" required />
+              <label htmlFor="receta-nombre" className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+              <input id="receta-nombre" name="nombre" autoComplete="off" value={form.nombre} onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" placeholder="Tableta Paracetamol 500mg" required />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Rendimiento</label>
-              <input type="number" step="0.01" value={form.rendimiento} onChange={(e) => setForm((f) => ({ ...f, rendimiento: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" required />
+              <label htmlFor="receta-rendimiento" className="block text-sm font-medium text-gray-700 mb-1">Rendimiento</label>
+              <input id="receta-rendimiento" name="rendimiento" type="number" step="0.01" autoComplete="off" value={form.rendimiento} onChange={(e) => setForm((f) => ({ ...f, rendimiento: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" required />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Unidad Rendimiento</label>
-              <select value={form.unidadRendimiento} onChange={(e) => setForm((f) => ({ ...f, unidadRendimiento: e.target.value }))} className="w-full px-3 py-2 border rounded-lg">
+              <label htmlFor="receta-unidad-rendimiento" className="block text-sm font-medium text-gray-700 mb-1">Unidad Rendimiento</label>
+              <select id="receta-unidad-rendimiento" name="unidadRendimiento" value={form.unidadRendimiento} onChange={(e) => setForm((f) => ({ ...f, unidadRendimiento: e.target.value }))} className="w-full px-3 py-2 border rounded-lg">
                 <option value="kg">kg</option>
                 <option value="g">g</option>
                 <option value="L">L</option>
@@ -203,8 +203,8 @@ export default function RecetasCliente({ rol }: { rol: string }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-            <textarea value={form.descripcion} onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" rows={2} />
+            <label htmlFor="receta-descripcion" className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+            <textarea id="receta-descripcion" name="descripcion" value={form.descripcion} onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" rows={2} />
           </div>
 
           {/* Fases de Fabricación */}
@@ -229,6 +229,10 @@ export default function RecetasCliente({ rol }: { rol: string }) {
                 <div className="bg-blue-50 px-4 py-3 flex items-center gap-3">
                   <span className="bg-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">{fIdx + 1}</span>
                   <input
+                    id={`fase-${fIdx}-nombre`}
+                    name={`fase-${fIdx}-nombre`}
+                    aria-label={`Nombre de la fase ${fIdx + 1}`}
+                    autoComplete="off"
                     value={fase.nombre}
                     onChange={(e) => updateFase(fIdx, "nombre", e.target.value)}
                     className="flex-1 px-3 py-1.5 border rounded-lg text-sm font-medium"
@@ -240,8 +244,8 @@ export default function RecetasCliente({ rol }: { rol: string }) {
 
                 <div className="p-4 space-y-3">
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">Instrucciones de la fase (opcional)</label>
-                    <input value={fase.instrucciones} onChange={(e) => updateFase(fIdx, "instrucciones", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" placeholder="Instrucciones generales para esta fase..." />
+                    <label htmlFor={`fase-${fIdx}-instrucciones`} className="block text-xs text-gray-600 mb-1">Instrucciones de la fase (opcional)</label>
+                    <input id={`fase-${fIdx}-instrucciones`} name={`fase-${fIdx}-instrucciones`} autoComplete="off" value={fase.instrucciones} onChange={(e) => updateFase(fIdx, "instrucciones", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" placeholder="Instrucciones generales para esta fase..." />
                   </div>
 
                   {/* Ingredientes de esta fase */}
@@ -258,8 +262,8 @@ export default function RecetasCliente({ rol }: { rol: string }) {
                       <p className="text-xs font-semibold text-gray-400 mb-2">Material {ingIdx + 1}</p>
                       <div className="grid grid-cols-4 gap-3">
                         <div className="col-span-2">
-                          <label className="block text-xs text-gray-600 mb-1">Material</label>
-                          <select value={ing.materialId} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "materialId", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" required>
+                          <label htmlFor={`fase-${fIdx}-ing-${ingIdx}-material`} className="block text-xs text-gray-600 mb-1">Material</label>
+                          <select id={`fase-${fIdx}-ing-${ingIdx}-material`} name={`fase-${fIdx}-ing-${ingIdx}-material`} value={ing.materialId} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "materialId", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" required>
                             <option value="">Seleccionar...</option>
                             {materiales.map((m) => (
                               <option key={m.id} value={m.id}>{m.nombre} ({m.unidad})</option>
@@ -267,28 +271,28 @@ export default function RecetasCliente({ rol }: { rol: string }) {
                           </select>
                         </div>
                         <div>
-                          <label className="block text-xs text-gray-600 mb-1">Cantidad</label>
-                          <input type="number" step="0.001" value={ing.cantidadTarget} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "cantidadTarget", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" required />
+                          <label htmlFor={`fase-${fIdx}-ing-${ingIdx}-cantidad`} className="block text-xs text-gray-600 mb-1">Cantidad</label>
+                          <input id={`fase-${fIdx}-ing-${ingIdx}-cantidad`} name={`fase-${fIdx}-ing-${ingIdx}-cantidad`} type="number" step="0.001" autoComplete="off" value={ing.cantidadTarget} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "cantidadTarget", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" required />
                         </div>
                         <div className="flex gap-2">
                           <div>
-                            <label className="block text-xs text-gray-600 mb-1">Tol -</label>
-                            <input type="number" step="0.1" value={ing.toleranciaMin} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "toleranciaMin", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" />
+                            <label htmlFor={`fase-${fIdx}-ing-${ingIdx}-tolerancia-min`} className="block text-xs text-gray-600 mb-1">Tol -</label>
+                            <input id={`fase-${fIdx}-ing-${ingIdx}-tolerancia-min`} name={`fase-${fIdx}-ing-${ingIdx}-tolerancia-min`} type="number" step="0.1" autoComplete="off" value={ing.toleranciaMin} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "toleranciaMin", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" />
                           </div>
                           <div>
-                            <label className="block text-xs text-gray-600 mb-1">Tol +</label>
-                            <input type="number" step="0.1" value={ing.toleranciaMax} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "toleranciaMax", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" />
+                            <label htmlFor={`fase-${fIdx}-ing-${ingIdx}-tolerancia-max`} className="block text-xs text-gray-600 mb-1">Tol +</label>
+                            <input id={`fase-${fIdx}-ing-${ingIdx}-tolerancia-max`} name={`fase-${fIdx}-ing-${ingIdx}-tolerancia-max`} type="number" step="0.1" autoComplete="off" value={ing.toleranciaMax} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "toleranciaMax", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" />
                           </div>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-3 mt-2">
                         <div>
-                          <label className="block text-xs text-gray-600 mb-1">Instrucciones</label>
-                          <input value={ing.instrucciones} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "instrucciones", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" placeholder="Agregar lentamente..." />
+                          <label htmlFor={`fase-${fIdx}-ing-${ingIdx}-instrucciones`} className="block text-xs text-gray-600 mb-1">Instrucciones</label>
+                          <input id={`fase-${fIdx}-ing-${ingIdx}-instrucciones`} name={`fase-${fIdx}-ing-${ingIdx}-instrucciones`} autoComplete="off" value={ing.instrucciones} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "instrucciones", e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm" placeholder="Agregar lentamente..." />
                         </div>
                         <div className="flex items-end">
-                          <label className="flex items-center gap-2 text-sm cursor-pointer">
-                            <input type="checkbox" checked={ing.peligroso} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "peligroso", e.target.checked)} className="rounded" />
+                          <label htmlFor={`fase-${fIdx}-ing-${ingIdx}-peligroso`} className="flex items-center gap-2 text-sm cursor-pointer">
+                            <input id={`fase-${fIdx}-ing-${ingIdx}-peligroso`} name={`fase-${fIdx}-ing-${ingIdx}-peligroso`} type="checkbox" checked={ing.peligroso} onChange={(e) => updateIngredienteInFase(fIdx, ingIdx, "peligroso", e.target.checked)} className="rounded" />
                             Peligroso
                           </label>
                         </div>

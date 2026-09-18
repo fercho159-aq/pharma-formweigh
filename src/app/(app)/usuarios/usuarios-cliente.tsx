@@ -85,21 +85,21 @@ export default function UsuariosCliente({ rol }: { rol: string }) {
         <form onSubmit={handleSubmit} className="bg-white rounded-xl border p-6 mb-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-              <input value={form.nombre} onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" required />
+              <label htmlFor="usuario-nombre" className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+              <input id="usuario-nombre" name="nombre" autoComplete="off" value={form.nombre} onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" required />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" required />
+              <label htmlFor="usuario-email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input id="usuario-email" name="email" type="email" autoComplete="off" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" required />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-              <input type="password" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" minLength={10} autoComplete="new-password" required />
+              <label htmlFor="usuario-password" className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+              <input id="usuario-password" name="password" type="password" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" minLength={10} autoComplete="new-password" required />
               <p className="text-xs text-gray-400 mt-1">Mínimo 10 caracteres</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Rol</label>
-              <select value={form.rol} onChange={(e) => setForm((f) => ({ ...f, rol: e.target.value }))} className="w-full px-3 py-2 border rounded-lg">
+              <label htmlFor="usuario-rol" className="block text-sm font-medium text-gray-700 mb-1">Rol</label>
+              <select id="usuario-rol" name="rol" value={form.rol} onChange={(e) => setForm((f) => ({ ...f, rol: e.target.value }))} className="w-full px-3 py-2 border rounded-lg">
                 <option value="OPERARIO">Operario</option>
                 <option value="SUPERVISOR">Supervisor</option>
                 <option value="DESARROLLO">Desarrollo</option>
@@ -110,8 +110,8 @@ export default function UsuariosCliente({ rol }: { rol: string }) {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Badge (código de barras)</label>
-              <input value={form.badge} onChange={(e) => setForm((f) => ({ ...f, badge: e.target.value }))} className="w-full px-3 py-2 border rounded-lg font-mono" placeholder="BADGE-001" />
+              <label htmlFor="usuario-badge" className="block text-sm font-medium text-gray-700 mb-1">Badge (código de barras)</label>
+              <input id="usuario-badge" name="badge" autoComplete="off" value={form.badge} onChange={(e) => setForm((f) => ({ ...f, badge: e.target.value }))} className="w-full px-3 py-2 border rounded-lg font-mono" placeholder="BADGE-001" />
             </div>
           </div>
           <div className="flex gap-2">

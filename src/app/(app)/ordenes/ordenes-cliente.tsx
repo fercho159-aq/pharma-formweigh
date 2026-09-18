@@ -105,8 +105,8 @@ export default function OrdenesCliente({ rol }: { rol: string }) {
           <h3 className="font-semibold">Nueva Orden de Producción</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Receta</label>
-              <select value={form.recetaId} onChange={(e) => setForm((f) => ({ ...f, recetaId: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" required>
+              <label htmlFor="orden-receta" className="block text-sm font-medium text-gray-700 mb-1">Receta</label>
+              <select id="orden-receta" name="recetaId" value={form.recetaId} onChange={(e) => setForm((f) => ({ ...f, recetaId: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" required>
                 <option value="">Seleccionar receta...</option>
                 {recetas.map((r) => (
                   <option key={r.id} value={r.id}>{r.codigo} - {r.nombre}</option>
@@ -114,16 +114,16 @@ export default function OrdenesCliente({ rol }: { rol: string }) {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Lote del Producto Final</label>
-              <input value={form.loteProducto} onChange={(e) => setForm((f) => ({ ...f, loteProducto: e.target.value }))} className="w-full px-3 py-2 border rounded-lg font-mono" placeholder="PROD-2024-001" required />
+              <label htmlFor="orden-lote-producto" className="block text-sm font-medium text-gray-700 mb-1">Lote del Producto Final</label>
+              <input id="orden-lote-producto" name="loteProducto" autoComplete="off" value={form.loteProducto} onChange={(e) => setForm((f) => ({ ...f, loteProducto: e.target.value }))} className="w-full px-3 py-2 border rounded-lg font-mono" placeholder="PROD-2024-001" required />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad (multiplicador)</label>
-              <input type="number" step="0.01" min="0.01" value={form.cantidad} onChange={(e) => setForm((f) => ({ ...f, cantidad: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" required />
+              <label htmlFor="orden-cantidad" className="block text-sm font-medium text-gray-700 mb-1">Cantidad (multiplicador)</label>
+              <input id="orden-cantidad" name="cantidad" type="number" step="0.01" min="0.01" autoComplete="off" value={form.cantidad} onChange={(e) => setForm((f) => ({ ...f, cantidad: e.target.value }))} className="w-full px-3 py-2 border rounded-lg" required />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Prioridad</label>
-              <select value={form.prioridad} onChange={(e) => setForm((f) => ({ ...f, prioridad: e.target.value }))} className="w-full px-3 py-2 border rounded-lg">
+              <label htmlFor="orden-prioridad" className="block text-sm font-medium text-gray-700 mb-1">Prioridad</label>
+              <select id="orden-prioridad" name="prioridad" value={form.prioridad} onChange={(e) => setForm((f) => ({ ...f, prioridad: e.target.value }))} className="w-full px-3 py-2 border rounded-lg">
                 <option value="0">Normal</option>
                 <option value="1">Alta</option>
                 <option value="2">Urgente</option>

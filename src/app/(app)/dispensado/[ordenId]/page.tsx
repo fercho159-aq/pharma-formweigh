@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useCallback, use } from "react";
 import { useRouter } from "next/navigation";
 import BarcodeInput from "@/components/barcode-input";
 import { BARRA_AMBAR_ANCHO, BARRA_VERDE_FIN, BARRA_VERDE_INICIO, evaluarPeso, posicionEnBarra } from "@/lib/dominio/tolerancia";
@@ -71,20 +71,7 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
   // All phases completed
   const [allCompleted, setAllCompleted] = useState(false);
 
-  useEffect(() => { loadOrden(); }, [ordenId]);
-
-  async function loadOrden() {
-    setLoading(true);
-    const res = await fetch(`/api/dispensado/${ordenId}`);
-    if (res.ok) {
-      const data: OrdenDetalle = await res.json();
-      setOrden(data);
-      initializeState(data);
-    }
-    setLoading(false);
-  }
-
-  function initializeState(data: OrdenDetalle) {
+  const initializeState = useCallback((data: OrdenDetalle) => {
     // Find the first phase that is not fully signed
     const firstActivePhaseIdx = data.fases.findIndex((f) => !f.firma);
     if (firstActivePhaseIdx < 0) {
@@ -119,7 +106,28 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
     setFirmaEmail("");
     setFirmaPassword("");
     setFirmaError("");
-  }
+  }, []);
+
+  const loadOrden = useCallback(async () => {
+    setLoading(true);
+    const res = await fetch(`/api/dispensado/${ordenId}`);
+    if (res.ok) {
+      const data: OrdenDetalle = await res.json();
+      setOrden(data);
+      initializeState(data);
+    }
+    setLoading(false);
+  }, [ordenId, initializeState]);
+
+  // La carga vive en una función local: así el efecto no llama a setState de forma
+  // síncrona (react-hooks/set-state-in-effect) y `loadOrden` sigue disponible
+  // para los handlers de pesaje y firma.
+  useEffect(() => {
+    async function cargarInicial() {
+      await loadOrden();
+    }
+    cargarInicial();
+  }, [loadOrden]);
 
   function getCurrentFase(): Fase | null {
     if (!orden || currentPhaseIdx >= orden.fases.length) return null;
@@ -428,12 +436,13 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
                   )}
                   <form onSubmit={handleFirma} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Email del Supervisor</label>
-                      <input type="email" value={firmaEmail} onChange={(e) => setFirmaEmail(e.target.value)} className="w-full px-4 py-3 border rounded-lg" required />
+                      <label htmlFor="firma-email" className="block text-sm font-medium text-gray-700 mb-1">Email del Supervisor</label>
+                      {/* autoComplete="off": firma OTRA persona, no debe rellenarse con la del operario. */}
+                      <input id="firma-email" name="firma-email" type="email" autoComplete="off" value={firmaEmail} onChange={(e) => setFirmaEmail(e.target.value)} className="w-full px-4 py-3 border rounded-lg" required />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-                      <input type="password" value={firmaPassword} onChange={(e) => setFirmaPassword(e.target.value)} className="w-full px-4 py-3 border rounded-lg" required />
+                      <label htmlFor="firma-password" className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                      <input id="firma-password" name="firma-password" type="password" autoComplete="off" value={firmaPassword} onChange={(e) => setFirmaPassword(e.target.value)} className="w-full px-4 py-3 border rounded-lg" required />
                     </div>
                     <button type="submit" disabled={firmaLoading} className="w-full bg-blue-700 text-white py-3 rounded-lg font-semibold hover:bg-blue-800 cursor-pointer disabled:bg-blue-400 disabled:cursor-wait">
                       {firmaLoading ? "Firmando..." : "Firmar y Aprobar Fase"}
@@ -489,6 +498,7 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
                     <div className="bg-white rounded-xl border p-6">
                       <BarcodeInput
                         onScan={handleScan}
+                        id="dispensado-codigo-lote"
                         label="Escanear código de barras del lote"
                         placeholder="Escanea el contenedor del material..."
                       />
@@ -512,8 +522,12 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
                         <p className="text-xs font-semibold uppercase mb-2">{status.label}</p>
                         <div className="flex items-center justify-center gap-4 mb-4">
                           <input
+                            id="dispensado-peso"
+                            name="dispensado-peso"
+                            aria-label={`Peso en ${ing.materialUnidad}`}
                             type="number"
                             step="0.001"
+                            autoComplete="off"
                             value={peso}
                             onChange={(e) => handlePesoChange(e.target.value)}
                             className={`text-5xl font-bold text-center w-64 bg-transparent border-b-4 ${status.border} ${status.text} focus:outline-none`}

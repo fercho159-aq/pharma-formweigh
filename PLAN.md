@@ -141,6 +141,8 @@ imagen construida en Actions, respaldo `pg_dump` diario con 14 días.
 ## 13. Pendientes
 
 ### PENDIENTE(cliente) — reglas que el sistema hoy resuelve con el valor más conservador o heredado
+Ronda lista para enviar: `docs/PREGUNTAS_CLIENTE_RONDA_1.md` (29 preguntas, cada una con lo que el sistema hace hoy).
+
 1. **Segregación de funciones en la firma:** ¿puede firmar una fase la misma persona que la pesó (p. ej. un supervisor que dispensa)? Hoy no se bloquea.
 2. **Fuera de tolerancia:** hoy el pesaje se rechaza. ¿Existe un flujo de desviación autorizada por Calidad?
 3. **Quién aprueba lotes:** se aplicó el manual (Calidad, Supervisor, Admin; Almacén no). ¿Supervisor debe poder?
@@ -157,6 +159,6 @@ imagen construida en Actions, respaldo `pg_dump` diario con 14 días.
 ### PENDIENTE(Fernando)
 1. Aprobar este `PLAN.md` y los ADR-001, 004, 005, 010 (cambian el modelo de datos).
 2. Horas, tarifa, precio, mensualidad y forma de pago de `docs/propuesta/*` (hoy marcados como pendiente, sin cifras inventadas).
-3. La cotización anterior afirma «21 CFR Part 11 ✓» y «disponibilidad 99.9 %»: no es verificable; decidir si se retira de lo ya enviado.
-4. Dar de baja el proyecto de Vercel y la base Neon (expuso credenciales por defecto; ver `docs/OPERACION.md`).
-5. Purgar del historial de git los binarios `gh` (48 MB) y `docs/tectonic` (54 MB): ya no están en el árbol, pero reescribir historia exige `push --force`.
+3. La cotización anterior afirma «21 CFR Part 11 ✓» y «disponibilidad 99.9 %»: no es verificable. En el repo ya está en `docs/archivo-obsoleto/` con aviso de no enviar y los guiones de video se corrigieron; **falta decidir** si se retira de lo ya enviado a prospectos y si se regraban los videos.
+4. ~~Dar de baja Vercel + Neon~~ — hecho 2026-09-18 lo reversible (respaldo, redirección 308, desconexión de Git y de Neon). Falta el borrado definitivo, no antes del 2026-10-19: `docs/OPERACION.md §8`.
+5. ~~Purgar del historial los binarios `gh` y `docs/tectonic`~~ — **descartado 2026-09-18**: medido, el repo completo pesa 40 MiB empaquetado; se ahorrarían ~35 MB a cambio de `push --force` en `main`, SHA nuevos para todo (rompe las referencias de este plan, los ADR y los PR #1–#6). Si algún día se quiere: `git filter-repo --invert-paths --path gh --path docs/tectonic`.

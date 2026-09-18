@@ -8,6 +8,8 @@ interface BarcodeInputProps {
   label?: string;
   disabled?: boolean;
   autoFocus?: boolean;
+  /** Identifica el campo en la pantalla que lo usa (label ↔ input y autotests). */
+  id?: string;
 }
 
 export default function BarcodeInput({
@@ -16,6 +18,7 @@ export default function BarcodeInput({
   label = "Código de Barras",
   disabled = false,
   autoFocus = true,
+  id = "codigo-barras",
 }: BarcodeInputProps) {
   const [value, setValue] = useState("");
   const [isScanning, setIsScanning] = useState(false);
@@ -123,7 +126,7 @@ export default function BarcodeInput({
   return (
     <div>
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+        <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
       )}
       <div className="relative">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -143,12 +146,15 @@ export default function BarcodeInput({
         </div>
         <input
           ref={inputRef}
+          id={id}
+          name={id}
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={disabled || cameraActive}
           placeholder={placeholder}
+          autoComplete="off"
           className={`w-full pl-10 pr-20 py-3 border-2 rounded-lg text-lg font-mono transition-colors ${
             isScanning
               ? "border-green-500 bg-green-50"

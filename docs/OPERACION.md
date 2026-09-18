@@ -343,8 +343,18 @@ PharmaWeigh vivía en Vercel con base de datos en Neon. Con el VPS en operación
 despliegue queda duplicado: mismo producto, dos bases de datos que se van separando
 en silencio, y alguien puede seguir capturando pesajes en la vieja.
 
-> **Decisión de Fernando.** Nada de esto se ejecuta sin su visto bueno explícito.
-> Aquí solo queda documentado el procedimiento.
+> **Estado al 2026-09-18** (autorizado por Fernando ese día). Ejecutados los pasos 2, 4 y 5, todos reversibles:
+> - **2 Respaldo:** `/opt/backups/pharmaweigh/neon_pharmaweigh_final_2026-09-18.sql.gz` (root 600, 10 tablas, íntegro).
+>   No entra en la retención de 14 días (otro prefijo). Solo contenía datos demo corruptos: **no se migró nada** (ADR-010).
+> - **4 Redirección:** `pharma-formweigh.vercel.app` responde 308 → sitio nuevo en todas las rutas (incluidas las
+>   `/api/*` que antes respondían sin sesión). Los despliegues antiguos solo son alcanzables tras el SSO de Vercel.
+> - **5 Desconexión:** Git desconectado del proyecto de Vercel (ningún push lo reemplaza) y el recurso Neon
+>   `neon-aquamarine-car` desconectado del proyecto (0 variables de entorno).
+>
+> **Pendiente (pasos 6–7), no antes del 2026-10-19:** `vercel integration-resource remove neon-aquamarine-car` y
+> `vercel project rm pharma-formweigh`, ambos con `--scope mawsoluciones-projects`. Son irreversibles: confirmar antes
+> que el respaldo del paso 2 sigue ahí. Para revertir lo hecho: `vercel git connect` y
+> `vercel integration-resource` (reconectar) + redeploy de un commit anterior.
 
 Orden sugerido, sin prisa y con vuelta atrás en cada paso:
 

@@ -76,6 +76,9 @@ export default function AuditoriaPage() {
       {/* Filters */}
       <div className="flex gap-4 mb-4">
         <select
+          id="auditoria-filtro-accion"
+          name="auditoria-filtro-accion"
+          aria-label="Filtrar por acción"
           value={filtroAccion}
           onChange={(e) => setFiltroAccion(e.target.value)}
           className="px-3 py-2 border rounded-lg text-sm"
@@ -84,6 +87,9 @@ export default function AuditoriaPage() {
           {acciones.map((a) => <option key={a} value={a}>{a}</option>)}
         </select>
         <select
+          id="auditoria-filtro-usuario"
+          name="auditoria-filtro-usuario"
+          aria-label="Filtrar por usuario"
           value={filtroUsuario}
           onChange={(e) => setFiltroUsuario(e.target.value)}
           className="px-3 py-2 border rounded-lg text-sm"

@@ -213,8 +213,11 @@ export default function InventarioCliente({ rol }: { rol: string }) {
             <form onSubmit={handleCreateMaterial} className="bg-white rounded-xl border p-6 mb-4 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Código (barras)</label>
+                  <label htmlFor="material-codigo" className="block text-sm font-medium text-gray-700 mb-1">Código (barras)</label>
                   <input
+                    id="material-codigo"
+                    name="codigo"
+                    autoComplete="off"
                     value={matForm.codigo}
                     onChange={(e) => setMatForm((f) => ({ ...f, codigo: e.target.value }))}
                     className="w-full px-3 py-2 border rounded-lg"
@@ -222,8 +225,11 @@ export default function InventarioCliente({ rol }: { rol: string }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                  <label htmlFor="material-nombre" className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
                   <input
+                    id="material-nombre"
+                    name="nombre"
+                    autoComplete="off"
                     value={matForm.nombre}
                     onChange={(e) => setMatForm((f) => ({ ...f, nombre: e.target.value }))}
                     className="w-full px-3 py-2 border rounded-lg"
@@ -231,8 +237,10 @@ export default function InventarioCliente({ rol }: { rol: string }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Unidad</label>
+                  <label htmlFor="material-unidad" className="block text-sm font-medium text-gray-700 mb-1">Unidad</label>
                   <select
+                    id="material-unidad"
+                    name="unidad"
                     value={matForm.unidad}
                     onChange={(e) => setMatForm((f) => ({ ...f, unidad: e.target.value }))}
                     className="w-full px-3 py-2 border rounded-lg"
@@ -246,11 +254,14 @@ export default function InventarioCliente({ rol }: { rol: string }) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Stock Mínimo</label>
+                  <label htmlFor="material-stock-minimo" className="block text-sm font-medium text-gray-700 mb-1">Stock Mínimo</label>
                   <input
+                    id="material-stock-minimo"
+                    name="stockMinimo"
                     type="number"
                     step="0.01"
                     min="0"
+                    autoComplete="off"
                     value={matForm.stockMinimo}
                     onChange={(e) => setMatForm((f) => ({ ...f, stockMinimo: e.target.value }))}
                     className="w-full px-3 py-2 border rounded-lg"
@@ -258,8 +269,11 @@ export default function InventarioCliente({ rol }: { rol: string }) {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                <label htmlFor="material-descripcion" className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
                 <input
+                  id="material-descripcion"
+                  name="descripcion"
+                  autoComplete="off"
                   value={matForm.descripcion}
                   onChange={(e) => setMatForm((f) => ({ ...f, descripcion: e.target.value }))}
                   className="w-full px-3 py-2 border rounded-lg"
@@ -401,6 +415,7 @@ export default function InventarioCliente({ rol }: { rol: string }) {
 
             <BarcodeInput
               onScan={handleScanRecepcion}
+              id="recepcion-codigo-material"
               label="1. Escanear código del material"
               placeholder="Escanea o escribe el código del material..."
             />
@@ -421,8 +436,11 @@ export default function InventarioCliente({ rol }: { rol: string }) {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Número de Lote</label>
+                    <label htmlFor="recepcion-numero-lote" className="block text-sm font-medium text-gray-700 mb-1">Número de Lote</label>
                     <input
+                      id="recepcion-numero-lote"
+                      name="numeroLote"
+                      autoComplete="off"
                       value={recForm.numeroLote}
                       onChange={(e) => setRecForm((f) => ({ ...f, numeroLote: e.target.value }))}
                       className="w-full px-3 py-2 border rounded-lg font-mono"
@@ -431,11 +449,14 @@ export default function InventarioCliente({ rol }: { rol: string }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad ({recMaterial.unidad})</label>
+                    <label htmlFor="recepcion-cantidad" className="block text-sm font-medium text-gray-700 mb-1">Cantidad ({recMaterial.unidad})</label>
                     <input
+                      id="recepcion-cantidad"
+                      name="cantidad"
                       type="number"
                       step="0.0001"
                       min="0.0001"
+                      autoComplete="off"
                       value={recForm.cantidad}
                       onChange={(e) => setRecForm((f) => ({ ...f, cantidad: e.target.value }))}
                       className="w-full px-3 py-2 border rounded-lg"
@@ -443,8 +464,11 @@ export default function InventarioCliente({ rol }: { rol: string }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Proveedor</label>
+                    <label htmlFor="recepcion-proveedor" className="block text-sm font-medium text-gray-700 mb-1">Proveedor</label>
                     <input
+                      id="recepcion-proveedor"
+                      name="proveedor"
+                      autoComplete="off"
                       value={recForm.proveedor}
                       onChange={(e) => setRecForm((f) => ({ ...f, proveedor: e.target.value }))}
                       className="w-full px-3 py-2 border rounded-lg"
@@ -452,9 +476,12 @@ export default function InventarioCliente({ rol }: { rol: string }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Caducidad</label>
+                    <label htmlFor="recepcion-fecha-caducidad" className="block text-sm font-medium text-gray-700 mb-1">Fecha de Caducidad</label>
                     <input
+                      id="recepcion-fecha-caducidad"
+                      name="fechaCaducidad"
                       type="date"
+                      autoComplete="off"
                       value={recForm.fechaCaducidad}
                       onChange={(e) => setRecForm((f) => ({ ...f, fechaCaducidad: e.target.value }))}
                       className="w-full px-3 py-2 border rounded-lg"
@@ -464,8 +491,11 @@ export default function InventarioCliente({ rol }: { rol: string }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Certificado de Análisis (referencia)</label>
+                  <label htmlFor="recepcion-certificado" className="block text-sm font-medium text-gray-700 mb-1">Certificado de Análisis (referencia)</label>
                   <input
+                    id="recepcion-certificado"
+                    name="certificado"
+                    autoComplete="off"
                     value={recForm.certificado}
                     onChange={(e) => setRecForm((f) => ({ ...f, certificado: e.target.value }))}
                     className="w-full px-3 py-2 border rounded-lg"

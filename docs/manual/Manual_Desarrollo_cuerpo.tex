@@ -1,5 +1,6 @@
 % =====================================================================
 %  CUERPO DEL MANUAL DE DESARROLLO - PharmaWeigh
+%  Capturas reales del sistema. Sin credenciales.
 % =====================================================================
 
 \seccion{1. Acceso al sistema}
@@ -8,359 +9,357 @@
 
 \vspace{8pt}
 
-Para ingresar al sistema:
-\begin{enumerate}
-    \item Abre tu navegador web (Chrome recomendado).
-    \item Ve a la dirección \cd{https://pharma-formweigh.vercel.app}.
-    \item Ingresa tu \campo{email} y tu \campo{contraseña}.
-    \item Haz clic en \boton{Ingresar}.
-\end{enumerate}
+\reglasAcceso
 
-\begin{center}
-\fbox{\includegraphics[width=0.85\linewidth]{capturas/01_login.png}}\\[3pt]
-{\footnotesize\color{gristexto}Pantalla de inicio de sesión. Ingresa tu email y contraseña.}
-\end{center}
+\captura{01_login.png}{Pantalla de entrada.}
 
-Como personal de \textbf{Desarrollo / Formulación}, tu función principal es
-\textbf{crear y cargar las recetas maestras} (fórmulas) al sistema. Estas recetas
-definen exactamente qué materiales, en qué cantidades y con qué tolerancias se
-deben pesar para fabricar cada producto.
-
-\begin{cajaNota}
-\textbf{Tu menú lateral muestra:} Dashboard, Recetas, Inventario (consulta),
-Auditoría (consulta) y Órdenes (consulta). No tienes acceso a Usuarios,
-Dispensado ni Códigos de Barras.
-\end{cajaNota}
-
-% =====================================================================
-\seccion{2. Tu rol en el proceso de producción}
-
-En una planta farmacéutica, el flujo de producción sigue estas etapas.
-Tu participación es en la \textbf{primera etapa}:
-
-\vspace{6pt}
-\begin{center}
-\begin{tikzpicture}[
-    node distance=0.3cm and 1.2cm,
-    every node/.style={font=\footnotesize},
-    paso/.style={draw=pharmablue, fill=pharmablue!8, rounded corners=6pt,
-        minimum width=2.6cm, minimum height=1cm, align=center, text width=2.4cm},
-    tuyo/.style={draw=pharmaazul, fill=pharmaazul!15, rounded corners=6pt,
-        minimum width=2.6cm, minimum height=1cm, align=center, text width=2.4cm,
-        line width=1.5pt},
-    flecha/.style={-{Stealth[length=5pt]}, thick, color=gristexto}
-]
-\node[tuyo] (receta) {\textbf{1. DESARROLLO}\\Crear receta\\maestra};
-\node[paso, right=of receta] (almacen) {2. ALMACÉN\\Recibir materias\\primas};
-\node[paso, right=of almacen] (super) {3. SUPERVISOR\\Crear orden de\\producción};
-\node[paso, below=1cm of receta] (oper) {4. OPERARIO\\Dispensar\\(pesar)};
-\node[paso, right=of oper] (calidad) {5. CALIDAD\\Revisar y\\liberar lote};
-\draw[flecha] (receta) -- (almacen);
-\draw[flecha] (almacen) -- (super);
-\draw[flecha] (super) |- (oper);
-\draw[flecha] (oper) -- (calidad);
-\end{tikzpicture}
-\end{center}
-\vspace{6pt}
-
-\begin{cajaInfo}[Principio de segregación de funciones (BPM/GMP)]
-Quien diseña la fórmula (Desarrollo) \textbf{no es quien la ejecuta} (Operario),
-ni quien la aprueba (Calidad). Esta separación garantiza la integridad del proceso
-y cumple con las Buenas Prácticas de Manufactura.
-\end{cajaInfo}
+\avisoValidacion
 
 % =====================================================================
 \newpage
-\seccion{3. Dashboard}
+\seccion{2. Tu papel dentro del sistema}
 
-Al ingresar verás el \textbf{Dashboard} con un resumen del estado de producción:
-
-\begin{center}
-\fbox{\includegraphics[width=0.92\linewidth]{capturas/03_dashboard.png}}\\[3pt]
-{\footnotesize\color{gristexto}Dashboard principal: KPIs, órdenes recientes y actividad del sistema.}
-\end{center}
-
-Como Desarrollo, los indicadores que más te interesan son:
-\begin{itemize}
-    \item \textbf{Recetas Activas:} cuántas recetas están disponibles para producción.
-    \item \textbf{Materiales:} total de materias primas registradas en el sistema.
-    \item \textbf{Completadas:} órdenes terminadas (tus recetas en acción).
-\end{itemize}
-
-% =====================================================================
-\seccion{4. Creación de recetas maestras}
-
-Este es \textbf{tu módulo principal}. Cada receta define la fórmula completa
-de un producto farmacéutico.
-
-\subseccion{4.1 Estructura de una receta}
-
-\begin{cajaTip}[Componentes de una receta]
-\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
-\textbf{Código}       & Identificador único (ej: \codigo{REC-PCT-500}) \\
-\textbf{Nombre}       & Nombre del producto (ej: Tableta Paracetamol 500mg) \\
-\textbf{Rendimiento}  & Cantidad que produce (ej: 10,000 tabletas) \\
-\textbf{Fases}        & Etapas del proceso (ej: Dispensado de activos, Mezclado) \\
-\textbf{Ingredientes} & Lista ordenada de materiales con cantidades y tolerancias \\
-\end{tabularx}
-\end{cajaTip}
-
-\subseccion{4.2 Crear una receta nueva paso a paso}
-
-\begin{enumerate}
-    \item Ve a \menu{Recetas} en el menú lateral.
-    \item Haz clic en \boton{+ Nueva Receta}.
-
-    \item \textbf{Datos generales:}
-        \begin{itemize}
-            \item \campo{Código}: identificador único. Usa el formato \codigo{REC-XXX-NNN}
-                  donde XXX son las iniciales del principio activo y NNN la concentración.
-            \item \campo{Nombre}: nombre descriptivo del producto final.
-            \item \campo{Rendimiento}: cuántas unidades produce la receta base.
-            \item \campo{Unidad de Rendimiento}: tabletas, cápsulas, mL, kg, etc.
-        \end{itemize}
-
-    \item \textbf{Crear las fases:}
-        \begin{itemize}
-            \item Haz clic en \boton{+ Agregar Fase}.
-            \item Cada fase representa una etapa del proceso
-                  (ej: ``Dispensado de activos'', ``Mezclado y lubricación'').
-            \item Las fases se ejecutan en orden secuencial.
-            \item El supervisor debe firmar cada fase antes de pasar a la siguiente.
-        \end{itemize}
-
-    \item \textbf{Agregar ingredientes a cada fase:}
-        \begin{itemize}
-            \item Dentro de cada fase, haz clic en \boton{+ Agregar Ingrediente}.
-            \item \campo{Material}: selecciona de la lista de materias primas registradas.
-            \item \campo{Cantidad (Target)}: el peso exacto requerido en la unidad del material.
-            \item \campo{Tolerancia Mín \%}: porcentaje mínimo aceptable (ej: $-1\%$).
-            \item \campo{Tolerancia Máx \%}: porcentaje máximo aceptable (ej: $+1\%$).
-            \item \campo{Instrucciones}: texto que verá el operario en pantalla durante el pesaje.
-            \item \campo{Material Peligroso}: marca esta casilla si requiere EPP especial.
-        \end{itemize}
-
-    \item Verifica el \textbf{orden de los ingredientes} --- el operario los pesará
-          exactamente en ese orden. No podrá saltarse pasos.
-
-    \item Haz clic en \boton{Guardar Receta}.
-\end{enumerate}
+Como \manualRol{} cargas las fórmulas de producción. Lo que guardes en una receta es,
+literalmente, lo que va a aparecer en la pantalla del operario y lo que el sistema va
+a exigir en la balanza.
 
 \begin{center}
-\fbox{\includegraphics[width=0.92\linewidth]{capturas/13_receta_nueva.png}}\\[3pt]
-{\footnotesize\color{gristexto}Formulario de nueva receta: datos generales, fases e ingredientes con tolerancias.}
-\end{center}
-
-\newpage
-\subseccion{4.3 Definición de tolerancias}
-
-Las tolerancias son \textbf{críticas} porque el sistema las usa para el semáforo
-de pesaje. Un peso fuera de tolerancia queda \textbf{bloqueado automáticamente}.
-
-\vspace{6pt}
-\begin{center}
-\begin{tabularx}{0.9\linewidth}{@{}l c >{\raggedright\arraybackslash}X@{}}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X c@{}}
 \toprule
-\textbf{Tipo de material} & \textbf{Tolerancia típica} & \textbf{Justificación} \\
+\textbf{Acción} & \textbf{Puedes} \\
 \midrule
-Principio activo      & $\pm 1\%$        & Alta precisión requerida (dosis exacta) \\
-Excipiente principal  & $\pm 2\%$ a $\pm 3\%$ & Menor impacto en dosis \\
-Excipiente menor      & $\pm 5\%$        & Componente auxiliar \\
-Lubricante/deslizante & $\pm 5\%$ a $\pm 10\%$ & Cantidades muy pequeñas \\
+\textbf{Crear recetas}                              & Sí \\
+Consultar órdenes y el detalle de cada pesaje       & Sí \\
+Consultar inventario, materiales y lotes            & Sí \\
+Consultar la bitácora de auditoría                  & Sí \\
+\midrule
+\textbf{Editar o borrar una receta}                 & \textbf{No (nadie puede)} \\
+Crear órdenes de producción                         & \textbf{No} \\
+Dar de alta materiales                              & \textbf{No} \\
+Recibir lotes o cambiar su estado                   & \textbf{No} \\
+Registrar pesajes                                   & \textbf{No} \\
+Firmar fases                                        & \textbf{No} \\
+Ver usuarios o códigos de barras                    & \textbf{No} \\
 \bottomrule
 \end{tabularx}
 \end{center}
 
+\subseccion{Tu menú}
+
+\menu{Dashboard}, \menu{Órdenes}, \menu{Dispensado}, \menu{Recetas},
+\menu{Inventario} y \menu{Auditoría}.
+
+\captura{03_dashboard.png}{Dashboard: conteos del día, procesos activos y actividad reciente.}
+
+% =====================================================================
+\newpage
+\seccion{3. Cómo está armada una receta}
+
+\vspace{6pt}
+\begin{center}
+\begin{tikzpicture}[
+    every node/.style={font=\footnotesize},
+    caja/.style={draw=pharmablue, fill=pharmablue!6, rounded corners=5pt,
+        minimum width=3.2cm, minimum height=0.8cm, align=center},
+    sub/.style={draw=pharmagreen, fill=pharmagreen!6, rounded corners=5pt,
+        minimum width=3.2cm, minimum height=0.7cm, align=center},
+    l/.style={-{Stealth[length=5pt]}, thick, color=gristexto}
+]
+\node[caja] (r) {\textbf{Receta}\\ \tiny código, nombre, rendimiento};
+\node[caja, below=0.5cm of r] (f1) {\textbf{Fase 1} \tiny(nombre + instrucciones)};
+\node[sub, below=0.4cm of f1] (i1) {Ingrediente 1 \tiny(material, cantidad, tolerancias)};
+\node[sub, below=0.25cm of i1] (i2) {Ingrediente 2};
+\node[caja, below=0.5cm of i2] (f2) {\textbf{Fase 2}};
+\node[sub, below=0.4cm of f2] (i3) {Ingrediente 3};
+\draw[l] (r) -- (f1);
+\draw[l] (f1) -- (i1);
+\draw[l] (i2) -- (f2);
+\draw[l] (f2) -- (i3);
+\end{tikzpicture}
+\end{center}
+\vspace{6pt}
+
+Tres niveles: la receta contiene \textbf{fases}, y cada fase contiene
+\textbf{ingredientes}. Eso no es decorativo:
+
+\begin{itemize}
+    \item El \textbf{orden de las fases} y el \textbf{orden de los ingredientes dentro
+          de cada fase} es el orden exacto en que el operario tiene que pesar.
+          \textbf{No lo puede alterar}: el servidor lo impone.
+    \item \textbf{Cada fase termina en una firma electrónica} de Supervisor, Calidad o
+          Administrador, y \textbf{bloquea la fase siguiente} hasta que se firme.
+\end{itemize}
+
 \begin{cajaOjo}
-\textbf{Tolerancias demasiado estrechas} causan rechazos innecesarios en piso.
-\textbf{Tolerancias demasiado amplias} comprometen la calidad del producto.
-Define las tolerancias según la farmacopea y la especificación del producto.
+\textbf{Cada fase que agregas es una firma que alguien tiene que ir a dar a la
+estación.} Divide por etapas reales del proceso (dispensado de activos, mezclado,
+granulación), no por comodidad de captura. Tres fases son tres interrupciones de la
+línea esperando a un supervisor.
 \end{cajaOjo}
 
-\subseccion{4.4 Instrucciones para el operario}
+% =====================================================================
+\newpage
+\seccion{4. Crear una receta}
 
-El campo \campo{Instrucciones} de cada ingrediente aparece como una \textbf{caja azul}
-en la pantalla de dispensado del operario. Escribe instrucciones claras y concisas:
+\subseccion{4.1 Paso a paso}
 
-\begin{itemize}
-    \item \textbf{Bueno:} ``Tamizar por malla 40 antes de pesar. Verificar identidad visual.''
-    \item \textbf{Bueno:} ``Usar mascarilla N95 y guantes de nitrilo. Polvo muy fino.''
-    \item \textbf{Malo:} ``Pesar con cuidado'' (demasiado genérico).
-\end{itemize}
+\begin{enumerate}
+    \item \menu{Recetas} $\rightarrow$ \boton{+ Nueva Receta}. El formulario se abre en
+          la misma pantalla.
+    \item Datos generales:
+        \begin{itemize}
+            \item \campo{Código}: identificador único (ej. \codigo{REC-PCT-500}).
+            \item \campo{Nombre}: descriptivo (ej. \textit{Tableta Paracetamol 500mg}).
+            \item \campo{Rendimiento} y \campo{Unidad Rendimiento}: kg, g, L, unidades
+                  o tabletas.
+            \item \campo{Descripción}: opcional.
+        \end{itemize}
+    \item \boton{+ Agregar Fase} por cada etapa. Cada fase pide su nombre (obligatorio)
+          y unas \campo{Instrucciones de la fase} opcionales, que el operario verá en la
+          cabecera mientras trabaja esa fase.
+    \item Dentro de cada fase, \boton{+ Agregar Material} por cada ingrediente:
+        \begin{itemize}
+            \item \campo{Material}: de la lista de materiales ya dados de alta.
+                  Entre paréntesis viene su unidad.
+            \item \campo{Cantidad}: el target para \textbf{un} lote estándar.
+            \item \campo{Tol -} y \campo{Tol +}: porcentajes (por omisión \cd{-2} y \cd{2}).
+            \item \campo{Instrucciones}: el texto que el operario lee en ese paso.
+            \item \campo{Peligroso}: enciende la alerta roja en la estación.
+        \end{itemize}
+    \item \boton{Guardar Receta}.
+\end{enumerate}
 
-\subseccion{4.5 Materiales peligrosos}
+\captura{13_receta_nueva.png}{Formulario de receta: primero las fases, y dentro de cada una sus materiales.}
 
-Si un ingrediente está marcado como \textbf{Material Peligroso}, el operario verá
-esta alerta durante el dispensado:
+\vspace{6pt}
 
-\begin{cajaPeligro}
-Siga las instrucciones al pie de la letra.
-Use el equipo de protección personal indicado (mascarilla, guantes, etc.).
-\end{cajaPeligro}
+El botón \boton{Guardar Receta} permanece \textbf{gris y deshabilitado} mientras no
+haya al menos una fase y todas las fases tengan al menos un material. Si el servidor
+rechaza el alta, el mensaje rojo aparece arriba del formulario y \textbf{no se guarda nada}.
+
+\begin{cajaOjo}
+\textbf{Una receta guardada no se edita, no se versiona y no se borra.} No existe esa
+pantalla, ni para ti ni para nadie. Revisa códigos, cantidades, unidades y tolerancias
+\textbf{antes} de pulsar el botón. Si te equivocaste, la única salida es dar de alta
+otra receta con código distinto y coordinar que las órdenes nuevas usen esa.
+\end{cajaOjo}
+
+\newpage
+\subseccion{4.2 Materiales: el prerrequisito}
+
+Sólo puedes elegir materiales que ya existan. \textbf{Tu rol no los da de alta}: eso lo
+hacen Almacén, Supervisión o el Administrador desde \menu{Inventario}.
+
+\captura{14_inventario_materiales.png}{Materiales disponibles, con su código y su unidad.}
+
+\vspace{6pt}
+
+Antes de empezar una receta, revisa esta tabla y confirma dos cosas:
+
+\begin{enumerate}
+    \item Que existan todos los materiales que vas a necesitar. Si falta alguno,
+          pídeselo a Almacén antes de abrir el formulario: si lo das de alta a media
+          captura, pierdes lo que llevabas escrito.
+    \item Que la \textbf{unidad} de cada material sea la correcta. La cantidad que
+          teclees se interpreta en \textit{esa} unidad, y \textbf{la unidad de un
+          material no se puede cambiar después}. Un material dado de alta en gramos
+          cuando debía ser kilogramos convierte todos tus targets en un error de
+          factor 1000.
+\end{enumerate}
 
 % =====================================================================
 \newpage
-\seccion{5. Consultar el inventario de materiales}
+\seccion{5. Tolerancias: cómo las calcula el sistema}
 
-Antes de crear una receta, verifica que los materiales que necesitas
-\textbf{existen en el sistema}. Si un material no está registrado, solicita
-al área de Almacén que lo dé de alta.
+\subseccion{5.1 La fórmula}
 
-\begin{center}
-\fbox{\includegraphics[width=0.92\linewidth]{capturas/14_inventario_materiales.png}}\\[3pt]
-{\footnotesize\color{gristexto}Inventario de materiales: código, nombre, stock actual, stock mínimo y lotes activos.}
-\end{center}
-
-\begin{cajaNota}
-Como Desarrollo, puedes \textbf{consultar} el inventario pero \textbf{no puedes}
-crear materiales ni registrar lotes. Esa función corresponde a Almacén.
-\end{cajaNota}
-
-% =====================================================================
-\seccion{6. Consultar recetas existentes}
-
-Desde \menu{Recetas} puedes ver todas las formulaciones cargadas en el sistema:
+Las tolerancias son \textbf{porcentaje del target}, y el target real se obtiene
+multiplicando la cantidad de la receta por el multiplicador de la orden.
 
 \begin{center}
-\fbox{\includegraphics[width=0.92\linewidth]{capturas/12_recetas.png}}\\[3pt]
-{\footnotesize\color{gristexto}Lista de recetas con código, nombre, versión, rendimiento y número de ingredientes.}
+\begin{tabularx}{0.95\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+Target real & cantidad de la receta $\times$ multiplicador de la orden \\
+Mínimo      & target $\times$ (1 + Tol$-$/100) \\
+Máximo      & target $\times$ (1 + Tol$+$/100) \\
+\bottomrule
+\end{tabularx}
 \end{center}
 
-Haz clic en cualquier receta para ver su detalle completo: fases, ingredientes,
-cantidades, tolerancias e instrucciones.
+\vspace{6pt}
+
+Ejemplo real del sistema: 5.000 kg con \cd{-1} y \cd{1} da un rango de
+\textbf{4.950 a 5.050 kg}. En una orden con multiplicador 2, el mismo ingrediente pide
+10.000 kg con rango 9.900 a 10.100 kg: \textbf{la tolerancia escala junto con el target}.
+
+\begin{cajaTip}[Precisión]
+El sistema trabaja con \textbf{4 decimales} y los porcentajes admiten centésimas
+(\cd{-2.5} es válido). Todo redondeo va \textbf{hacia adentro} del rango: un decimal
+sobrante nunca ensancha la tolerancia. Un target muy pequeño con una tolerancia muy
+cerrada puede quedar en un rango de un par de milésimas, imposible de acertar en la
+balanza de piso. Verifica que el rango que sale sea pesable con el instrumento real.
+\end{cajaTip}
+
+\subseccion{5.2 El semáforo que verá el operario}
+
+\begin{center}
+\begin{tabularx}{0.9\linewidth}{@{}c l >{\raggedright\arraybackslash}X@{}}
+\toprule
+& \textbf{Estado} & \textbf{Cuándo} \\
+\midrule
+\semaverde{}    & \cd{OK}         & Dentro del rango y lejos de las orillas. \\
+\semaamarillo{} & \cd{PRECAUCIÓN} & Dentro del rango, pero en el \textbf{10\% exterior} de la banda. Se puede confirmar. \\
+\semarojo{}     & \cd{FUERA}      & Fuera del rango. \textbf{Botón bloqueado.} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\vspace{6pt}
+
+La franja ámbar no la defines tú: el sistema la calcula sola como el 10\% exterior del
+rango que pusiste. Con \cd{-1}/\cd{+1} sobre 5 kg, el ámbar cae en los 10 g pegados a
+cada extremo.
+
+\begin{cajaOjo}
+\textbf{Un peso fuera de tolerancia no se registra}, y \textbf{no hay forma de
+autorizar una excepción} desde ninguna pantalla. Si pones una tolerancia demasiado
+cerrada, detienes la línea y la única salida es crear otra receta. Si la pones
+demasiado ancha, el sistema deja pasar pesos que no debería: no tiene criterio propio,
+respeta el tuyo.
+\end{cajaOjo}
+
+\subseccion{5.3 Criterios habituales}
+
+$\pm 1\%$ para principios activos, $\pm 2\%$ a $\pm 3\%$ para excipientes, $\pm 5\%$
+para lubricantes y deslizantes. Ajústalo al expediente de desarrollo de la planta, no
+a este manual.
 
 % =====================================================================
 \newpage
-\seccion{7. Consultar órdenes y resultados}
+\seccion{6. Instrucciones y materiales peligrosos}
 
-Aunque no creas órdenes (eso lo hace el Supervisor), puedes consultarlas
-para verificar cómo se están ejecutando tus recetas:
+\subseccion{6.1 Instrucciones}
 
-\begin{center}
-\fbox{\includegraphics[width=0.92\linewidth]{capturas/04_ordenes.png}}\\[3pt]
-{\footnotesize\color{gristexto}Lista de órdenes de producción con estado, receta asociada y prioridad.}
-\end{center}
+Hay dos niveles, y los dos llegan al operario:
 
-Esto te permite:
 \begin{itemize}
-    \item Verificar que las recetas se están usando correctamente.
-    \item Detectar si alguna tolerancia necesita ajuste (muchos rechazos = tolerancia muy estrecha).
-    \item Consultar el historial de producción de cada producto.
+    \item \campo{Instrucciones de la fase}: se muestran en la cabecera azul mientras dure
+          esa fase completa. Sirven para condiciones generales (\textit{trabajar bajo
+          campana}, \textit{temperatura máxima 25 °C}).
+    \item \campo{Instrucciones} del ingrediente: se muestran en el recuadro del paso, junto
+          al material. Sirven para la operación concreta (\textit{tamizar antes de pesar
+          (malla 40)}, \textit{agregar al final}).
 \end{itemize}
 
+\begin{cajaTip}[Cómo escribirlas]
+Frases cortas, en imperativo, con el dato numérico dentro. El operario las lee de pie,
+con guantes y con prisa. \textit{``Tamizar malla 40 antes de pesar''} funciona;
+\textit{``se recomienda considerar el tamizado previo''} no.
+\end{cajaTip}
+
+\subseccion{6.2 La casilla \campo{Peligroso}}
+
+Marca la casilla y la estación pinta el recuadro del paso en rojo con la etiqueta
+\textbf{MATERIAL PELIGROSO}. Es una advertencia visual: \textbf{no cambia ninguna regla
+del sistema}, no exige confirmación extra ni restringe quién puede pesarlo. El equipo
+de protección concreto ponlo en las instrucciones del ingrediente.
+
 % =====================================================================
+\newpage
+\seccion{7. Verificar cómo quedó tu receta}
+
+No hay una vista de detalle de receta en \menu{Recetas}: la tabla sólo muestra código,
+nombre, versión, rendimiento, número de fases y de ingredientes.
+
+\captura{12_recetas.png}{Listado de recetas.}
+
+\vspace{6pt}
+
+Para revisar targets y rangos tal como los va a ver la planta, pide a Supervisión que
+cree una orden de prueba con tu receta y ábrela desde \menu{Órdenes}. Tu rol aterriza
+en la \textbf{vista de consulta}, que muestra cada fase y, por ingrediente, el target y
+el rango calculado.
+
+\captura{24_orden_consulta.png}{Vista de consulta de una orden: por ingrediente, target, rango permitido y peso real dispensado.}
+
+\vspace{6pt}
+
+Es también la mejor forma de cerrar el ciclo: una vez producida la orden, la misma
+pantalla te muestra el \textbf{peso real} que se dispensó de cada ingrediente. Si los
+pesos reales se pegan sistemáticamente a una orilla del rango, la tolerancia o el
+target merecen revisión en la siguiente fórmula.
+
+\captura{04_ordenes.png}{Listado de órdenes. Para tu rol la acción siempre es \boton{Ver detalle}.}
+
+% =====================================================================
+\newpage
 \seccion{8. Auditoría}
 
-Desde \menu{Auditoría} puedes consultar el registro de acciones relacionadas
-con tus recetas:
+\menu{Auditoría} te da los 500 eventos más recientes, con filtros por acción y por
+usuario. No hay filtro por fecha, ni búsqueda de texto, ni exportación.
 
-\begin{center}
-\fbox{\includegraphics[width=0.92\linewidth]{capturas/17_auditoria.png}}\\[3pt]
-{\footnotesize\color{gristexto}Log de auditoría: registro inmutable de todas las acciones del sistema.}
-\end{center}
+\captura{17_auditoria.png}{Bitácora del sistema.}
 
-Filtra por acción \textbf{CREAR\_RECETA} para ver el historial de recetas creadas,
-quién las creó y cuándo.
+\vspace{6pt}
+
+Para tu trabajo, dos filtros valen la pena:
+
+\begin{itemize}
+    \item \cd{CREAR\_RECETA}: qué fórmulas se cargaron, por quién y cuándo.
+    \item \cd{DISPENSAR}: los pesos reales registrados, útil para contrastar contra los
+          targets que diseñaste.
+\end{itemize}
+
+La bitácora no se puede editar ni borrar desde la aplicación.
 
 % =====================================================================
 \newpage
-\seccion{9. Equipo de la estación de pesaje}
-
-Aunque como Desarrollo no operas la estación de pesaje, debes conocer
-el equipo que usa el operario para ejecutar tus recetas:
-
-\subseccion{9.1 Báscula de pesaje (ingreso manual)}
+\seccion{9. Qué sí puedes romper}
 
 \begin{center}
-\begin{tikzpicture}[
-    every node/.style={font=\small}
-]
-% Báscula
-\draw[fill=gray!10, draw=gray, rounded corners=4pt, line width=1pt]
-    (0,0) rectangle (5,3);
-\draw[fill=white, draw=gray!60, rounded corners=2pt]
-    (0.5,1.5) rectangle (4.5,2.7);
-\node[font=\Large\bfseries\color{pharmaazul}] at (2.5,2.1) {5.023 kg};
-\node[font=\footnotesize\color{gristexto}] at (2.5,0.7) {Báscula analítica / de piso};
-
-% Flecha hacia computadora
-\draw[-{Stealth[length=6pt]}, thick, color=pharmablue] (5.3,1.5) -- (7,1.5)
-    node[midway, above, font=\footnotesize\color{gristexto}] {El operario lee};
-\node[draw=pharmablue, fill=pharmablue!5, rounded corners=4pt,
-    minimum width=2.5cm, minimum height=1.5cm, align=center]
-    at (8.5,1.5) {Ingresa el peso\\manualmente\\en PharmaWeigh};
-\end{tikzpicture}
+\begin{tabularx}{\linewidth}{@{}p{0.32\linewidth} >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Riesgo} & \textbf{Por qué importa} \\
+\midrule
+\textbf{Guardar una receta con un error} & No se edita ni se borra. El error se va a producción tal cual y sólo se resuelve creando otra receta. \\
+\textbf{Confundir la unidad del material} & Si el material está en gramos y tú piensas en kilogramos, el target sale con un factor 1000 y nadie lo va a poder pesar. \\
+\textbf{Tolerancia demasiado cerrada}    & Detienes la línea: el operario no logra confirmar y no existe autorización de excepción. \\
+\textbf{Tolerancia demasiado ancha}      & El semáforo deja pasar pesos fuera de especificación. El sistema respeta lo que pusiste. \\
+\textbf{Orden de ingredientes equivocado} & Es el orden real de pesaje y no se puede cambiar en piso. \\
+\textbf{Demasiadas fases}                & Cada fase exige una firma presencial. Fragmentar de más paraliza la producción. \\
+\textbf{Olvidar marcar \campo{Peligroso}} & El operario pierde la advertencia visual del material. \\
+\bottomrule
+\end{tabularx}
 \end{center}
-
-\begin{cajaNota}
-La báscula \textbf{no está conectada} al sistema. El operario lee el peso
-en la pantalla de la báscula y lo \textbf{ingresa manualmente} en PharmaWeigh.
-El sistema valida si el peso está dentro de la tolerancia que tú definiste
-en la receta.
-\end{cajaNota}
-
-\subseccion{9.2 Pistola láser (lector de código de barras)}
-
-\begin{center}
-\begin{tikzpicture}[
-    every node/.style={font=\small}
-]
-% Pistola
-\draw[fill=gray!15, draw=gray, rounded corners=3pt, line width=1pt]
-    (0,0.5) -- (1.5,0.5) -- (2,1) -- (2,2.5) -- (1.5,3) -- (0,3) -- cycle;
-\draw[fill=red!30, draw=red!60] (2,1.7) -- (3.5,1.2) -- (3.5,1.5) -- (2,2) -- cycle;
-\node[font=\footnotesize\color{gristexto}] at (1,0) {Pistola láser USB};
-\node[font=\tiny\color{red}] at (3.8,1.35) {Láser};
-
-% Flecha
-\draw[-{Stealth[length=6pt]}, thick, color=pharmablue] (4.2,1.5) -- (5.5,1.5);
-
-% Código de barras
-\draw[fill=white, draw=gray, rounded corners=2pt]
-    (5.8,0.3) rectangle (9.2,2.7);
-\foreach \x in {6.1,6.3,6.4,6.7,6.8,7.1,7.2,7.4,7.7,7.8,8.0,8.2,8.4,8.6,8.8} {
-    \draw[line width=1.2pt] (\x,0.8) -- (\x,2.2);
-}
-\node[font=\ttfamily\footnotesize] at (7.5,0.5) {LOT-PAR-2024-001};
-\end{tikzpicture}
-\end{center}
-
-La pistola láser escanea el \textbf{código de barras del lote} de materia prima.
-El sistema verifica automáticamente:
-\begin{itemize}
-    \item ¿Es el material correcto para este paso de la receta?
-    \item ¿El lote está \aprobado{} por Calidad?
-    \item ¿No está caducado?
-    \item ¿Tiene cantidad suficiente?
-\end{itemize}
 
 % =====================================================================
 \newpage
 \seccion{10. Preguntas frecuentes}
 
 \subseccion{¿Puedo modificar una receta que ya tiene órdenes?}
-Sí, pero se recomienda crear una nueva versión. Las órdenes existentes
-mantienen la receta con la que fueron creadas.
+No, y tampoco una que no las tenga. Ninguna receta se edita ni se borra en el sistema.
+Crea otra con código distinto.
 
-\subseccion{¿Qué pasa si un material no existe en el sistema?}
-Solicita al área de \textbf{Almacén} que registre el material con su código
-de barras, unidad y stock mínimo. Una vez registrado, podrás usarlo en tus recetas.
+\subseccion{¿Cómo hago una versión 2 de una fórmula?}
+No hay función de versionado. El campo \textit{versión} existe, pero ninguna pantalla
+lo incrementa. En la práctica: nueva receta, código nuevo (por ejemplo
+\codigo{REC-PCT-500-B}), y coordinar con Supervisión que las órdenes nuevas la usen.
+
+\subseccion{Un material no existe en el sistema}
+Pídeselo a Almacén o a Supervisión antes de empezar a capturar la receta. Tu rol no da
+de alta materiales, y si sales del formulario a medias pierdes lo capturado.
+
+\subseccion{¿Puedo crear una orden para probar mi receta?}
+No. Pídesela a Supervisión o al Administrador.
+
+\subseccion{¿La casilla \campo{Peligroso} restringe algo?}
+No. Sólo cambia el aspecto de la pantalla del operario. El control real va en las
+instrucciones y en el procedimiento de la planta.
+
+\subseccion{¿Puedo definir el tipo de balanza o el instrumento?}
+No. El sistema no conoce los instrumentos: \textbf{la báscula no está conectada} y el
+operario teclea el peso. Lo único que controlas es el rango aceptado.
 
 \subseccion{¿Cómo sé si una tolerancia es correcta?}
-Si el operario tiene muchos rechazos (semáforo rojo) para un ingrediente,
-puede que la tolerancia sea demasiado estrecha. Revisa el log de auditoría
-y ajusta según la farmacopea vigente.
-
-\subseccion{¿Quién puede crear recetas?}
-Solo los usuarios con rol \textbf{DESARROLLO}, \textbf{SUPERVISOR} o \textbf{ADMIN}.
-Los operarios, almacenistas, calidad y auditores \textbf{no pueden} crear ni
-modificar recetas.
-
-\subseccion{¿Cómo defino las fases de una receta?}
-Las fases representan etapas del proceso. Por ejemplo:
-\begin{enumerate}
-    \item \textbf{Fase 1: Dispensado de activos} --- principios activos principales.
-    \item \textbf{Fase 2: Mezclado y lubricación} --- excipientes y lubricantes.
-\end{enumerate}
-El supervisor firma cada fase antes de que el operario pueda continuar
-con la siguiente.
+El sistema no opina. Contrasta el rango resultante contra la resolución real de la
+balanza de piso y contra el expediente de desarrollo.

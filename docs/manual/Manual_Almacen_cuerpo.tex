@@ -1,5 +1,6 @@
 % =====================================================================
 %  CUERPO DEL MANUAL DE ALMACÉN - PharmaWeigh
+%  Capturas reales del sistema. Sin credenciales.
 % =====================================================================
 
 \seccion{1. Acceso al sistema}
@@ -8,325 +9,325 @@
 
 \vspace{8pt}
 
-Para ingresar al sistema:
-\begin{enumerate}
-    \item Abre tu navegador web (Chrome recomendado).
-    \item Ve a la dirección \cd{https://pharma-formweigh.vercel.app}.
-    \item Ingresa tu \campo{email} y tu \campo{contraseña}.
-    \item Haz clic en \boton{Ingresar}.
-\end{enumerate}
+\reglasAcceso
 
-\begin{center}
-\fbox{\includegraphics[width=0.85\linewidth]{capturas/01_login.png}}\\[3pt]
-{\footnotesize\color{gristexto}Pantalla de inicio de sesión. Ingresa tu email y contraseña.}
-\end{center}
-
-Como \textbf{Almacenista}, tu función principal es recibir materias primas,
-registrarlas en el sistema y mantener el inventario actualizado.
-
-\begin{cajaNota}
-\textbf{Tu menú lateral muestra:} Dashboard, Inventario, Códigos de Barras.
-No tienes acceso a Recetas, Órdenes, Dispensado, Auditoría ni Usuarios.
-\end{cajaNota}
-
-% =====================================================================
-\seccion{2. Tu rol en el proceso de producción}
-
-Tú eres el \textbf{punto de entrada} de todas las materias primas al sistema:
-
-\vspace{6pt}
-\begin{center}
-\begin{tikzpicture}[
-    node distance=0.3cm and 1.2cm,
-    every node/.style={font=\footnotesize},
-    paso/.style={draw=pharmablue, fill=pharmablue!8, rounded corners=6pt,
-        minimum width=2.6cm, minimum height=1cm, align=center, text width=2.4cm},
-    tuyo/.style={draw=pharmagreen!80!black, fill=pharmagreen!15, rounded corners=6pt,
-        minimum width=2.6cm, minimum height=1cm, align=center, text width=2.4cm,
-        line width=1.5pt},
-    flecha/.style={-{Stealth[length=5pt]}, thick, color=gristexto}
-]
-\node[tuyo] (recibir) {\textbf{1. ALMACÉN}\\Recibir materia\\prima};
-\node[tuyo, right=of recibir] (registrar) {\textbf{2. ALMACÉN}\\Registrar lote\\en sistema};
-\node[paso, right=of registrar] (calidad) {3. CALIDAD\\Aprobar lote};
-\node[paso, below=1cm of recibir] (super) {4. SUPERVISOR\\Crear orden};
-\node[paso, right=of super] (oper) {5. OPERARIO\\Dispensar};
-\draw[flecha] (recibir) -- (registrar);
-\draw[flecha] (registrar) -- (calidad);
-\draw[flecha] (calidad) |- (super);
-\draw[flecha] (super) -- (oper);
-\end{tikzpicture}
-\end{center}
-\vspace{6pt}
-
-Sin tu registro, el material \textbf{no existe} para el sistema y no puede
-usarse en producción.
-
-% =====================================================================
-\newpage
-\seccion{3. Dashboard}
-
-\begin{center}
-\fbox{\includegraphics[width=0.92\linewidth]{capturas/03_dashboard.png}}\\[3pt]
-{\footnotesize\color{gristexto}Dashboard principal con indicadores de producción.}
-\end{center}
-
-Como Almacenista, los indicadores clave son:
-\begin{itemize}
-    \item \textbf{Materiales:} total de materias primas en el sistema.
-    \item \textbf{Lotes en Cuarentena:} lotes que registraste y esperan aprobación de Calidad.
-    \item \textbf{Por Caducar (30 días):} lotes próximos a vencer --- coordina su uso prioritario.
-\end{itemize}
-
-% =====================================================================
-\seccion{4. Equipo de trabajo}
-
-\subseccion{4.1 Pistola láser (lector de código de barras)}
-
-Tu herramienta principal es la \textbf{pistola láser} de código de barras.
-La usas para identificar materiales rápidamente durante la recepción.
-
-\begin{center}
-\begin{tikzpicture}[
-    every node/.style={font=\small}
-]
-% Pistola
-\draw[fill=gray!15, draw=gray, rounded corners=3pt, line width=1pt]
-    (0,0.5) -- (1.5,0.5) -- (2,1) -- (2,2.5) -- (1.5,3) -- (0,3) -- cycle;
-\draw[fill=red!30, draw=red!60] (2,1.7) -- (3.5,1.2) -- (3.5,1.5) -- (2,2) -- cycle;
-\node[font=\footnotesize\color{gristexto}] at (1,0) {Pistola láser USB};
-\node[font=\tiny\color{red}] at (3.8,1.35) {Láser};
-
-% Flecha
-\draw[-{Stealth[length=6pt]}, thick, color=pharmablue] (4.2,1.5) -- (5.5,1.5);
-
-% Etiqueta del material
-\draw[fill=white, draw=gray, rounded corners=2pt]
-    (5.8,0.3) rectangle (9.2,2.7);
-\foreach \x in {6.1,6.3,6.4,6.7,6.8,7.1,7.2,7.4,7.7,7.8,8.0,8.2,8.4,8.6,8.8} {
-    \draw[line width=1.2pt] (\x,0.8) -- (\x,2.2);
-}
-\node[font=\ttfamily\footnotesize] at (7.5,0.5) {MAT-PAR-001};
-\end{tikzpicture}
-\end{center}
-
-La pistola funciona como un \textbf{teclado USB}:
-\begin{itemize}
-    \item Se conecta por USB a la computadora. No requiere drivers.
-    \item Al escanear, envía los caracteres del código seguidos de \textbf{Enter}.
-    \item El sistema identifica automáticamente el material por su código.
-    \item Si la pistola no está disponible, puedes escribir el código manualmente.
-\end{itemize}
-
-\begin{cajaTip}[Tip]
-Mantén la pistola siempre cargada (si es inalámbrica) o conectada (si es con cable).
-Apunta el láser al \textbf{centro} del código de barras para una lectura rápida.
-\end{cajaTip}
-
-\subseccion{4.2 Báscula para recepción (ingreso manual)}
-
-Al recibir material, necesitas pesar lo que llega. La báscula \textbf{no está
-conectada} al sistema --- tú lees el peso en la báscula e ingresas la cantidad
-manualmente en PharmaWeigh.
-
-\begin{center}
-\begin{tikzpicture}[
-    every node/.style={font=\small}
-]
-\draw[fill=gray!10, draw=gray, rounded corners=4pt, line width=1pt]
-    (0,0) rectangle (5,3);
-\draw[fill=white, draw=gray!60, rounded corners=2pt]
-    (0.5,1.5) rectangle (4.5,2.7);
-\node[font=\Large\bfseries\color{pharmaazul}] at (2.5,2.1) {25.00 kg};
-\node[font=\footnotesize\color{gristexto}] at (2.5,0.7) {Báscula de recepción};
-
-\draw[-{Stealth[length=6pt]}, thick, color=pharmablue] (5.3,1.5) -- (7,1.5)
-    node[midway, above, font=\footnotesize\color{gristexto}] {Tú lees y};
-\node[draw=pharmablue, fill=pharmablue!5, rounded corners=4pt,
-    minimum width=2.5cm, minimum height=1.5cm, align=center]
-    at (8.5,1.5) {Ingresas la\\cantidad en\\PharmaWeigh};
-\end{tikzpicture}
-\end{center}
-
-% =====================================================================
-\newpage
-\seccion{5. Recepción de materia prima}
-
-Este es tu proceso principal. Cada vez que llega material a la planta,
-debes registrarlo en el sistema.
-
-\subseccion{5.1 Proceso paso a paso}
-
-\begin{enumerate}
-    \item Ve a \menu{Inventario} $\rightarrow$ pestaña \menu{Recepción}.
-
-    \item \textbf{Escanea el código de barras del material} con la pistola láser.
-        \begin{itemize}
-            \item Apunta la pistola al código impreso en la etiqueta del material.
-            \item El campo se llena automáticamente.
-            \item El sistema muestra el nombre del material encontrado.
-        \end{itemize}
-
-    \item Si el material se identifica correctamente, llena los datos del lote:
-        \begin{itemize}
-            \item \campo{Número de Lote}: el identificador que trae el proveedor
-                  (ej: \codigo{LOT-PAR-2024-003}).
-            \item \campo{Cantidad}: pesa el material en la báscula e ingresa
-                  la cantidad (ej: 25 kg).
-            \item \campo{Proveedor}: nombre del proveedor.
-            \item \campo{Fecha de Caducidad}: fecha de vencimiento del lote.
-            \item \campo{Certificado de Análisis}: número de referencia del
-                  certificado del proveedor (opcional).
-        \end{itemize}
-
-    \item Haz clic en \boton{Registrar Lote (Cuarentena)}.
-
-    \item El lote se crea automáticamente en estado \cuarentena.
-          \textbf{Calidad} lo revisará y aprobará después.
-\end{enumerate}
-
-\begin{center}
-\fbox{\includegraphics[width=0.92\linewidth]{capturas/16_inventario_recepcion.png}}\\[3pt]
-{\footnotesize\color{gristexto}Pantalla de recepción: escanea el material con la pistola y llena los datos del lote.}
-\end{center}
+\captura{01_login.png}{Pantalla de entrada.}
 
 \begin{cajaOjo}
-\textbf{Todo lote nuevo entra en CUARENTENA.} Esto significa que no puede usarse
-en producción hasta que Calidad lo apruebe. Es una medida de seguridad del proceso
-farmacéutico (BPM/GMP).
+Todo lo que registres queda a tu nombre, con la hora y la dirección IP de tu equipo.
+No prestes tu contraseña.
 \end{cajaOjo}
+
+\avisoValidacion
 
 % =====================================================================
 \newpage
-\seccion{6. Gestión de materiales}
+\seccion{2. Tu papel dentro del sistema}
 
-\subseccion{6.1 Dar de alta un material nuevo}
+Como \manualRol{} eres la puerta de entrada de la materia prima: das de alta los
+materiales y registras los lotes que llegan. \textbf{No liberas producto}: eso lo hace
+Calidad.
 
-Si llega un material que no existe en el sistema, tú puedes crearlo:
+\subseccion{2.1 Tu menú}
 
-\begin{enumerate}
-    \item Ve a \menu{Inventario} $\rightarrow$ pestaña \menu{Materiales}.
-    \item Haz clic en \boton{+ Nuevo Material}.
-    \item Llena los campos:
-        \begin{itemize}
-            \item \campo{Código}: el código de barras del material (ej: \codigo{MAT-PAR-001}).
-                  Este es el código que escaneará la pistola.
-            \item \campo{Nombre}: nombre completo del material.
-            \item \campo{Unidad}: kg, g, L, mL, mg o unidad.
-            \item \campo{Stock Mínimo}: umbral de alerta. Si el stock baja de este
-                  valor, el material se resalta en \textbf{rojo} en el inventario.
-        \end{itemize}
-    \item Haz clic en \boton{Crear Material}.
-\end{enumerate}
+Tu rol ve \textbf{tres} opciones. Es el menú más corto del sistema:
 
 \begin{center}
-\fbox{\includegraphics[width=0.92\linewidth]{capturas/14_inventario_materiales.png}}\\[3pt]
-{\footnotesize\color{gristexto}Lista de materiales con código, stock actual, stock mínimo y lotes activos.
-Los materiales con stock bajo se resaltan en rojo.}
-\end{center}
-
-\begin{cajaNota}
-El \campo{Código} debe coincidir exactamente con el código impreso en las etiquetas
-del material para que la pistola láser lo identifique correctamente.
-\end{cajaNota}
-
-\subseccion{6.2 Cambiar estado de lotes}
-
-Como almacenista, puedes cambiar el estado de los lotes para reflejar
-movimientos físicos:
-
-\begin{itemize}
-    \item Poner un lote en \cuarentena{} si detectas un problema físico.
-    \item Marcar un lote como \agotado{} si se consumió completamente fuera del sistema.
-\end{itemize}
-
-\begin{cajaOjo}
-La \textbf{aprobación definitiva} de lotes corresponde a \textbf{Calidad}.
-Tú puedes mover estados para reflejar la realidad física del almacén,
-pero el dictamen de calidad lo emite el área de QA.
-\end{cajaOjo}
-
-% =====================================================================
-\newpage
-\seccion{7. Consultar el inventario}
-
-\subseccion{7.1 Pestaña Materiales}
-
-Muestra todos los materiales registrados con su stock actual:
-
-\begin{center}
-\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\begin{tabularx}{0.9\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
 \toprule
-\textbf{Columna} & \textbf{Descripción} \\
+\textbf{Opción} & \textbf{Para qué} \\
 \midrule
-Código        & Código de barras del material \\
-Nombre        & Nombre completo \\
-Stock Actual  & Suma de todos los lotes aprobados \\
-Stock Mínimo  & Umbral de alerta (rojo si el actual es menor) \\
-Lotes Activos & Número de lotes con estado APROBADO o CUARENTENA \\
+\menu{Dashboard}         & Resumen general del día. \\
+\menu{Inventario}        & \textbf{Tu pantalla principal}: materiales, lotes y recepción. \\
+\menu{Códigos de Barras} & Generar e imprimir las etiquetas de lotes y materiales. \\
 \bottomrule
 \end{tabularx}
 \end{center}
 
-\subseccion{7.2 Pestaña Lotes}
+\vspace{6pt}
+
+No verás \menu{Órdenes}, \menu{Dispensado}, \menu{Recetas}, \menu{Auditoría} ni
+\menu{Usuarios}. Si escribes esas direcciones a mano, el sistema te regresa al
+Dashboard. No es una falla: tu rol no tiene acceso a esas pantallas.
+
+\subseccion{2.2 Qué puedes y qué no}
 
 \begin{center}
-\fbox{\includegraphics[width=0.92\linewidth]{capturas/15_inventario_lotes.png}}\\[3pt]
-{\footnotesize\color{gristexto}Lista de lotes con estado, cantidad, proveedor y fecha de caducidad.}
-\end{center}
-
-Verifica regularmente:
-\begin{itemize}
-    \item \textbf{Lotes en cuarentena:} recuerda a Calidad que los apruebe.
-    \item \textbf{Lotes próximos a caducar:} coordina con el supervisor para
-          usarlos primero (FEFO: First Expired, First Out).
-    \item \textbf{Stock bajo:} solicita reabastecimiento al área de compras.
-\end{itemize}
-
-% =====================================================================
-\newpage
-\seccion{8. Códigos de barras}
-
-Desde \menu{Códigos de Barras} puedes ver e imprimir los códigos de todos
-los lotes, materiales y badges del sistema.
-
-\subseccion{8.1 Pestañas disponibles}
-
-\begin{center}
-\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X c@{}}
 \toprule
-\textbf{Pestaña} & \textbf{Contenido} \\
+\textbf{Acción} & \textbf{Puedes} \\
 \midrule
-Lotes      & Códigos de barras de cada lote de materia prima \\
-Materiales & Códigos de barras de cada material registrado \\
-Badges     & Códigos de los gafetes de identificación de usuarios \\
+Dar de alta un material nuevo                        & Sí \\
+Registrar un lote recibido (queda en cuarentena)     & Sí \\
+Regresar a cuarentena un lote aprobado (\boton{Retener}) & Sí \\
+Consultar materiales, lotes y existencias            & Sí \\
+Imprimir códigos de barras                           & Sí \\
+\midrule
+\textbf{Aprobar un lote}                             & \textbf{No} \\
+\textbf{Rechazar un lote}                            & \textbf{No} \\
+Ver o crear órdenes de producción                    & \textbf{No} \\
+Entrar a la estación de pesaje                       & \textbf{No} \\
+Ver recetas                                          & \textbf{No} \\
+Ver la bitácora de auditoría                         & \textbf{No} \\
+Modificar o borrar un lote ya registrado             & \textbf{No} \\
 \bottomrule
 \end{tabularx}
 \end{center}
 
-\begin{cajaTip}[Tip]
-Imprime los códigos de barras de los lotes nuevos y pégalos en los contenedores
-físicos. Así el operario podrá escanearlos fácilmente durante el dispensado.
+\captura{03_dashboard.png}{Dashboard. El panel \textbf{Actividad Reciente} aparece vacío para tu rol: el detalle de la bitácora no es visible desde Almacén.}
+
+% =====================================================================
+\newpage
+\seccion{3. Recepción de materia prima}
+
+Es tu trabajo principal en el sistema.
+
+\subseccion{3.1 Paso a paso}
+
+\begin{enumerate}
+    \item \menu{Inventario} $\rightarrow$ pestaña \menu{Recepción}.
+    \item En \textbf{1. Escanear código del material}, dispara la pistola sobre el código
+          del material (no el del lote). También puedes escribirlo y pulsar \boton{Enter},
+          o usar el botón de cámara.
+    \item El sistema responde \cd{Material encontrado: ...} en verde y abre el resto del
+          formulario. Si responde \cd{Material no encontrado. Registra el material
+          primero.}, ve a la sección 4 de este manual.
+    \item Llena los datos del lote:
+        \begin{itemize}
+            \item \campo{Número de Lote} --- el que trae la etiqueta del proveedor.
+            \item \campo{Cantidad} --- en la unidad que indica la etiqueta del campo
+                  (kg, L, etc.). Es lo que realmente recibiste, no lo que dice la orden de compra.
+            \item \campo{Proveedor}.
+            \item \campo{Fecha de Caducidad}.
+            \item \campo{Certificado de Análisis (referencia)} --- opcional, texto libre.
+        \end{itemize}
+    \item Pulsa \boton{Registrar Lote (Cuarentena)}.
+\end{enumerate}
+
+\captura{16_inventario_recepcion.png}{Recepción: primero se identifica el material, después se capturan los datos del lote.}
+
+\vspace{6pt}
+
+Si todo salió bien aparece \cd{Lote registrado exitosamente en CUARENTENA} y el
+formulario se limpia. Si algo falló, el mensaje se pinta de rojo y \textbf{no se
+registra nada}: corrige y vuelve a intentar.
+
+\subseccion{3.2 Reglas que el sistema aplica solo}
+
+\begin{cajaCuarentena}
+\textbf{Todo lote entra en CUARENTENA.} No hay forma de registrar un lote como
+aprobado directamente, ni siquiera si viene con su certificado. La liberación es
+un acto aparte, y lo hace Calidad.
+\end{cajaCuarentena}
+
+\begin{cajaOjo}
+\textbf{No se puede recibir un lote ya caducado.} Si la fecha que capturas ya pasó,
+el sistema rechaza el alta. Revisa la etiqueta antes de teclear: un error de dedo en
+el año es el motivo más común de que el alta no pase.
+\end{cajaOjo}
+
+\begin{cajaInfo}[Cómo cuenta el sistema la caducidad]
+La fecha de caducidad es una \textbf{fecha de calendario de la planta}, no una hora:
+la que capturas es la que ves después en la tabla de lotes, sin desfases por huso horario.
+El criterio es que el lote \textbf{deja de poder usarse a las 00:00 del día de su
+caducidad}; es decir, el día que marca la etiqueta ya no se dispensa.
+
+\textbf{Esta regla está por confirmar con el cliente.} Si en la planta el criterio es
+otro (por ejemplo, que el lote sirva durante todo su día de caducidad), avísalo antes
+del arranque: cambia qué lotes acepta la estación el día del corte.
+\end{cajaInfo}
+
+\begin{cajaOjo}
+\textbf{Un lote registrado no se puede corregir ni borrar} desde ninguna pantalla.
+Si capturaste mal la cantidad, el proveedor o la caducidad, avisa de inmediato a
+Calidad y al administrador. Verifica los datos \textbf{antes} de pulsar el botón.
+\end{cajaOjo}
+
+\vspace{6pt}
+
+El número de lote es único: si lo repites, el sistema responde
+\cd{Ya existe un registro con esos datos.}
+
+% =====================================================================
+\newpage
+\seccion{4. Materiales}
+
+\subseccion{4.1 Consultar existencias}
+
+\menu{Inventario} $\rightarrow$ pestaña \menu{Materiales}.
+
+\captura{14_inventario_materiales.png}{Materiales con código, unidad, stock actual, stock mínimo y número de lotes.}
+
+\vspace{6pt}
+
+Las filas que están \textbf{por debajo del stock mínimo} se resaltan en rojo. Esa es tu
+señal de reposición; el sistema no manda avisos por ningún otro medio.
+
+\subseccion{4.2 Dar de alta un material nuevo}
+
+Sólo si el material no existe todavía. Un material es el \textit{tipo} de insumo
+(Paracetamol, Lactosa); un lote es \textit{una entrega concreta} de ese material.
+
+\begin{enumerate}
+    \item En la pestaña \menu{Materiales}, pulsa \boton{+ Nuevo Material}.
+    \item \campo{Código (barras)}: el identificador con el que se va a escanear.
+          Tiene que ser único.
+    \item \campo{Nombre}: cómo lo va a leer el operario en la estación.
+    \item \campo{Unidad}: kg, g, L, mL, mg o unidad. \textbf{Elígela bien}: es la unidad
+          en la que se van a capturar todas las cantidades y todos los pesajes de ese material.
+    \item \campo{Stock Mínimo}: el nivel que enciende el resaltado rojo.
+    \item \campo{Descripción}: opcional.
+    \item \boton{Guardar}.
+\end{enumerate}
+
+\begin{cajaOjo}
+\textbf{La unidad de un material no se puede cambiar después}, y tampoco se puede
+borrar un material. Confírmala con Calidad o con Desarrollo antes de guardar.
+\end{cajaOjo}
+
+% =====================================================================
+\newpage
+\seccion{5. Lotes}
+
+\menu{Inventario} $\rightarrow$ pestaña \menu{Lotes}. Aquí ves cada lote con su
+cantidad restante sobre la cantidad inicial, proveedor, caducidad y estado.
+
+\captura{27_inventario_lotes_almacen.png}{Vista de Almacén. En el lote en cuarentena la columna \menu{ACCIONES} aparece \textbf{vacía}: tu rol no lo puede liberar.}
+
+\subseccion{5.1 Los estados}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Estado} & \textbf{Significado} \\
+\midrule
+\cuarentena  & Recién recibido, o retenido después de haber estado aprobado. No se puede dispensar. \\
+\aprobado    & Liberado por Calidad. Es el único estado que la estación acepta. \\
+\rechazado   & Descartado por Calidad. Definitivo. \\
+\agotado     & Llegó a cero. Lo marca el sistema solo, nadie lo pone a mano. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subseccion{5.2 Lo único que puedes cambiar: \boton{Retener}}
+
+En las filas con estado \aprobado{} tienes el botón \boton{Retener}: regresa el lote a
+\cuarentena. Úsalo si detectas un problema físico después de la liberación (empaque
+dañado, identificación dudosa, condiciones de almacenamiento fuera de especificación).
+
+\begin{cajaNota}
+\textbf{En las filas en cuarentena no verás ningún botón.} No es una falla de la
+pantalla: aprobar y rechazar están reservados a Calidad, Supervisión y el
+Administrador. Si intentas forzarlo, el sistema responde
+\cd{Solo Calidad, Supervisor o Admin pueden aprobar o rechazar lotes.}
+\end{cajaNota}
+
+\vspace{6pt}
+
+\boton{Retener} se aplica con \textbf{un solo clic, sin confirmación}, y es correcto que
+así sea: no rompe nada irreversible, porque Calidad puede volver a aprobar el lote.
+(El que sí pide confirmación en dos pasos es \boton{Rechazar}, que tu rol no tiene.)
+
+Pero \textbf{sí detiene la línea} si ese lote estaba en uso, así que avisa a Calidad y a
+Supervisión cuando lo hagas.
+
+% =====================================================================
+\newpage
+\seccion{6. Códigos de barras}
+
+\menu{Códigos de Barras} genera las etiquetas en pantalla. Para tu rol hay
+\textbf{dos} pestañas: \menu{Lotes} y \menu{Materiales} (la de gafetes sólo la ven
+Administración y Supervisión).
+
+\captura{26_codigos.png}{Página de códigos. Cada tarjeta trae el nombre, el estado del lote y su código de barras.}
+
+\vspace{6pt}
+
+Dos formas de usarla:
+
+\begin{itemize}
+    \item \textbf{Imprimir}: usa la impresión del navegador (Ctrl+P o Cmd+P). La página
+          está preparada para que las tarjetas salgan legibles en blanco y negro. No hay
+          un botón de imprimir dentro de la aplicación.
+    \item \textbf{Desde el celular}: abre la página en el teléfono y escanea de ahí con
+          la cámara de la estación.
+\end{itemize}
+
+\begin{cajaTip}[Etiquetado]
+Pega la etiqueta del \textbf{lote} en el contenedor en cuanto lo recibas. Es la que
+el operario va a escanear en la estación; si el contenedor no la trae, el pesaje se
+detiene ahí.
 \end{cajaTip}
 
 % =====================================================================
+\newpage
+\seccion{7. Equipo de trabajo}
+
+\subseccion{7.1 Pistola lectora de código de barras}
+
+Funciona como un teclado: lee el código, lo escribe en el campo y manda el Enter sola.
+No necesita configuración ni instalación en el sistema.
+
+Si no lee: limpia la ventana del lector, verifica que la etiqueta no esté arrugada ni
+mojada, y prueba a \textbf{escribir el código a mano} y pulsar Enter. El campo acepta
+las dos cosas. También hay un botón de cámara a la derecha del campo.
+
+\subseccion{7.2 Báscula}
+
+\begin{cajaNota}
+\textbf{La báscula no está conectada al sistema.} No hay integración con ningún
+instrumento. Las cantidades que registras en Recepción las \textbf{tecleas} tú, leyendo
+la balanza o la documentación del embarque. El sistema guarda lo que escribas, sin
+poder comprobarlo.
+\end{cajaNota}
+
+% =====================================================================
+\newpage
+\seccion{8. Qué sí puedes romper}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}p{0.32\linewidth} >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Riesgo} & \textbf{Por qué importa} \\
+\midrule
+\textbf{Capturar mal la cantidad}   & Es el inventario del que se va a descontar cada pesaje. Un lote no se puede editar ni borrar. \\
+\textbf{Capturar mal la caducidad}  & Si la pones más lejos de lo real, la estación va a aceptar un material vencido. El sistema confía en lo que tecleaste. \\
+\textbf{Equivocar el número de lote} & Rompe la trazabilidad con la documentación del proveedor y no se puede corregir. \\
+\textbf{Elegir mal la unidad de un material} & No se cambia después. Todas las recetas y pesajes de ese material quedan atados a ella. \\
+\textbf{Etiquetar un contenedor con el código de otro lote} & El sistema valida el código, no el contenido. Es el único punto donde un error humano pasa desapercibido. \\
+\textbf{Retener sin avisar}         & Detienes la línea sin que nadie sepa por qué. Avisa a Calidad y a Supervisión. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% =====================================================================
+\newpage
 \seccion{9. Preguntas frecuentes}
 
-\subseccion{¿Qué hago si el material no se encuentra al escanear?}
-Significa que no está registrado en el sistema. Créalo primero en
-\menu{Inventario} $\rightarrow$ \menu{Materiales} $\rightarrow$
-\boton{+ Nuevo Material} y luego registra el lote.
+\subseccion{Escaneo el material y dice que no se encuentra}
+Ese material no está dado de alta, o el código no coincide. Verifica el código en la
+pestaña \menu{Materiales}; si de verdad no existe, dalo de alta con
+\boton{+ Nuevo Material} y vuelve a Recepción.
 
-\subseccion{¿Puedo modificar un lote ya registrado?}
-Puedes cambiar su estado (cuarentena, aprobado, etc.) pero no la cantidad
-original. Si hubo un error en la cantidad, registra un nuevo lote con los
-datos correctos.
+\subseccion{¿Puedo modificar un lote que ya registré?}
+No. No hay pantalla de edición ni de borrado. Avisa a Calidad y al administrador;
+la corrección se hace desde el servidor y queda registrada.
 
-\subseccion{¿Qué pasa si la pistola no lee el código?}
-Puedes \textbf{escribir el código manualmente} en el campo y presionar
-\boton{Enter}. La pistola a veces no lee si el código está dañado,
-sucio o tiene bajo contraste.
+\subseccion{¿Por qué no puedo aprobar un lote?}
+Porque la liberación es de Calidad (también pueden Supervisión y el Administrador).
+Tu rol recibe y retiene; no libera. Es una separación de funciones a propósito.
 
-\subseccion{¿Quién puede crear materiales y registrar lotes?}
-Solo usuarios con rol \textbf{ALMACEN}, \textbf{SUPERVISOR} o \textbf{ADMIN}.
-Los demás roles pueden consultar el inventario pero no modificarlo.
+\subseccion{Registré un lote y no aparece para dispensar}
+Correcto: entró en \cuarentena. Hasta que Calidad lo apruebe, la estación lo rechaza.
+
+\subseccion{No veo el menú de Órdenes ni el de Auditoría}
+Tu rol no tiene acceso a esas pantallas. No es una falla.
+
+\subseccion{¿Qué hago con un lote rechazado?}
+Sepáralo físicamente según el procedimiento de la planta. En el sistema queda
+\rechazado{} para siempre; no se puede reactivar.
+
+\subseccion{Se bloqueó mi cuenta}
+Fueron 5 intentos fallidos con tu correo en 15 minutos. Espera 15 minutos. No hay
+botón de desbloqueo ni de recuperación de contraseña: si la perdiste, el
+administrador tiene que generarte una nueva desde el servidor.

@@ -1,5 +1,6 @@
 % =====================================================================
 %  CUERPO DEL MANUAL DE CALIDAD - PharmaWeigh
+%  Capturas reales del sistema. Sin credenciales.
 % =====================================================================
 
 \seccion{1. Acceso al sistema}
@@ -8,337 +9,332 @@
 
 \vspace{8pt}
 
-Para ingresar al sistema:
-\begin{enumerate}
-    \item Abre tu navegador web (Chrome recomendado).
-    \item Ve a la dirección \cd{https://pharma-formweigh.vercel.app}.
-    \item Ingresa tu \campo{email} y tu \campo{contraseña}.
-    \item Haz clic en \boton{Ingresar}.
-\end{enumerate}
+\reglasAcceso
 
-\begin{center}
-\fbox{\includegraphics[width=0.85\linewidth]{capturas/01_login.png}}\\[3pt]
-{\footnotesize\color{gristexto}Pantalla de inicio de sesión. Ingresa tu email y contraseña.}
-\end{center}
+\captura{01_login.png}{Pantalla de entrada.}
 
-Como analista de \textbf{Control de Calidad}, tu función es garantizar que los
-materiales y procesos cumplan con las especificaciones y las Buenas Prácticas
-de Manufactura (BPM/GMP).
+\begin{cajaOjo}
+\textbf{Tu contraseña vale como firma electrónica y como liberación de lote.}
+Es el control más fuerte que tiene el sistema. No la compartas con nadie.
+\end{cajaOjo}
 
-\begin{cajaNota}
-\textbf{Tu menú lateral muestra:} Dashboard, Órdenes (consulta), Dispensado (consulta),
-Recetas (consulta), Inventario y Auditoría. No tienes acceso a Usuarios ni
-Códigos de Barras.
-\end{cajaNota}
-
-% =====================================================================
-\seccion{2. Tu rol en el proceso de producción}
-
-Tu participación abarca \textbf{dos momentos clave}:
-
-\vspace{6pt}
-\begin{center}
-\begin{tikzpicture}[
-    node distance=0.3cm and 1.2cm,
-    every node/.style={font=\footnotesize},
-    paso/.style={draw=pharmablue, fill=pharmablue!8, rounded corners=6pt,
-        minimum width=2.6cm, minimum height=1cm, align=center, text width=2.4cm},
-    tuyo/.style={draw=pharmayellow, fill=pharmayellow!15, rounded corners=6pt,
-        minimum width=2.6cm, minimum height=1cm, align=center, text width=2.4cm,
-        line width=1.5pt},
-    flecha/.style={-{Stealth[length=5pt]}, thick, color=gristexto}
-]
-\node[paso] (receta) {1. DESARROLLO\\Crear receta};
-\node[tuyo] (lotes) {2. CALIDAD\\Aprobar lotes\\de materia prima};
-\node[paso, right=of lotes] (super) {3. SUPERVISOR\\Crear orden};
-\node[paso, below=1cm of receta] (oper) {4. OPERARIO\\Dispensar};
-\node[tuyo, right=of oper] (firma) {5. CALIDAD\\Firmar y\\liberar lote};
-\draw[flecha] (receta) -- (lotes);
-\draw[flecha] (lotes) -- (super);
-\draw[flecha] (super) |- (oper);
-\draw[flecha] (oper) -- (firma);
-\end{tikzpicture}
-\end{center}
-\vspace{6pt}
-
-\begin{enumerate}
-    \item \textbf{Antes de producción:} Apruebas o rechazas los lotes de materia prima.
-    \item \textbf{Después del dispensado:} Firmas electrónicamente las fases completadas
-          y liberas el lote de producto terminado.
-\end{enumerate}
+\avisoValidacion
 
 % =====================================================================
 \newpage
-\seccion{3. Dashboard}
+\seccion{2. Tu papel dentro del sistema}
+
+Como \manualRol{} eres quien libera la materia prima y quien puede cerrar una fase de
+dispensado con su firma. \textbf{No pesas}: el sistema te deja ver todo el proceso,
+pero no te da la estación.
 
 \begin{center}
-\fbox{\includegraphics[width=0.92\linewidth]{capturas/03_dashboard.png}}\\[3pt]
-{\footnotesize\color{gristexto}Dashboard principal con indicadores de producción.}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X c@{}}
+\toprule
+\textbf{Acción} & \textbf{Puedes} \\
+\midrule
+Aprobar un lote en cuarentena                       & Sí \\
+Rechazar un lote en cuarentena                      & Sí \\
+Regresar a cuarentena un lote aprobado (\boton{Retener}) & Sí \\
+\textbf{Firmar una fase de dispensado}              & Sí \\
+Consultar órdenes, recetas, inventario y bitácora   & Sí \\
+\midrule
+Registrar pesajes en la estación                    & \textbf{No} \\
+Crear órdenes de producción                         & \textbf{No} \\
+Crear recetas o materiales                          & \textbf{No} \\
+Recibir lotes (recepción)                           & \textbf{No} \\
+Ver o crear usuarios                                & \textbf{No} \\
+Ver la pantalla de códigos de barras                & \textbf{No} \\
+\bottomrule
+\end{tabularx}
 \end{center}
 
-Como Calidad, los indicadores que más te interesan son:
-\begin{itemize}
-    \item \textbf{Lotes en Cuarentena} (naranja): lotes de materia prima pendientes
-          de tu aprobación. \textbf{Este es tu indicador principal.}
-    \item \textbf{Por Caducar (30 días)} (rojo): lotes próximos a vencer que
-          requieren atención.
-    \item \textbf{Dispensados Hoy} (verde): órdenes que podrían necesitar tu firma.
-\end{itemize}
+\subseccion{Tu menú}
 
-\begin{cajaTip}[Rutina diaria]
-Al iniciar tu turno, revisa el dashboard. Si hay lotes en cuarentena,
-apruébalos lo antes posible para no detener la producción. Si hay órdenes
-dispensadas sin firmar, coordina con el supervisor.
-\end{cajaTip}
+Verás seis opciones: \menu{Dashboard}, \menu{Órdenes}, \menu{Dispensado},
+\menu{Recetas}, \menu{Inventario} y \menu{Auditoría}. No aparecen \menu{Usuarios}
+ni \menu{Códigos de Barras}.
+
+\captura{03_dashboard.png}{Dashboard. La tarjeta \textbf{Lotes en Cuarentena} lleva directo a tu trabajo del día.}
 
 % =====================================================================
-\seccion{4. Aprobación y rechazo de lotes}
+\newpage
+\seccion{3. Liberación de lotes}
 
-Esta es tu \textbf{responsabilidad principal}. Ningún lote puede usarse
-en producción hasta que tú lo apruebes.
+\subseccion{3.1 El ciclo de vida de un lote}
 
-\subseccion{4.1 Flujo de estados de un lote}
-
+\vspace{6pt}
 \begin{center}
 \begin{tikzpicture}[
-    node distance=1.5cm,
-    every node/.style={font=\small},
-    estado/.style={draw, rounded corners=8pt, minimum width=2.5cm,
-        minimum height=0.9cm, align=center, font=\small\bfseries},
-    flecha/.style={-{Stealth[length=5pt]}, thick}
+    every node/.style={font=\footnotesize},
+    est/.style={draw, rounded corners=5pt, minimum width=2.4cm, minimum height=0.9cm, align=center},
+    flecha/.style={-{Stealth[length=6pt]}, thick}
 ]
-\node[estado, fill=pharmayellow!20, draw=pharmayellow] (cuarentena) {CUARENTENA};
-\node[estado, fill=pharmagreen!20, draw=pharmagreen, right=of cuarentena] (aprobado) {APROBADO};
-\node[estado, fill=pharmared!20, draw=pharmared, below=of cuarentena] (rechazado) {RECHAZADO};
-\node[estado, fill=gray!20, draw=gray, below=of aprobado] (agotado) {AGOTADO};
-
-\draw[flecha, color=pharmagreen] (cuarentena) -- node[above,font=\footnotesize\color{gristexto}]{Calidad aprueba} (aprobado);
-\draw[flecha, color=pharmared] (cuarentena) -- node[left,font=\footnotesize\color{gristexto}]{Calidad rechaza} (rechazado);
-\draw[flecha, color=gray] (aprobado) -- node[right,font=\footnotesize\color{gristexto}]{Se consume todo} (agotado);
+\node[est, draw=pharmayellow, fill=pharmayellow!10] (cua) {CUARENTENA};
+\node[est, draw=pharmagreen, fill=pharmagreen!10, right=2.6cm of cua] (apr) {APROBADO};
+\node[est, draw=pharmared, fill=pharmared!10, below=1.1cm of apr] (rec) {RECHAZADO};
+\node[est, draw=gristexto, fill=grisfondo, right=2.6cm of apr] (ago) {AGOTADO};
+\draw[flecha, color=pharmagreen] (cua) -- node[above, font=\tiny] {apruebas tú} (apr);
+\draw[flecha, color=pharmared] (cua) -- node[right, font=\tiny] {rechazas tú} (rec);
+\draw[flecha, color=pharmayellow] ([yshift=-6pt]apr.west) -- node[below, font=\tiny] {retienes} ([yshift=-6pt]cua.east);
+\draw[flecha, color=gristexto] (apr) -- node[above, font=\tiny] {llega a 0} (ago);
 \end{tikzpicture}
 \end{center}
+\vspace{6pt}
 
-\subseccion{4.2 Aprobar o rechazar un lote paso a paso}
+\begin{itemize}
+    \item \textbf{Todo lote nace en \cuarentena}, lo reciba quien lo reciba.
+    \item Sólo \textbf{Calidad, Supervisión y el Administrador} aprueban o rechazan.
+          Almacén \textbf{no puede}: si lo intenta, el sistema responde
+          \cd{Solo Calidad, Supervisor o Admin pueden aprobar o rechazar lotes.}
+    \item Un lote \aprobado{} puede volver a \cuarentena. Esa puerta sí tiene regreso.
+    \item \rechazado{} y \agotado{} son \textbf{estados finales}, sin vuelta atrás.
+    \item \agotado{} lo pone el sistema al llegar a cero, no una persona.
+\end{itemize}
+
+\subseccion{3.2 Aprobar o rechazar, paso a paso}
 
 \begin{enumerate}
-    \item Ve a \menu{Inventario} $\rightarrow$ pestaña \menu{Lotes}.
-    \item Identifica los lotes con estado \cuarentena{} (badge amarillo).
-    \item Para cada lote en cuarentena:
-        \begin{itemize}
-            \item Verifica el \textbf{certificado de análisis} del proveedor.
-            \item Confirma que el material cumple con las especificaciones.
-            \item Verifica la \textbf{fecha de caducidad}.
-            \item Revisa las condiciones de almacenamiento.
-        \end{itemize}
-    \item Haz clic en \boton{Aprobar} si cumple, o \boton{Rechazar} si no cumple.
+    \item \menu{Inventario} $\rightarrow$ pestaña \menu{Lotes}.
+    \item Localiza las filas con estado \cuarentena{} (etiqueta ámbar).
+    \item Verifica \textbf{fuera del sistema} lo que corresponda: certificado de
+          análisis, muestreo, identidad, integridad del empaque, fecha de caducidad.
+    \item Pulsa \boton{Aprobar} o \boton{Rechazar} en la columna \menu{ACCIONES}.
 \end{enumerate}
 
-\begin{center}
-\fbox{\includegraphics[width=0.92\linewidth]{capturas/15_inventario_lotes.png}}\\[3pt]
-{\footnotesize\color{gristexto}Lista de lotes con estado. Los lotes en cuarentena tienen botones de Aprobar / Rechazar.}
-\end{center}
+\captura{25_inventario_lotes_calidad.png}{Vista de Calidad: el lote en cuarentena ofrece \boton{Aprobar} y \boton{Rechazar}; los aprobados ofrecen \boton{Retener}.}
+
+\subseccion{3.3 Rechazar pide confirmación; aprobar no}
+
+Los dos botones no se comportan igual, y la diferencia es deliberada:
+
+\begin{itemize}
+    \item \boton{Aprobar} y \boton{Retener} se aplican \textbf{con un solo clic}.
+          Son reversibles entre sí: lo que apruebas lo puedes retener después.
+    \item \boton{Rechazar} pide \textbf{confirmación en dos pasos}, porque
+          \rechazado{} es un estado final. Al primer clic la fila cambia y muestra
+          \cd{¿Confirmar rechazo?} con los botones \boton{Sí, rechazar} y
+          \boton{Cancelar}. Hasta que no pulses \boton{Sí, rechazar} no pasa nada;
+          \boton{Cancelar} deja el lote como estaba, en \cuarentena.
+\end{itemize}
+
+\captura{30_confirmar_rechazo.png}{La fila pide confirmación antes de rechazar. \boton{Cancelar} no cambia nada.}
 
 \begin{cajaOjo}
-\textbf{Un lote rechazado o en cuarentena NO puede usarse para dispensado.}
-El sistema bloqueará cualquier intento de escanear un lote no aprobado.
-Si rechazas un lote por error, puedes cambiar su estado de vuelta a cuarentena
-y luego aprobarlo.
+La confirmación te protege del clic accidental, \textbf{no de la decisión}.
+Una vez que pulsas \boton{Sí, rechazar}, el rechazo es \textbf{irreversible}: no hay
+deshacer, y recuperar ese material obliga a darlo de alta otra vez desde Recepción
+con otro número de lote.
 \end{cajaOjo}
 
-\begin{cajaInfo}[Registro automático]
-Cada cambio de estado se registra en la auditoría con tu nombre, fecha/hora,
-estado anterior y nuevo. Este registro es \textbf{inmutable} y no puede borrarse.
+\begin{cajaInfo}[Qué queda registrado]
+Cada cambio de estado se guarda en la bitácora como \cd{CAMBIAR\_ESTADO\_LOTE} con tu
+nombre, tu rol, la fecha y hora, la dirección IP y el estado anterior y el nuevo.
+No se puede borrar.
+\end{cajaInfo}
+
+\newpage
+\subseccion{3.4 Retener un lote ya aprobado}
+
+Si aparece una desviación después de liberar, el botón \boton{Retener} regresa el lote
+a \cuarentena{} y \textbf{deja de poder usarse en la estación de inmediato}: cualquier
+operario que lo escanee recibirá \cd{Lote en estado CUARENTENA. Solo se pueden usar
+lotes APROBADOS.}
+
+Lo que \textbf{no} deshace: lo ya dispensado con ese lote sigue dispensado. Eso se
+maneja por el procedimiento de desviaciones de la planta.
+
+\subseccion{3.5 Lo que el sistema no revisa por ti}
+
+\begin{cajaOjo}
+El sistema \textbf{no pide} el certificado de análisis para aprobar, \textbf{no valida}
+resultados analíticos y \textbf{no compara} contra especificación. El campo
+\campo{Certificado de Análisis} de la recepción es texto libre de referencia.
+La decisión de liberar es enteramente tuya; el sistema sólo la anota.
+\end{cajaOjo}
+
+% =====================================================================
+\newpage
+\seccion{4. Firma electrónica de fases}
+
+\subseccion{4.1 Cuándo te llaman}
+
+Cuando el operario termina el último ingrediente de una fase, su pantalla cambia sola
+al formulario de firma y \textbf{la fase siguiente queda bloqueada} hasta que alguien
+firme. Pueden llamarte a ti o al supervisor: los dos roles firman.
+
+\captura{22_firma_fase.png}{Formulario de firma de fase en la estación.}
+
+\subseccion{4.2 Qué verificas antes de teclear}
+
+\begin{enumerate}
+    \item Que los contenedores usados correspondan a los lotes que dice la pantalla.
+    \item Que la lista \textbf{Ingredientes de esta fase} muestre todos los pesos
+          registrados y dentro de rango.
+    \item Que el material sobrante quedó cerrado, identificado y devuelto.
+    \item Que la orden y el lote de producto final son los correctos.
+\end{enumerate}
+
+\subseccion{4.3 Cómo se firma}
+
+Escribes \textbf{tu} correo y \textbf{tu} contraseña, y pulsas
+\boton{Firmar y Aprobar Fase}. El operario no toca el teclado.
+
+\subseccion{4.4 Reglas de la firma}
+
+\begin{itemize}
+    \item Firman \textbf{Supervisor}, \textbf{Calidad} y \textbf{Administrador}. Nadie más.
+    \item Un rechazo responde siempre lo mismo, sin decir qué falló:
+          \cd{Firma rechazada: credenciales inválidas o el usuario no es Supervisor,
+          Calidad ni Admin.}
+    \item Cada rechazo queda en bitácora como \cd{FIRMA\_RECHAZADA}.
+    \item A los \textbf{5 rechazos} con el mismo correo en 15 minutos, ese correo queda
+          bloqueado 15 minutos, también para entrar al sistema.
+    \item No se puede firmar una fase incompleta, ni una fase cuyas anteriores sigan
+          sin firma.
+    \item Al firmar la última fase, la orden pasa sola a \dispensado.
+\end{itemize}
+
+\begin{cajaOjo}
+\textbf{La firma no se retira.} Queda con tu nombre, la hora y la IP de la estación.
+Firmar de lejos, "para no parar la línea", convierte el control en un trámite.
+\end{cajaOjo}
+
+% =====================================================================
+\newpage
+\seccion{5. Seguimiento de una orden}
+
+Tu rol \textbf{no entra a la estación de pesaje}. Cuando abres una orden desde
+\menu{Dispensado} o desde \menu{Órdenes}, el sistema te lleva a la
+\textbf{vista de consulta}.
+
+\captura{24_orden_consulta.png}{Vista de consulta de una orden: fases, estado de firma y el detalle de cada ingrediente con su rango y su peso real.}
+
+\vspace{6pt}
+
+Ahí ves, por fase: si está firmada y por quién, y por ingrediente: el target, el rango
+permitido y el peso realmente dispensado. Es la pantalla que conviene revisar
+\textbf{antes} de firmar.
+
+\subseccion{Reglas de pesaje que conviene que conozcas}
+
+\begin{itemize}
+    \item \textbf{La báscula no está conectada al sistema}: el operario teclea el peso
+          que lee en su balanza. El sistema valida el rango, no el instrumento ni su
+          calibración.
+    \item Un peso fuera de tolerancia \textbf{no se registra}. Se rechaza con mensaje.
+          No existe una opción de "autorizar la excepción".
+    \item Los pasos van en orden estricto y una fase completa bloquea la siguiente.
+    \item Un pesaje confirmado \textbf{no se corrige ni se borra} desde ninguna pantalla.
+    \item El inventario nunca queda en negativo y un doble clic no duplica el descuento.
+\end{itemize}
+
+\captura{10_peso_rojo.png}{Así ve el operario un peso fuera de tolerancia: el botón queda bloqueado.}
+
+% =====================================================================
+\newpage
+\seccion{6. Bitácora}
+
+\menu{Auditoría} muestra los \textbf{500 eventos más recientes}, del más nuevo al más
+viejo, con fecha y hora, usuario y rol, acción, entidad, \textbf{dirección IP} y detalles.
+
+\captura{17_auditoria.png}{Bitácora con filtros por acción y por usuario.}
+
+\subseccion{6.1 Revisiones útiles}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}p{0.34\linewidth} >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Filtro de acción} & \textbf{Qué te dice} \\
+\midrule
+\cd{CAMBIAR\_ESTADO\_LOTE}  & Quién liberó, rechazó o retuvo cada lote, y cuándo. \\
+\cd{DISPENSAR}              & Cada pesaje: quién, qué material, cuánto y a qué hora. \\
+\cd{FIRMAR\_FASE}           & Quién cerró cada fase de cada orden. \\
+\cd{FIRMA\_RECHAZADA}       & Intentos de firma fallidos. Un repunte aquí merece explicación. \\
+\cd{LOGIN\_FALLIDO}         & Intentos de acceso fallidos, con el correo y la IP. \\
+\cd{RECEPCION\_LOTE}        & Altas de materia prima. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subseccion{6.2 Límites de la pantalla}
+
+\begin{itemize}
+    \item Sólo hay filtro por \textbf{acción} y por \textbf{usuario}. No hay filtro por
+          fecha, ni búsqueda de texto, ni exportación desde la aplicación.
+    \item Se muestran los últimos 500 registros. Para un periodo más largo o para un
+          respaldo formal hay que pedirlo al administrador, que lo extrae del servidor.
+\end{itemize}
+
+\begin{cajaInfo}[Registro inmutable]
+La bitácora \textbf{no se puede editar ni borrar} desde la aplicación: lo impide la
+propia base de datos. Ninguna cuenta, ni la del administrador, tiene un botón para
+hacerlo.
 \end{cajaInfo}
 
 % =====================================================================
 \newpage
-\seccion{5. Firma electrónica de dispensados}
+\seccion{7. Recetas}
 
-Después de que el operario termina de pesar todos los ingredientes de una fase,
-el sistema solicita una \textbf{firma electrónica} de autorización.
-Como Calidad, \textbf{puedes firmar dispensados}.
+Desde \menu{Recetas} consultas las fórmulas cargadas: código, nombre, versión,
+rendimiento, número de fases e ingredientes.
 
-\subseccion{5.1 Proceso de firma}
+\captura{12_recetas.png}{Listado de recetas.}
 
-\begin{enumerate}
-    \item El operario o supervisor te llama a la estación de pesaje cuando aparece
-          la pantalla de firma.
-    \item \textbf{Verifica visualmente:}
-        \begin{itemize}
-            \item Que los contenedores correspondan a los materiales indicados.
-            \item Que las etiquetas de lote sean legibles y correctas.
-            \item Que el área de pesaje esté limpia.
-        \end{itemize}
-    \item Revisa el \textbf{Resumen de pasos} en pantalla: verifica que todos los
-          pesos estén dentro de tolerancia (palomitas verdes).
-    \item Ingresa tu \campo{email} (\cd{calidad@pharma.com}) y tu \campo{contraseña}.
-    \item Haz clic en \boton{Firmar y Aprobar}.
-\end{enumerate}
+\vspace{6pt}
+
+\textbf{Tu rol no crea ni edita recetas.} Las cargan Desarrollo, Supervisión o el
+Administrador, y \textbf{ninguna receta se puede modificar ni borrar} una vez guardada:
+un cambio de fórmula obliga a dar de alta otra receta. Si detectas un target o una
+tolerancia mal puestos, avisa antes de que se creen órdenes con esa receta.
+
+% =====================================================================
+\newpage
+\seccion{8. Qué sí puedes romper}
 
 \begin{center}
-\fbox{\includegraphics[width=0.92\linewidth]{capturas/06_dispensado_paso.png}}\\[3pt]
-{\footnotesize\color{gristexto}Pantalla de dispensado con resumen de pasos e información del material actual.}
-\end{center}
-
-\begin{cajaOjo}
-\textbf{Tu firma es legalmente vinculante (21 CFR Part 11).} Al firmar certificas que:
-\begin{itemize}
-    \item Los materiales dispensados son correctos.
-    \item Los pesos están dentro de las tolerancias aprobadas.
-    \item El proceso se ejecutó siguiendo las BPM.
-\end{itemize}
-\textbf{NO firmes sin verificar físicamente la estación.}
-\end{cajaOjo}
-
-\subseccion{5.2 ¿Quién puede firmar?}
-
-\begin{center}
-\begin{tabularx}{0.7\linewidth}{@{}l c@{}}
+\begin{tabularx}{\linewidth}{@{}p{0.32\linewidth} >{\raggedright\arraybackslash}X@{}}
 \toprule
-\textbf{Rol} & \textbf{¿Puede firmar?} \\
+\textbf{Riesgo} & \textbf{Por qué importa} \\
 \midrule
-ADMIN      & Sí \\
-SUPERVISOR & Sí \\
-\textbf{CALIDAD}    & \textbf{Sí} \\
-DESARROLLO & No \\
-ALMACEN    & No \\
-OPERARIO   & No \\
-AUDITOR    & No \\
+\textbf{Confirmar un rechazo a la ligera} & La confirmación en dos pasos evita el clic accidental, pero \boton{Sí, rechazar} sigue siendo irreversible y obliga a dar de alta el lote de nuevo. Lee el número de lote de la fila antes de confirmar. \\
+\textbf{Aprobar sin verificar}     & El sistema no revisa el COA ni los resultados analíticos. Sólo anota tu decisión. \\
+\textbf{Firmar sin ir a la estación} & La firma queda a tu nombre y no se retira. \\
+\textbf{Tardar en liberar}         & Los lotes en cuarentena no se pueden dispensar: la línea se detiene. \\
+\textbf{Retener tarde}             & Lo ya dispensado con ese lote sigue dispensado. Retener sólo corta hacia adelante. \\
+\textbf{Prestar tu contraseña}     & Es firma y es liberación. Todo queda a tu nombre. \\
 \bottomrule
 \end{tabularx}
 \end{center}
 
 % =====================================================================
 \newpage
-\seccion{6. Auditoría y trazabilidad}
+\seccion{9. Preguntas frecuentes}
 
-La auditoría es tu herramienta principal para verificar el cumplimiento.
+\subseccion{Rechacé un lote por error, ¿lo puedo recuperar?}
+Si todavía no has pulsado \boton{Sí, rechazar}, sí: pulsa \boton{Cancelar} y el lote se
+queda en \cuarentena{} como estaba. Si ya confirmaste, no. \rechazado{} es final; hay
+que registrar el lote otra vez desde \menu{Inventario} $\rightarrow$ \menu{Recepción}
+(lo hace Almacén o Supervisión), con un número de lote distinto, y volver a evaluarlo.
 
-\begin{center}
-\fbox{\includegraphics[width=0.92\linewidth]{capturas/17_auditoria.png}}\\[3pt]
-{\footnotesize\color{gristexto}Log de auditoría: registro inmutable de todas las acciones del sistema.}
-\end{center}
+\subseccion{¿Puedo pesar o dispensar yo?}
+No. Tu rol ve la estación en modo consulta. Si escribes la dirección de la estación a
+mano, el sistema te lleva a la vista de detalle de la orden.
 
-\subseccion{6.1 Consultas que debes hacer regularmente}
-
-\begin{center}
-\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
-\toprule
-\textbf{Filtrar por} & \textbf{¿Qué verificas?} \\
-\midrule
-CAMBIAR\_ESTADO\_LOTE & Quién aprobó/rechazó cada lote y cuándo \\
-DISPENSAR             & Peso real vs.\ target de cada material dispensado \\
-FIRMAR\_FASE          & Quién firmó cada fase y en qué momento \\
-COMPLETAR\_DISPENSADO & Órdenes terminadas y lista para tu revisión final \\
-\bottomrule
-\end{tabularx}
-\end{center}
-
-\subseccion{6.2 Cumplimiento 21 CFR Part 11}
-
-El sistema cumple con los requisitos de la FDA para registros electrónicos:
-
-\begin{center}
-\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
-\toprule
-\textbf{Requisito} & \textbf{Implementación} \\
-\midrule
-Registros electrónicos & Toda acción genera un registro inmutable con timestamp \\
-Firmas electrónicas    & Email + contraseña, vinculante legalmente \\
-Audit trail            & Log completo, no editable, no borrable \\
-Control de acceso      & 7 roles con permisos diferenciados \\
-Integridad de datos    & Base de datos con transacciones ACID \\
-Trazabilidad           & Material $\rightarrow$ Lote $\rightarrow$ Orden $\rightarrow$ Operario $\rightarrow$ Firma \\
-\bottomrule
-\end{tabularx}
-\end{center}
-
-% =====================================================================
-\newpage
-\seccion{7. Equipo en la estación de pesaje}
-
-Aunque no operas directamente el equipo, debes conocerlo para verificar
-el proceso durante tus inspecciones.
-
-\subseccion{7.1 Báscula de pesaje (ingreso manual)}
-
-\begin{center}
-\begin{tikzpicture}[
-    every node/.style={font=\small}
-]
-\draw[fill=gray!10, draw=gray, rounded corners=4pt, line width=1pt]
-    (0,0) rectangle (5,3);
-\draw[fill=white, draw=gray!60, rounded corners=2pt]
-    (0.5,1.5) rectangle (4.5,2.7);
-\node[font=\Large\bfseries\color{pharmaazul}] at (2.5,2.1) {5.023 kg};
-\node[font=\footnotesize\color{gristexto}] at (2.5,0.7) {Báscula analítica / de piso};
-
-\draw[-{Stealth[length=6pt]}, thick, color=pharmablue] (5.3,1.5) -- (7,1.5)
-    node[midway, above, font=\footnotesize\color{gristexto}] {El operario lee};
-\node[draw=pharmablue, fill=pharmablue!5, rounded corners=4pt,
-    minimum width=2.5cm, minimum height=1.5cm, align=center]
-    at (8.5,1.5) {Ingresa el peso\\manualmente\\en PharmaWeigh};
-\end{tikzpicture}
-\end{center}
-
-\begin{cajaNota}
-La báscula \textbf{no está conectada} al sistema. El operario lee el peso
-en la pantalla de la báscula y lo ingresa manualmente. El sistema valida
-si el peso está dentro de la tolerancia definida en la receta.
-\end{cajaNota}
-
-\subseccion{7.2 Pistola láser (lector de código de barras)}
-
-\begin{center}
-\begin{tikzpicture}[
-    every node/.style={font=\small}
-]
-\draw[fill=gray!15, draw=gray, rounded corners=3pt, line width=1pt]
-    (0,0.5) -- (1.5,0.5) -- (2,1) -- (2,2.5) -- (1.5,3) -- (0,3) -- cycle;
-\draw[fill=red!30, draw=red!60] (2,1.7) -- (3.5,1.2) -- (3.5,1.5) -- (2,2) -- cycle;
-\node[font=\footnotesize\color{gristexto}] at (1,0) {Pistola láser USB};
-\node[font=\tiny\color{red}] at (3.8,1.35) {Láser};
-
-\draw[-{Stealth[length=6pt]}, thick, color=pharmablue] (4.2,1.5) -- (5.5,1.5);
-
-\draw[fill=white, draw=gray, rounded corners=2pt]
-    (5.8,0.3) rectangle (9.2,2.7);
-\foreach \x in {6.1,6.3,6.4,6.7,6.8,7.1,7.2,7.4,7.7,7.8,8.0,8.2,8.4,8.6,8.8} {
-    \draw[line width=1.2pt] (\x,0.8) -- (\x,2.2);
-}
-\node[font=\ttfamily\footnotesize] at (7.5,0.5) {LOT-PAR-2024-001};
-\end{tikzpicture}
-\end{center}
-
-La pistola escanea el código de barras del lote. El sistema valida automáticamente
-que sea el material correcto, esté aprobado, no esté caducado y tenga stock.
-
-% =====================================================================
-\newpage
-\seccion{8. Preguntas frecuentes}
-
-\subseccion{¿Puedo aprobar un lote que rechacé por error?}
-No directamente. Pero puedes cambiar su estado de \rechazado{} a \cuarentena{}
-y luego aprobarlo nuevamente. Ambas acciones quedan registradas en auditoría.
+\subseccion{¿Mi firma es distinta a la del supervisor?}
+No en efecto técnico: las dos cierran la fase igual. La diferencia es de
+responsabilidad, según el procedimiento de la planta.
 
 \subseccion{¿Qué pasa si no apruebo los lotes a tiempo?}
-La producción se detiene. El operario no puede escanear lotes en cuarentena
-ni rechazados. Aprueba los lotes lo antes posible para no generar cuellos
-de botella.
+Nada se rompe, pero la producción se detiene: un lote que no está \aprobado{} no se
+puede escanear en la estación.
 
-\subseccion{¿Puedo ver quién dispensó cada material?}
-Sí. En \menu{Auditoría} filtra por ``DISPENSAR''. Verás el operario,
-material, peso real vs.\ target y si estuvo dentro de tolerancia.
+\subseccion{¿Puedo exportar la bitácora?}
+No desde la aplicación. Pídelo al administrador: se extrae del servidor.
 
-\subseccion{¿Mi firma es diferente a la del supervisor?}
-No. Ambas firmas tienen la misma validez legal. La diferencia es que como
-Calidad tu enfoque es el \textbf{cumplimiento normativo}, mientras que el
-supervisor se enfoca en la \textbf{operación}.
+\subseccion{¿Puedo cambiar una tolerancia que quedó mal?}
+No. Las recetas no se editan. Hay que crear otra receta y usarla en las órdenes nuevas.
 
-\subseccion{¿Qué verifico antes de firmar?}
-\begin{enumerate}
-    \item Todos los pasos tienen palomita verde (dentro de tolerancia).
-    \item Los lotes usados corresponden a materiales aprobados.
-    \item El área de pesaje está limpia y ordenada.
-    \item Las etiquetas de los contenedores son legibles.
-\end{enumerate}
+\subseccion{Se bloqueó mi cuenta}
+Fueron 5 intentos fallidos con tu correo en 15 minutos, sea al entrar o al firmar.
+Espera 15 minutos; no hay desbloqueo manual.

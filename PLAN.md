@@ -1,6 +1,6 @@
 # PLAN — PharmaWeigh
 
-Versión 1.0 · 2026-09-18 · **Estado: BORRADOR — pendiente de aprobación de Fernando** (Método MAW §2 y §9).
+Versión 1.0 · 2026-09-18 · **Estado: APROBADO por Fernando el 2026-09-18** (literal: «está aprobado ya el plan»). Método MAW §2 y §9.
 
 > Este plan es **retroactivo**. El prototipo se construyó sin `PLAN.md`; el 2026-09-18 se auditó, se reescribió el núcleo
 > (seguridad, datos, reglas) y se documentó aquí lo que el código y los manuales ya dicen. Lo que nadie ha confirmado
@@ -157,7 +157,7 @@ Ronda lista para enviar: `docs/PREGUNTAS_CLIENTE_RONDA_1.md` (29 preguntas, cada
 12. **Nombre del cliente y del producto en los textos.**
 
 ### PENDIENTE(Fernando)
-1. Aprobar este `PLAN.md` y los ADR-001, 004, 005, 010 (cambian el modelo de datos).
+1. ~~Aprobar este `PLAN.md`~~ — aprobado 2026-09-18. Los ADR-001, 004, 005 y 010 (modelo de datos) forman parte del plan (§1, §5) y quedan cubiertos por esa aprobación salvo que Fernando indique lo contrario.
 2. Horas, tarifa, precio, mensualidad y forma de pago de `docs/propuesta/*` (hoy marcados como pendiente, sin cifras inventadas).
 3. La cotización anterior afirma «21 CFR Part 11 ✓» y «disponibilidad 99.9 %»: no es verificable. En el repo ya está en `docs/archivo-obsoleto/` con aviso de no enviar y los guiones de video se corrigieron; **falta decidir** si se retira de lo ya enviado a prospectos y si se regraban los videos.
 4. ~~Dar de baja Vercel + Neon~~ — hecho 2026-09-18 lo reversible (respaldo, redirección 308, desconexión de Git y de Neon). Falta el borrado definitivo, no antes del 2026-10-19: `docs/OPERACION.md §8`.

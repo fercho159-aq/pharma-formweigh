@@ -113,7 +113,8 @@ $CO run --rm --no-deps app node scripts/crear-usuario.mjs correo@dominio "Nombre
 
 # SOLO para la demo comercial: 7 usuarios (uno por rol), materiales, lotes, recetas y órdenes de ejemplo.
 # Se niega a correr si ya hay materiales. Imprime las contraseñas aleatorias una sola vez: guárdalas
-# en /opt/pharmaweigh/CREDENCIALES_DEMO.txt (root, 600), nunca en el repo.
+# en /opt/backups/pharmaweigh/CREDENCIALES_DEMO.txt (root, 600): NUNCA dentro de /opt/pharmaweigh (el deploy hace
+# rsync --delete y lo borra) y nunca en el repo.
 $CO run --rm --no-deps app node scripts/seed.mjs
 ```
 

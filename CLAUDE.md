@@ -57,5 +57,6 @@ npm run db:generate     # nueva migración desde src/db/schema.ts
 npm run db:migrate      # aplica /drizzle a DATABASE_URL de .env.local
 npm run db:seed         # datos DEMO; contraseñas aleatorias impresas una vez (o PHARMA_DEMO_PASSWORD)
 npm run crear-usuario -- correo@dominio "Nombre" ROL [badge]
+npm run usuario -- restablecer|desactivar|activar|desbloquear correo@dominio
 npm run test:e2e        # E2E_URL + E2E_PASSWORD; solo contra localhost y BD desechable
 ```

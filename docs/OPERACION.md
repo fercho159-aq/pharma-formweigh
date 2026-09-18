@@ -190,11 +190,31 @@ de certbot, primer deploy por Actions en verde, primer `pg_dump` en `/opt/backup
 - **Llave de deploy:** par ed25519 propio de este repo (comentario `github-actions-pharmaweigh` en
   `/home/deploy/.ssh/authorized_keys`). La privada solo vive en el secreto `VPS_SSH_KEY` de GitHub. Para rotarla:
   generar otra, agregar la pública, actualizar el secreto y borrar la línea vieja.
-- **Credenciales de la demo:** `/opt/pharmaweigh/CREDENCIALES_DEMO.txt` (root, 600). Son las 7 contraseñas aleatorias
-  que imprimió `seed.mjs`; no están en el repo ni en ningún documento. Leerlas: `ssh maw-vps cat /opt/pharmaweigh/CREDENCIALES_DEMO.txt`.
+- **Credenciales de la demo:** `/opt/backups/pharmaweigh/CREDENCIALES_DEMO.txt` (root, 600); no están en el repo ni en
+  ningún documento. Leerlas: `ssh maw-vps cat /opt/backups/pharmaweigh/CREDENCIALES_DEMO.txt`.
+  **Nunca guardar nada a mano dentro de `/opt/pharmaweigh`:** el deploy hace `rsync --delete` y lo borra (así se perdió
+  el primer archivo de credenciales el 2026-09-18; las 7 contraseñas se restablecieron ese día, con asiento en bitácora).
   Antes de un piloto con el cliente: crear sus usuarios reales con `crear-usuario.mjs` y desactivar los demo.
 - **Consumo medido:** app 43 MiB / 384, db 38 MiB / 256. El VPS quedó con swap 6.9/8 GB tras el `docker load`:
   vigilar `free -h` (ver §7).
+
+## 5 bis. Gestión de cuentas por consola
+
+No hay pantalla para restablecer contraseñas, dar de baja ni desbloquear (pendiente de definir con el cliente,
+`PLAN.md §13.7`). Se hace con `scripts/usuario.mjs`, que viaja en la imagen y deja asiento en la bitácora:
+
+```bash
+ssh maw-vps
+cd /opt/pharmaweigh
+CO="docker compose -f docker-compose.yml --env-file .env -p pharmaweigh"
+$CO run --rm --no-deps app node scripts/usuario.mjs restablecer correo@dominio   # imprime la contraseña nueva UNA vez
+$CO run --rm --no-deps app node scripts/usuario.mjs desactivar  correo@dominio   # cierra sus sesiones; conserva historial
+$CO run --rm --no-deps app node scripts/usuario.mjs activar     correo@dominio
+$CO run --rm --no-deps app node scripts/usuario.mjs desbloquear correo@dominio   # levanta el bloqueo de 15 min
+$CO run --rm --no-deps app node scripts/crear-usuario.mjs correo@dominio "Nombre Apellido" ROL
+```
+
+Para fijar una contraseña concreta: `-e PHARMA_PASSWORD='…'` (mínimo 10 caracteres) después de `run`.
 
 ## 6. Respaldos y restauración
 

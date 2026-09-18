@@ -167,7 +167,7 @@ Este contrato refleja la propuesta \textbf{PROPUESTA\_PHARMAWEIGH}. Los datos de
 \needspace{5\baselineskip}\clausula{Alcance y entregables}\label{cl:alcance}
 \begin{enumerate}
     \item El alcance de LOS SERVICIOS es el descrito en el \textbf{Anexo A}, que corresponde al sistema tal como se encuentra en el ambiente de demostración a la fecha de firma. Todo lo que no esté expresamente incluido en dicho anexo se considera fuera de alcance.
-    \item Quedan expresamente \textbf{fuera de alcance}, y se cotizarán por separado con la tarifa de la cláusula \ref{cl:contraprestacion}: (a) la validación del sistema (CSV, IQ/OQ/PQ), la calificación de equipos y cualquier entregable documental para auditorías regulatorias; (b) la certificación o adecuación específica a 21 CFR Part 11, NOM-059-SSA1 o normas equivalentes; (c) la \textbf{lectura automática del peso desde básculas}, ya que el peso se captura manualmente en la interfaz; (d) integraciones con ERP, LIMS, MES o cualquier sistema de terceros; (e) la ampliación de la cobertura de pruebas automatizadas y la prueba automatizada de punta a punta del dispensado; (f) notificaciones por correo, mensajería o WhatsApp; (g) módulos o pantallas adicionales; (h) aplicaciones móviles nativas; (i) el hardware de planta: tabletas, computadoras, lectores de código de barras, básculas e impresoras de etiquetas.
+    \item Quedan expresamente \textbf{fuera de alcance}, y se cotizarán por separado con la tarifa de la cláusula \ref{cl:contraprestacion}: (a) la validación del sistema (CSV, IQ/OQ/PQ), la calificación de equipos y cualquier entregable documental para auditorías regulatorias; (b) la certificación o adecuación específica a 21 CFR Part 11, NOM-059-SSA1 o normas equivalentes; (c) la \textbf{lectura automática del peso desde básculas}, ya que el peso se captura manualmente en la interfaz; (d) integraciones con ERP, LIMS, MES o cualquier sistema de terceros; (e) las pruebas automatizadas de interfaz en navegador, adicionales al juego de pruebas del Anexo A.6; (f) notificaciones por correo, mensajería o WhatsApp; (g) módulos o pantallas adicionales; (h) aplicaciones móviles nativas; (i) el hardware de planta: tabletas, computadoras, lectores de código de barras, básculas e impresoras de etiquetas.
     \item No se consideran cambios de alcance las altas y ediciones que el sistema ya permite desde su interfaz --- materiales, lotes, recetas, fases, ingredientes, tolerancias, órdenes y usuarios ---, las cuales EL CLIENTE puede realizar por sí mismo sin costo.
 \end{enumerate}
 
@@ -215,7 +215,7 @@ Este contrato refleja la propuesta \textbf{PROPUESTA\_PHARMAWEIGH}. Los datos de
 
 \needspace{5\baselineskip}\clausula{Estado regulatorio del sistema}\label{cl:regulatorio}
 \begin{enumerate}
-    \item PharmaWeigh incorpora funciones \textbf{orientadas} al control de procesos regulados: identificación de usuario por correo y contraseña, roles con permisos diferenciados, firma electrónica por fase restringida a los roles autorizados, bitácora de acciones, control de estado y caducidad de lotes y registro del peso objetivo contra el peso real dispensado.
+    \item PharmaWeigh incorpora funciones \textbf{orientadas} al control de procesos regulados: identificación de usuario por correo y contraseña, roles con permisos diferenciados, firma electrónica por fase restringida a los roles autorizados, bitácora de acciones inmutable a nivel de base de datos conforme al Anexo D.4, control de estado y caducidad de lotes y registro del peso objetivo contra el peso real dispensado.
     \item \textbf{Dichas funciones no constituyen una certificación ni una validación.} EL PRESTADOR no declara ni garantiza que el sistema cumpla 21 CFR Part 11, NOM-059-SSA1, Anexo 11 de la UE ni normativa equivalente, ni que se encuentre validado conforme a un plan maestro de validación.
     \item La decisión de utilizar el sistema como registro en procesos regulados, así como la validación, calificación y la conservación de registros que la normativa le exija, son responsabilidad exclusiva de EL CLIENTE.
     \item Si EL CLIENTE requiere la validación del sistema, ésta se contrata conforme al Anexo C y se ejecuta contra el plan maestro de validación de EL CLIENTE.
@@ -361,7 +361,7 @@ Inventario & Materiales con código, nombre y unidad. Lotes con número, proveed
 Recetas & Receta con código, nombre, versión, rendimiento y unidad. Fases ordenadas con instrucciones. Ingredientes por fase con cantidad objetivo, tolerancia mínima y máxima expresadas en porcentaje y marca de material peligroso. \\
 Órdenes & Alta con receta, lote de producto terminado, cantidad y prioridad. Estados: pendiente, en proceso, dispensado, completada y cancelada. Detalle con avance por fase. \\
 Dispensado & Flujo guiado descrito en A.3. \\
-Auditoría & Consulta de la bitácora con usuario, rol, acción, entidad, identificador, detalle y fecha, con filtros por acción y por usuario. \\
+Auditoría & Consulta de la bitácora con usuario, rol, acción, entidad, identificador, detalle, dirección IP y fecha, con filtros por acción y por usuario. La bitácora es de sólo inserción conforme al Anexo D.4. \\
 Códigos de barras & Generación de códigos de barras de lotes y materiales, y de gafetes de usuario, en hojas listas para imprimir. \\
 \bottomrule
 \end{tabularx}
@@ -390,9 +390,20 @@ Cierre de la orden & Cuando todas las fases de la receta están firmadas, la ord
 \vspace{6pt}\needspace{4\baselineskip}\subseccion{A.5 Documentación}
 \noindent Manuales en PDF por rol con capturas de pantalla, manual de operación técnica y video demostrativo de la operación.
 
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{A.6 Pruebas automatizadas entregadas}
+\noindent Forman parte del entregable y se ejecutan con los comandos documentados en el manual de operación técnica:
+\vspace{4pt}
+\noindent
+\begin{tabularx}{\linewidth}{@{}L{5.0cm} X@{}}
+\toprule
+163 pruebas unitarias & De las reglas de negocio, sin base de datos: tolerancias de pesaje, estados y caducidad de lote, avance de fases, cantidades y permisos por rol. \\
+Prueba de punta a punta, 72 verificaciones & Contra la imagen de producción y una base de datos desechable. Cubre el camino completo --- alta de material, recepción de lote, aprobación por calidad, receta por fases, orden, pesaje, firma por fase y cierre en estado DISPENSADO --- y los intentos de burlarlo: sesión falsificada, tolerancia alterada desde el navegador, ráfaga de ocho pesajes simultáneos de la que se acepta uno solo, existencia que nunca queda negativa y bloqueo del acceso tras cinco intentos fallidos. \\
+\bottomrule
+\end{tabularx}
+
 \vspace{8pt}
 \begin{cajaAviso}[Fuera de alcance del Anexo A]
-Validación del sistema (CSV, IQ/OQ/PQ) y certificación 21 CFR Part 11 o NOM-059; lectura automática del peso desde básculas; integraciones con ERP, LIMS o MES; ampliación de la cobertura de pruebas automatizadas; notificaciones por correo o mensajería; aplicaciones móviles nativas; y el hardware de planta. Ver cláusula \ref{cl:alcance} y Anexo C.5.
+Validación del sistema (CSV, IQ/OQ/PQ) y certificación 21 CFR Part 11 o NOM-059; lectura automática del peso desde básculas; integraciones con ERP, LIMS o MES; pruebas automatizadas de interfaz en navegador; notificaciones por correo o mensajería; aplicaciones móviles nativas; y el hardware de planta. Ver cláusula \ref{cl:alcance} y Anexo C.5.
 \end{cajaAviso}
 
 % ============================================================
@@ -511,7 +522,7 @@ Actualizaciones de seguridad y dependencias & \HR{\hMc} h & \IM{\hMc} \\
 \midrule
 Lectura directa del peso desde báscula & \HR{\hOa} & \IM{\hOa} & \PENDmini \\
 Validación del sistema (CSV, IQ/OQ/PQ) & \PENDmini & \PENDIENTE{cliente}{alcance} & --- \\
-Ampliación de cobertura de pruebas y prueba de punta a punta & \HR{\hOb} & \IM{\hOb} & --- \\
+Pruebas automatizadas de interfaz en navegador & \HR{\hOb} & \IM{\hOb} & --- \\
 Integración con ERP, LIMS o MES & \PENDmini & \PENDIENTE{cliente}{sistema} & \PENDmini \\
 Notificaciones por correo & \HR{\hOc} & \IM{\hOc} & \PENDmini \\
 Dominio propio de EL CLIENTE & \HR{\hOd} & \IM{\hOd} & --- \\
@@ -569,7 +580,7 @@ Bajo & Dudas de uso, altas de usuarios, materiales o lotes, ajustes menores. & 2
 Respaldos & Diarios, de la base de datos; retención mínima de 14 días; prueba de restauración al menos trimestral. \\
 Cifrado & Tráfico cifrado con TLS; contraseñas de usuarios almacenadas con algoritmo de derivación seguro. \\
 Accesos & Usuarios nominales; los módulos están restringidos por rol y la facultad de firma se limita a SUPERVISOR, CALIDAD y ADMIN. \\
-Bitácora & La aplicación no ofrece función alguna para editar ni eliminar registros de la bitácora de auditoría. \\
+Bitácora & Inmutable en el motor de base de datos: disparadores de PostgreSQL rechazan \texttt{UPDATE}, \texttt{DELETE} y \texttt{TRUNCATE} sobre la tabla de auditoría. Cada asiento se escribe en la misma transacción que la operación que lo origina y registra la dirección IP. EL PRESTADOR hace constar el límite de esta medida: un superusuario del motor de base de datos podría desactivar los disparadores, y no existe encadenado criptográfico de los asientos ni copia en un tercero de confianza. \\
 Incidentes & Aviso a EL CLIENTE dentro de las 72 horas siguientes a la detección de un incidente de seguridad que afecte su información. \\
 \bottomrule
 \end{tabularx}

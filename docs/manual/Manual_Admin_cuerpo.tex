@@ -93,25 +93,40 @@ Solo el administrador puede crear, activar y desactivar usuarios.
 \textbf{Rol} & \textbf{Permisos} \\
 \midrule
 \textbf{ADMIN} &
-    Todo lo que hace el supervisor, más:
-    crear/desactivar usuarios, acceso completo a configuración. \\
+    Acceso total: gestión de usuarios, recetas, órdenes, inventario,
+    firma de dispensados, auditoría y configuración. \\
 \textbf{SUPERVISOR} &
     Crear recetas y órdenes.
     Aprobar/rechazar lotes.
     Firmar dispensados.
-    Crear materiales y registrar lotes nuevos.
-    Consultar auditoría completa. \\
+    Crear materiales y registrar lotes. \\
+\textbf{DESARROLLO} &
+    Crear y editar recetas maestras (formulaciones).
+    Consultar inventario, órdenes y auditoría (solo lectura). \\
+\textbf{CALIDAD} &
+    Aprobar/rechazar lotes de materia prima.
+    Firmar dispensados (firma electrónica).
+    Consultar recetas, órdenes y auditoría. \\
+\textbf{ALMACEN} &
+    Registrar materiales nuevos.
+    Registrar lotes de materia prima (recepción).
+    Cambiar estados de lotes.
+    Consultar inventario y códigos de barras. \\
 \textbf{OPERARIO} &
     Ejecutar dispensado (pesar materiales).
-    Consultar inventario, órdenes y recetas (solo lectura).
-    No puede crear ni aprobar nada. \\
+    Consultar inventario, órdenes y recetas (solo lectura). \\
+\textbf{AUDITOR} &
+    Acceso de solo lectura a todos los módulos.
+    Consultar auditoría completa para inspecciones. \\
 \bottomrule
 \end{tabularx}
 \end{center}
 
 \begin{cajaInfo}[Principio de segregación de funciones]
 El operario que pesa \textbf{no puede firmar} su propio trabajo.
-El que aprueba un lote \textbf{puede ser diferente} del que lo recibe.
+Quien diseña la fórmula (Desarrollo) \textbf{no es quien la ejecuta} (Operario).
+Quien aprueba el lote (Calidad) \textbf{es diferente} de quien lo recibe (Almacén).
+El auditor \textbf{no puede modificar nada}, solo consultar.
 Esto cumple con las Buenas Prácticas de Manufactura (BPM/GMP).
 \end{cajaInfo}
 
@@ -271,7 +286,7 @@ El sistema cumple con los requisitos clave de la norma FDA:
 Registros electrónicos & Toda acción genera un registro inmutable con timestamp \\
 Firmas electrónicas    & El supervisor firma con email + contraseña (vinculante) \\
 Audit trail            & Log completo, no editable, no borrable \\
-Control de acceso      & Tres roles con permisos diferenciados \\
+Control de acceso      & Siete roles con permisos diferenciados \\
 Integridad de datos    & Base de datos con transacciones ACID \\
 Trazabilidad           & Rastreo completo: material $\rightarrow$ lote $\rightarrow$ orden $\rightarrow$ operario \\
 \bottomrule

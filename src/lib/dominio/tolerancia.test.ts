@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  BARRA_AMBAR_ANCHO,
   BARRA_VERDE_FIN,
   BARRA_VERDE_INICIO,
   calcularRango,
@@ -215,5 +216,16 @@ describe("posicionEnBarra", () => {
     expect(posicionEnBarra(99, rango)).toBe(100);
     const punto = { target: 1, min: 1, max: 1 };
     expect([posicionEnBarra(0.9, punto), posicionEnBarra(1, punto), posicionEnBarra(1.1, punto)]).toEqual([0, 50, 100]);
+  });
+});
+
+describe("barra y semáforo comparten zonas", () => {
+  it("un peso ámbar cae en la franja ámbar de la barra; uno verde, en la verde", () => {
+    const rango = { target: 2, min: 1.98, max: 2.02 };
+    for (const p of [1.98, 1.982, 1.9839, 1.984, 1.99, 2, 2.016, 2.0161, 2.02]) {
+      const x = posicionEnBarra(p, rango);
+      const enAmbar = x < BARRA_VERDE_INICIO + BARRA_AMBAR_ANCHO - 1e-9 || x > BARRA_VERDE_FIN - BARRA_AMBAR_ANCHO + 1e-9;
+      expect(enAmbar).toBe(evaluarPeso(p, rango) === "warning");
+    }
   });
 });

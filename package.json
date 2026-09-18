@@ -14,7 +14,8 @@
     "db:migrate": "node --env-file=.env.local scripts/migrar.mjs",
     "db:seed": "node --env-file=.env.local scripts/seed.mjs",
     "crear-usuario": "node --env-file=.env.local scripts/crear-usuario.mjs",
-    "test:e2e": "node scripts/e2e.mjs"
+    "test:e2e": "node scripts/e2e.mjs",
+    "usuario": "node --env-file=.env.local scripts/usuario.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

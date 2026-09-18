@@ -34,6 +34,7 @@ COPY --from=builder --chown=app:app /app/scripts/migrar.mjs ./scripts/migrar.mjs
 # Operación desde consola (docs/OPERACION.md): alta de usuarios y datos de demostración.
 COPY --from=builder --chown=app:app /app/scripts/crear-usuario.mjs ./scripts/crear-usuario.mjs
 COPY --from=builder --chown=app:app /app/scripts/seed.mjs ./scripts/seed.mjs
+COPY --from=builder --chown=app:app /app/scripts/usuario.mjs ./scripts/usuario.mjs
 # El standalone trae solo lo que Next trazó; el migrador necesita los paquetes completos.
 COPY --from=builder --chown=app:app /app/node_modules/drizzle-orm ./node_modules/drizzle-orm
 COPY --from=builder --chown=app:app /app/node_modules/postgres ./node_modules/postgres

@@ -144,7 +144,7 @@ imagen construida en Actions, respaldo `pg_dump` diario con 14 días.
 1. **Segregación de funciones en la firma:** ¿puede firmar una fase la misma persona que la pesó (p. ej. un supervisor que dispensa)? Hoy no se bloquea.
 2. **Fuera de tolerancia:** hoy el pesaje se rechaza. ¿Existe un flujo de desviación autorizada por Calidad?
 3. **Quién aprueba lotes:** se aplicó el manual (Calidad, Supervisor, Admin; Almacén no). ¿Supervisor debe poder?
-4. **Lotes:** ¿FEFO obligatorio (usar primero el que caduca antes)? ¿Se puede repartir un ingrediente entre dos lotes? ¿La caducidad vence al inicio o al final del día indicado (hoy se compara al instante exacto guardado)? ¿Quién y cuándo marca `CADUCADO`? ¿Hay re-análisis?
+4. **Lotes:** ¿FEFO obligatorio (usar primero el que caduca antes)? ¿Se puede repartir un ingrediente entre dos lotes? ¿La caducidad vence al inicio o al final del día indicado? (hoy, criterio conservador: el lote deja de ser utilizable a las 00:00 hora de la planta de su día de caducidad — `src/lib/fechas.ts`) ¿Quién y cuándo marca `CADUCADO`? ¿Hay re-análisis?
 5. **Órdenes:** ¿quién pasa `DISPENSADO → COMPLETADA`? ¿quién cancela y qué pasa con el material ya pesado?
 6. **Recetas:** versionado y aprobación de cambios; ¿una receta usada en órdenes puede editarse? (hoy no hay edición).
 7. **Contraseñas y sesión:** política (hoy mínimo 10 caracteres), caducidad, cierre por inactividad (hoy 24 h fijas), bloqueo (hoy 5 fallos/15 min), alta/baja de usuarios y reinicio de contraseña (hoy solo por consola).

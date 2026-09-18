@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { calcularRango, dentroDeTolerancia, evaluarPeso, type ReglaIngrediente } from "./tolerancia";
+import {
+  BARRA_VERDE_FIN,
+  BARRA_VERDE_INICIO,
+  calcularRango,
+  dentroDeTolerancia,
+  evaluarPeso,
+  posicionEnBarra,
+  type ReglaIngrediente,
+} from "./tolerancia";
 
 const regla = (cantidadTarget: number, toleranciaMin: number, toleranciaMax: number): ReglaIngrediente => ({
   cantidadTarget,
@@ -183,5 +191,29 @@ describe("calcularRango — porcentajes con más de 2 decimales", () => {
     const r = calcularRango({ cantidadTarget: 100, toleranciaMin: -1.15, toleranciaMax: 1.15 }, 1);
     expect(r.min).toBe(98.85);
     expect(r.max).toBe(101.15);
+  });
+});
+
+describe("posicionEnBarra", () => {
+  const rango = { target: 5, min: 4.95, max: 5.05 };
+  it("los límites caen en los bordes del tercio verde y el target al centro", () => {
+    expect(posicionEnBarra(4.95, rango)).toBeCloseTo(BARRA_VERDE_INICIO, 6);
+    expect(posicionEnBarra(5.05, rango)).toBeCloseTo(BARRA_VERDE_FIN, 6);
+    expect(posicionEnBarra(5, rango)).toBeCloseTo(50, 6);
+  });
+  it("todo peso dentro de tolerancia queda dentro del verde, y fuera queda fuera", () => {
+    for (const p of [4.95, 4.9731, 5, 5.0499, 5.05]) {
+      const x = posicionEnBarra(p, rango);
+      expect(x).toBeGreaterThanOrEqual(BARRA_VERDE_INICIO - 1e-9);
+      expect(x).toBeLessThanOrEqual(BARRA_VERDE_FIN + 1e-9);
+    }
+    expect(posicionEnBarra(4.9499, rango)).toBeLessThan(BARRA_VERDE_INICIO);
+    expect(posicionEnBarra(5.0501, rango)).toBeGreaterThan(BARRA_VERDE_FIN);
+  });
+  it("se satura en 0 y 100, y no divide entre cero con tolerancia 0", () => {
+    expect(posicionEnBarra(0, rango)).toBe(0);
+    expect(posicionEnBarra(99, rango)).toBe(100);
+    const punto = { target: 1, min: 1, max: 1 };
+    expect([posicionEnBarra(0.9, punto), posicionEnBarra(1, punto), posicionEnBarra(1.1, punto)]).toEqual([0, 50, 100]);
   });
 });

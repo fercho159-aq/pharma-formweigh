@@ -70,7 +70,7 @@ export default function AuditoriaPage() {
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Audit Trail</h1>
-        <p className="text-gray-500">Registro inmutable de todas las acciones del sistema (21 CFR Part 11)</p>
+        <p className="text-gray-500">Registro inmutable de todas las acciones del sistema</p>
       </div>
 
       {/* Filters */}

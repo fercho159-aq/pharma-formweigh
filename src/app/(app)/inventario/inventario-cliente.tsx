@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import BarcodeInput from "@/components/barcode-input";
+import { formatearFecha } from "@/lib/fechas";
 
 import { tienePermiso } from "@/lib/auth/permisos";
 
@@ -49,6 +50,7 @@ export default function InventarioCliente({ rol }: { rol: string }) {
   const [matForm, setMatForm] = useState({ codigo: "", nombre: "", descripcion: "", unidad: "kg", stockMinimo: "0" });
 
   // Lote reception form
+  const [confirmandoRechazo, setConfirmandoRechazo] = useState<string | null>(null);
   const [recForm, setRecForm] = useState({ codigoMaterial: "", numeroLote: "", cantidad: "", proveedor: "", fechaCaducidad: "", certificado: "" });
   const [recMaterial, setRecMaterial] = useState<{ id: string; nombre: string; unidad: string } | null>(null);
   const [recMsg, setRecMsg] = useState({ type: "", text: "" });
@@ -328,7 +330,7 @@ export default function InventarioCliente({ rol }: { rol: string }) {
                   <td className="px-4 py-3 text-sm">{l.materialNombre}</td>
                   <td className="px-4 py-3 text-sm text-right">{l.cantidad.toFixed(2)} / {l.cantidadInicial.toFixed(2)}</td>
                   <td className="px-4 py-3 text-sm">{l.proveedor}</td>
-                  <td className="px-4 py-3 text-sm">{new Date(l.fechaCaducidad).toLocaleDateString("es-MX")}</td>
+                  <td className="px-4 py-3 text-sm">{formatearFecha(l.fechaCaducidad)}</td>
                   <td className="px-4 py-3 text-center">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium border ${estadoColor[l.estado]}`}>
                       {l.estado}
@@ -344,12 +346,31 @@ export default function InventarioCliente({ rol }: { rol: string }) {
                           >
                             Aprobar
                           </button>
-                          <button
-                            onClick={() => handleCambiarEstadoLote(l.id, "RECHAZADO")}
-                            className="text-red-600 hover:bg-red-50 px-2 py-1 rounded text-xs font-medium cursor-pointer"
-                          >
-                            Rechazar
-                          </button>
+                          {/* RECHAZADO es un estado final: se confirma en dos pasos dentro de la fila. */}
+                          {confirmandoRechazo === l.id ? (
+                            <span className="inline-flex items-center gap-1 text-xs">
+                              <span className="text-red-700 font-semibold">¿Confirmar rechazo?</span>
+                              <button
+                                onClick={() => { setConfirmandoRechazo(null); handleCambiarEstadoLote(l.id, "RECHAZADO"); }}
+                                className="bg-red-600 text-white hover:bg-red-700 px-2 py-1 rounded font-medium cursor-pointer"
+                              >
+                                Sí, rechazar
+                              </button>
+                              <button
+                                onClick={() => setConfirmandoRechazo(null)}
+                                className="text-gray-600 hover:bg-gray-100 px-2 py-1 rounded font-medium cursor-pointer"
+                              >
+                                Cancelar
+                              </button>
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => setConfirmandoRechazo(l.id)}
+                              className="text-red-600 hover:bg-red-50 px-2 py-1 rounded text-xs font-medium cursor-pointer"
+                            >
+                              Rechazar
+                            </button>
+                          )}
                         </div>
                       )}
                       {l.estado === "APROBADO" && (

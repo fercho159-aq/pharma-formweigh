@@ -81,12 +81,13 @@ console.log("— Inventario: material → lote en cuarentena → aprobación");
 const rMat = await almacen.pedir("POST", "/api/inventario/materiales", { codigo: `MAT-E2E-${sufijo}`, nombre: `Material E2E ${sufijo}`, unidad: "kg", stockMinimo: 1 });
 verificar("ALMACEN crea material", rMat.status === 200 && rMat.json?.id, JSON.stringify(rMat.json));
 const materialId = rMat.json.id;
-const caducidad = new Date(Date.now() + 90 * 864e5).toISOString();
+const caducidad = new Date(Date.now() + 90 * 864e5).toISOString().slice(0, 10); // fecha de calendario AAAA-MM-DD
 const numeroLote = `LOT-E2E-${sufijo}`;
 verificar("lote con cantidad negativa → 400", (await almacen.pedir("POST", "/api/inventario/lotes", { numero: numeroLote + "-N", materialId, cantidad: -5, fechaCaducidad: caducidad, proveedor: "P" })).status === 400);
 verificar("lote ya caducado → 400", (await almacen.pedir("POST", "/api/inventario/lotes", { numero: numeroLote + "-C", materialId, cantidad: 5, fechaCaducidad: "2020-01-01", proveedor: "P" })).status === 400);
 const rLote = await almacen.pedir("POST", "/api/inventario/lotes", { numero: numeroLote, materialId, cantidad: 3, fechaCaducidad: caducidad, proveedor: "Proveedor E2E" });
 verificar("ALMACEN recibe lote", rLote.status === 200, JSON.stringify(rLote.json));
+verificar("caducidad con hora (no es fecha de calendario) → 400", (await almacen.pedir("POST", "/api/inventario/lotes", { numero: numeroLote + "-H", materialId, cantidad: 1, fechaCaducidad: new Date(Date.now() + 864e7).toISOString(), proveedor: "P" })).status === 400);
 const loteId = rLote.json.id;
 verificar("lote duplicado → 409", (await almacen.pedir("POST", "/api/inventario/lotes", { numero: numeroLote, materialId, cantidad: 3, fechaCaducidad: caducidad, proveedor: "P" })).status === 409);
 verificar("ALMACEN NO puede aprobar su lote → 403", (await almacen.pedir("PATCH", `/api/inventario/lotes/${loteId}`, { estado: "APROBADO" })).status === 403);
@@ -125,6 +126,8 @@ verificar("firmar fase incompleta → 409", (await operario.pedir("POST", "/api/
 const rafaga = await Promise.all(Array.from({ length: 8 }, () => operario.pedir("POST", "/api/dispensado/registrar", { ordenId, ingredienteId: ingA.id, loteId, cantidadReal: 1.01 })));
 verificar("ráfaga de 8 pesajes idénticos → exactamente 1 aceptado", rafaga.filter((r) => r.status === 200).length === 1, rafaga.map((r) => r.status).join(","));
 const lotesTras = (await admin.pedir("GET", "/api/inventario/lotes")).json.find((l) => l.id === loteId);
+verificar("la caducidad se guarda como el mismo día de calendario en la planta (no un día antes)", new Date(lotesTras.fechaCaducidad).toLocaleDateString("sv-SE", { timeZone: "America/Mexico_City" }) === caducidad, lotesTras.fechaCaducidad);
+verificar("el detalle dice si ESTE usuario puede pesar", (await operario.pedir("GET", `/api/dispensado/${ordenId}`)).json.puedeDispensar === true && (await auditor.pedir("GET", `/api/dispensado/${ordenId}`)).json.puedeDispensar === false);
 verificar("stock descontado una sola vez (3 − 1.01 = 1.99)", lotesTras.cantidad === 1.99, String(lotesTras.cantidad));
 
 console.log("— Firma electrónica");

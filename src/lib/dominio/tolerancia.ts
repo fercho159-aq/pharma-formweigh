@@ -46,3 +46,22 @@ export function evaluarPeso(peso: number, rango: RangoPesaje): EstadoPesaje {
   if (p < min + margen || p > max - margen) return "warning";
   return "ok";
 }
+
+/**
+ * Geometría de la barra de pesaje. La ventana visible va de (min − ancho) a (max + ancho), así
+ * la zona verde ocupa SIEMPRE el tercio central y el marcador cae donde el semáforo dice.
+ * (La barra anterior iba de 0 a max: con ±1 % el verde era una astilla y un peso correcto
+ * parecía estar en rojo.)
+ */
+export const BARRA_VERDE_INICIO = 100 / 3;
+export const BARRA_VERDE_FIN = 200 / 3;
+
+export function posicionEnBarra(peso: number, rango: RangoPesaje): number {
+  const min = aDiezmilesimas(rango.min);
+  const max = aDiezmilesimas(rango.max);
+  const p = aDiezmilesimas(peso);
+  const ancho = max - min;
+  if (ancho <= 0) return p < min ? 0 : p > max ? 100 : 50;
+  const posicion = ((p - (min - ancho)) / (3 * ancho)) * 100;
+  return Math.min(100, Math.max(0, posicion));
+}

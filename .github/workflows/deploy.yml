@@ -17,6 +17,8 @@ env:
 on:
   push:
     branches: [main]
+    # Documentos y manuales no cambian la imagen: no gastar RAM/disco del VPS en redeploys.
+    paths-ignore: ["docs/**", "**/*.md"]
   workflow_dispatch:
 concurrency:
   group: deploy-vps-pharmaweigh

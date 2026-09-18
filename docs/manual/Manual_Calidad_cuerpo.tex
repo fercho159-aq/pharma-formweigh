@@ -113,12 +113,14 @@ Los dos botones no se comportan igual, y la diferencia es deliberada:
           Son reversibles entre sí: lo que apruebas lo puedes retener después.
     \item \boton{Rechazar} pide \textbf{confirmación en dos pasos}, porque
           \rechazado{} es un estado final. Al primer clic la fila cambia y muestra
-          \cd{¿Confirmar rechazo?} con los botones \boton{Sí, rechazar} y
-          \boton{Cancelar}. Hasta que no pulses \boton{Sí, rechazar} no pasa nada;
-          \boton{Cancelar} deja el lote como estaba, en \cuarentena.
+          \cd{¿Rechazar LOT-...?} \textbf{con el número del lote}, más los botones
+          \boton{Sí, rechazar} y \boton{Cancelar}. Hasta que no pulses
+          \boton{Sí, rechazar} no pasa nada; \boton{Cancelar} deja el lote como estaba,
+          en \cuarentena. Mientras dura la pregunta, el botón \boton{Aprobar} de esa
+          fila desaparece, para que no haya forma de equivocarse de acción.
 \end{itemize}
 
-\captura{30_confirmar_rechazo.png}{La fila pide confirmación antes de rechazar. \boton{Cancelar} no cambia nada.}
+\captura{30_confirmar_rechazo.png}{La fila nombra el lote que va a rechazar y esconde \boton{Aprobar} mientras pregunta. \boton{Cancelar} no cambia nada.}
 
 \begin{cajaOjo}
 La confirmación te protege del clic accidental, \textbf{no de la decisión}.
@@ -297,7 +299,7 @@ tolerancia mal puestos, avisa antes de que se creen órdenes con esa receta.
 \toprule
 \textbf{Riesgo} & \textbf{Por qué importa} \\
 \midrule
-\textbf{Confirmar un rechazo a la ligera} & La confirmación en dos pasos evita el clic accidental, pero \boton{Sí, rechazar} sigue siendo irreversible y obliga a dar de alta el lote de nuevo. Lee el número de lote de la fila antes de confirmar. \\
+\textbf{Confirmar un rechazo a la ligera} & La confirmación en dos pasos evita el clic accidental, pero \boton{Sí, rechazar} sigue siendo irreversible y obliga a dar de alta el lote de nuevo. La pregunta trae el número de lote: \textbf{léelo} y confirma que es el que querías. \\
 \textbf{Aprobar sin verificar}     & El sistema no revisa el COA ni los resultados analíticos. Sólo anota tu decisión. \\
 \textbf{Firmar sin ir a la estación} & La firma queda a tu nombre y no se retira. \\
 \textbf{Tardar en liberar}         & Los lotes en cuarentena no se pueden dispensar: la línea se detiene. \\

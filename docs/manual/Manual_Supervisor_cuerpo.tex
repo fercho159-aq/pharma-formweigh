@@ -156,12 +156,13 @@ Los botones no se comportan igual, y la diferencia es deliberada:
     \item \boton{Aprobar} y \boton{Retener} se aplican \textbf{con un solo clic}, porque
           son reversibles entre sí: lo que apruebas lo puedes retener después.
     \item \boton{Rechazar} pide \textbf{confirmación en dos pasos}, porque \rechazado{}
-          es un estado final. Al primer clic la fila muestra \cd{¿Confirmar rechazo?}
-          con \boton{Sí, rechazar} y \boton{Cancelar}. Hasta que no pulses
+          es un estado final. Al primer clic la fila muestra \cd{¿Rechazar LOT-...?}
+          \textbf{con el número del lote}, más \boton{Sí, rechazar} y \boton{Cancelar},
+          y esconde el \boton{Aprobar} de esa fila. Hasta que no pulses
           \boton{Sí, rechazar} no pasa nada.
 \end{itemize}
 
-\captura{30_confirmar_rechazo.png}{La fila pide confirmación antes de rechazar. \boton{Cancelar} deja el lote en \cuarentena.}
+\captura{30_confirmar_rechazo.png}{La fila nombra el lote que va a rechazar. \boton{Cancelar} deja el lote en \cuarentena.}
 
 \begin{cajaOjo}
 La confirmación te protege del clic accidental, \textbf{no de la decisión}.
@@ -386,7 +387,7 @@ contraseña}: se hace desde el servidor.
 \toprule
 \textbf{Riesgo} & \textbf{Por qué importa} \\
 \midrule
-\textbf{Confirmar un rechazo a la ligera} & El segundo clic (\boton{Sí, rechazar}) es irreversible: el lote queda inservible y hay que volver a recibirlo como lote nuevo. Lee el número de lote de la fila antes de confirmar. \\
+\textbf{Confirmar un rechazo a la ligera} & El segundo clic (\boton{Sí, rechazar}) es irreversible: el lote queda inservible y hay que volver a recibirlo como lote nuevo. La pregunta trae el número de lote: \textbf{léelo} antes de confirmar. \\
 \textbf{Firmar sin verificar}           & La firma es tuya, queda con tu nombre y no se retira. \\
 \textbf{Guardar una receta mal}         & No se edita ni se borra. Un target o una tolerancia equivocada se va a producción tal cual. \\
 \textbf{Tolerancias demasiado anchas}   & El semáforo deja pasar pesos que no deberían pasar. El sistema respeta lo que pusiste. \\

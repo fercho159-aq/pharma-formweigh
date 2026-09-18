@@ -1,42 +1,50 @@
+import { desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { query, generateId, registrarAuditoria } from "@/lib/db";
-import { getSession } from "@/lib/auth";
 
-export async function GET() {
-  const lotes = await query(`
-    SELECT l.*, m.nombre as "materialNombre"
-    FROM lotes l
-    JOIN materiales m ON l."materialId" = m.id
-    ORDER BY l."createdAt" DESC
-  `);
-  return NextResponse.json(lotes);
-}
+import { db } from "@/db";
+import { lotes, materiales } from "@/db/schema";
+import { ruta } from "@/lib/api";
+import { registrarAuditoria } from "@/lib/auditoria";
+import { ErrorDominio } from "@/lib/dominio/errores";
+import { esquemaRecibirLote } from "@/lib/esquemas";
 
-export async function POST(request: Request) {
-  const user = await getSession();
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  if (!["ADMIN", "SUPERVISOR", "ALMACEN"].includes(user.rol)) return NextResponse.json({ error: "Solo almacén, supervisor o admin pueden registrar lotes" }, { status: 403 });
+export const GET = ruta({ permiso: "inventario.ver" }, async () => {
+  const lista = await db
+    .select({
+      id: lotes.id,
+      numero: lotes.numero,
+      materialId: lotes.materialId,
+      cantidad: lotes.cantidad,
+      cantidadInicial: lotes.cantidadInicial,
+      fechaRecepcion: lotes.fechaRecepcion,
+      fechaCaducidad: lotes.fechaCaducidad,
+      proveedor: lotes.proveedor,
+      estado: lotes.estado,
+      certificado: lotes.certificado,
+      createdAt: lotes.createdAt,
+      materialNombre: materiales.nombre,
+      materialUnidad: materiales.unidad,
+    })
+    .from(lotes)
+    .innerJoin(materiales, eq(lotes.materialId, materiales.id))
+    .orderBy(desc(lotes.createdAt));
+  return NextResponse.json(lista);
+});
 
-  const data = await request.json();
-  const id = generateId();
-
-  try {
-    await query(
-      `INSERT INTO lotes (id, numero, "materialId", cantidad, "cantidadInicial", "fechaRecepcion", "fechaCaducidad", proveedor, certificado)
-       VALUES ($1, $2, $3, $4, $5, now(), $6, $7, $8)`,
-      [id, data.numero, data.materialId, data.cantidad, data.cantidad, data.fechaCaducidad, data.proveedor, data.certificado || null]
-    );
-
-    await registrarAuditoria(user.id, "RECEPCION_LOTE", "lotes", id, {
-      numero: data.numero,
-      materialId: data.materialId,
-      cantidad: data.cantidad,
-      proveedor: data.proveedor,
-    });
-
-    return NextResponse.json({ id });
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : "Error desconocido";
-    return NextResponse.json({ error: msg }, { status: 400 });
+export const POST = ruta({ permiso: "inventario.recibirLote", esquema: esquemaRecibirLote }, async ({ usuario, datos, ip }) => {
+  if (datos.fechaCaducidad.getTime() <= Date.now()) {
+    throw new ErrorDominio("No se puede recibir un lote ya caducado.", "LOTE_CADUCADO", 400);
   }
-}
+  const id = await db.transaction(async (tx) => {
+    const [material] = await tx.select({ id: materiales.id }).from(materiales).where(eq(materiales.id, datos.materialId));
+    if (!material) throw new ErrorDominio("Material no encontrado.", "MATERIAL_NO_ENCONTRADO", 404);
+    // Todo lote nuevo entra en CUARENTENA (default de BD): el cliente no elige el estado.
+    const [alta] = await tx
+      .insert(lotes)
+      .values({ numero: datos.numero, materialId: datos.materialId, cantidad: datos.cantidad, cantidadInicial: datos.cantidad, fechaCaducidad: datos.fechaCaducidad, proveedor: datos.proveedor, certificado: datos.certificado })
+      .returning({ id: lotes.id });
+    await registrarAuditoria({ usuarioId: usuario.id, accion: "RECEPCION_LOTE", entidad: "lotes", entidadId: alta!.id, ip, detalles: { numero: datos.numero, materialId: datos.materialId, cantidad: datos.cantidad, proveedor: datos.proveedor } }, tx);
+    return alta!.id;
+  });
+  return NextResponse.json({ id });
+});

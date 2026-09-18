@@ -1,41 +1,47 @@
+import { desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { query, queryOne, generateId, registrarAuditoria } from "@/lib/db";
-import { getSession } from "@/lib/auth";
 
-export async function GET() {
-  const ordenes = await query(`
-    SELECT op.*, r.nombre as "recetaNombre", r.codigo as "recetaCodigo"
-    FROM ordenes_produccion op
-    JOIN recetas r ON op."recetaId" = r.id
-    ORDER BY op.prioridad DESC, op."createdAt" DESC
-  `);
-  return NextResponse.json(ordenes);
-}
+import { db } from "@/db";
+import { ordenesProduccion, recetas } from "@/db/schema";
+import { ruta } from "@/lib/api";
+import { registrarAuditoria } from "@/lib/auditoria";
+import { ErrorDominio } from "@/lib/dominio/errores";
+import { formatearNumeroOrden } from "@/lib/dominio/ordenes";
+import { esquemaCrearOrden } from "@/lib/esquemas";
+import { siguienteConsecutivoOrden } from "@/lib/servicios/dispensado";
 
-export async function POST(request: Request) {
-  const user = await getSession();
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  if (!["ADMIN", "SUPERVISOR"].includes(user.rol)) return NextResponse.json({ error: "Solo supervisor o admin pueden crear órdenes" }, { status: 403 });
+export const GET = ruta({ permiso: "ordenes.ver" }, async () => {
+  const lista = await db
+    .select({
+      id: ordenesProduccion.id,
+      numero: ordenesProduccion.numero,
+      recetaId: ordenesProduccion.recetaId,
+      loteProducto: ordenesProduccion.loteProducto,
+      cantidad: ordenesProduccion.cantidad,
+      estado: ordenesProduccion.estado,
+      prioridad: ordenesProduccion.prioridad,
+      createdAt: ordenesProduccion.createdAt,
+      updatedAt: ordenesProduccion.updatedAt,
+      recetaNombre: recetas.nombre,
+      recetaCodigo: recetas.codigo,
+    })
+    .from(ordenesProduccion)
+    .innerJoin(recetas, eq(ordenesProduccion.recetaId, recetas.id))
+    .orderBy(desc(ordenesProduccion.prioridad), desc(ordenesProduccion.createdAt));
+  return NextResponse.json(lista);
+});
 
-  const data = await request.json();
-  const id = generateId();
-
-  // Auto-generate order number
-  const count = await queryOne("SELECT COUNT(*) as c FROM ordenes_produccion") as { c: string };
-  const numero = `ORD-${String(parseInt(count.c) + 1).padStart(5, "0")}`;
-
-  try {
-    await query(
-      `INSERT INTO ordenes_produccion (id, numero, "recetaId", "loteProducto", cantidad, prioridad)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [id, numero, data.recetaId, data.loteProducto, data.cantidad, data.prioridad || 0]
-    );
-
-    await registrarAuditoria(user.id, "CREAR_ORDEN", "ordenes_produccion", id, { numero, loteProducto: data.loteProducto });
-
-    return NextResponse.json({ id, numero });
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : "Error";
-    return NextResponse.json({ error: msg }, { status: 400 });
-  }
-}
+export const POST = ruta({ permiso: "ordenes.crear", esquema: esquemaCrearOrden }, async ({ usuario, datos, ip }) => {
+  const resultado = await db.transaction(async (tx) => {
+    const [receta] = await tx.select({ id: recetas.id, activa: recetas.activa }).from(recetas).where(eq(recetas.id, datos.recetaId));
+    if (!receta || !receta.activa) throw new ErrorDominio("La receta no existe o está inactiva.", "RECETA_NO_DISPONIBLE", 404);
+    const numero = formatearNumeroOrden(await siguienteConsecutivoOrden(tx));
+    const [alta] = await tx
+      .insert(ordenesProduccion)
+      .values({ numero, recetaId: datos.recetaId, loteProducto: datos.loteProducto, cantidad: datos.cantidad, prioridad: datos.prioridad })
+      .returning({ id: ordenesProduccion.id });
+    await registrarAuditoria({ usuarioId: usuario.id, accion: "CREAR_ORDEN", entidad: "ordenes_produccion", entidadId: alta!.id, ip, detalles: { numero, loteProducto: datos.loteProducto, cantidad: datos.cantidad } }, tx);
+    return { id: alta!.id, numero };
+  });
+  return NextResponse.json(resultado);
+});

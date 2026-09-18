@@ -1,0 +1,25 @@
+# Rutas que NUNCA viajan del repo al VPS ni se borran allá (rsync --delete).
+# Al VPS solo le hace falta docker-compose.yml y deploy/: la imagen llega ya construida.
+.git/
+.github/
+node_modules/
+.next/
+.vercel/
+coverage/
+src/
+public/
+drizzle/
+scripts/
+docs/
+imagen/
+.env
+.env.*
+!.env.example
+*.log
+*.tsbuildinfo
+.DS_Store
+.claude/
+.cursor/
+.devin/
+.agents/
+gh

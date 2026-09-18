@@ -1,0 +1,107 @@
+# Despliega a pharmaweigh.appsoluciones.duckdns.org (VPS maw-vps, 31.220.109.7)
+# en cada push a main.
+#
+# Usuario del VPS: `deploy` (no root). Puede escribir /opt/pharmaweigh y pedir el
+# deploy vía sudo al wrapper /usr/local/sbin/pharmaweigh-deploy; nada más.
+# Secretos del repo: VPS_HOST, VPS_SSH_KEY, VPS_KNOWN_HOSTS.
+#
+# POR QUÉ LA IMAGEN SE CONSTRUYE AQUÍ Y NO EN EL VPS:
+# el VPS tiene ~1 GiB de RAM libre, swap medio lleno y el disco al 92 %. Un
+# `next build` allá tumba la máquina (manual MAW §6). Así que este runner hace
+# buildx -> docker save -> gzip -> rsync del tar, y el VPS solo hace `docker load`.
+name: Deploy VPS
+env:
+  VPS_USER: deploy
+  DESTINO: /opt/pharmaweigh
+  SITIO: https://pharmaweigh.appsoluciones.duckdns.org
+on:
+  push:
+    branches: [main]
+    # Documentos y manuales no cambian la imagen: no gastar RAM/disco del VPS en redeploys.
+    paths-ignore: ["docs/**", "**/*.md"]
+  workflow_dispatch:
+concurrency:
+  group: deploy-vps-pharmaweigh
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: Verificación
+        run: npm run lint && npm run typecheck && npm test
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Construir imagen (amd64, igual que el VPS)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          tags: pharmaweigh:latest
+          load: true
+          build-args: |
+            NEXT_PUBLIC_SITE_URL=${{ env.SITIO }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Empaquetar imagen
+        run: |
+          mkdir -p imagen
+          # gzip -6: el runner tiene CPU de sobra, pero el cuello es la subida al VPS.
+          docker save pharmaweigh:latest | gzip -6 > imagen/pharmaweigh.tar.gz
+          ls -lh imagen/pharmaweigh.tar.gz
+
+      - name: Preparar SSH
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "${{ secrets.VPS_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          printf 'Host *\n  ConnectTimeout 30\n  ConnectionAttempts 3\n  ServerAliveInterval 15\n' > ~/.ssh/config
+
+      - name: Sincronizar compose y scripts de deploy
+        run: |
+          ssh "$VPS_USER@${{ secrets.VPS_HOST }}" "mkdir -p $DESTINO/imagen"
+          for intento in 1 2 3; do
+            rsync -rlptzv --delete --chmod=Dg+ws,Fg+w \
+              --exclude-from=deploy/rsync-exclude.txt \
+              ./ "$VPS_USER@${{ secrets.VPS_HOST }}:$DESTINO/" && exit 0
+            echo "::warning::rsync de código falló (intento $intento/3)"; sleep 20
+          done
+          exit 1
+
+      - name: Subir imagen al VPS
+        run: |
+          # Sin -z: el tar ya viene comprimido. Sin --delete: el wrapper borra el tar
+          # al terminar, y un --delete aquí competiría con él.
+          for intento in 1 2 3; do
+            rsync -rlpt --partial --inplace \
+              imagen/pharmaweigh.tar.gz \
+              "$VPS_USER@${{ secrets.VPS_HOST }}:$DESTINO/imagen/pharmaweigh.tar.gz" && exit 0
+            echo "::warning::rsync de imagen falló (intento $intento/3)"; sleep 20
+          done
+          exit 1
+
+      - name: Deploy en el VPS (load -> migrar -> up -> health)
+        run: ssh "$VPS_USER@${{ secrets.VPS_HOST }}" 'sudo -n /usr/local/sbin/pharmaweigh-deploy'
+
+      - name: Verificar sitio público
+        run: |
+          COD=$(curl -s -o /dev/null -w '%{http_code}' -L --max-time 30 "$SITIO/api/salud")
+          echo "salud -> $COD"
+          [ "$COD" = "200" ]
+
+      - name: Diagnóstico si algo falló
+        if: failure()
+        run: |
+          ssh "$VPS_USER@${{ secrets.VPS_HOST }}" '
+            uptime; free -h; df -h /
+            docker compose -f /opt/pharmaweigh/docker-compose.yml --env-file /opt/pharmaweigh/.env -p pharmaweigh ps
+            docker compose -f /opt/pharmaweigh/docker-compose.yml --env-file /opt/pharmaweigh/.env -p pharmaweigh logs --tail=80 app
+          ' || true

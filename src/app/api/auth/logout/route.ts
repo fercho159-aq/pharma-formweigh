@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
-import { destroySession, getSession } from "@/lib/auth";
-import { registrarAuditoria } from "@/lib/db";
 
-export async function POST() {
-  const user = await getSession();
-  if (user) {
-    await registrarAuditoria(user.id, "LOGOUT", "usuarios", user.id);
+import { ipDe, origenValido, responderError } from "@/lib/api";
+import { registrarAuditoria } from "@/lib/auditoria";
+import { destruirSesion, getSession } from "@/lib/auth/sesion";
+
+export async function POST(request: Request) {
+  try {
+    if (!origenValido(request)) return NextResponse.json({ ok: false, error: "Origen no permitido." }, { status: 403 });
+    const usuario = await getSession();
+    if (usuario) {
+      await registrarAuditoria({ usuarioId: usuario.id, accion: "LOGOUT", entidad: "usuarios", entidadId: usuario.id, ip: ipDe(request) });
+    }
+    await destruirSesion();
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    return responderError(e);
   }
-  await destroySession();
-  return NextResponse.json({ ok: true });
 }

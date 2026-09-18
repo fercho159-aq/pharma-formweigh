@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import BarcodeInput from "@/components/barcode-input";
+import { evaluarPeso } from "@/lib/dominio/tolerancia";
 
 interface Ingrediente {
   id: string;
@@ -18,6 +19,8 @@ interface Ingrediente {
   orden: number;
   dispensado: boolean;
   dispensadoReal?: number;
+  /** Límites calculados por el servidor (target × cantidad de la orden, en 4 decimales). */
+  rango: { target: number; min: number; max: number };
 }
 
 interface Fase {
@@ -55,6 +58,7 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
   const [scannedLoteId, setScannedLoteId] = useState("");
   const [peso, setPeso] = useState("");
   const [pesoStatus, setPesoStatus] = useState<"none" | "low" | "ok" | "warning" | "high">("none");
+  const [registroError, setRegistroError] = useState("");
 
   // Firma
   const [showFirma, setShowFirma] = useState(false);
@@ -137,8 +141,8 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         codigoLote: code,
-        materialId: ing.materialId,
-        cantidadRequerida: ing.cantidadTarget * orden.cantidad,
+        ordenId: orden.id,
+        ingredienteId: ing.id,
       }),
     });
     const data = await res.json();
@@ -161,15 +165,12 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
     }
 
     const pesoNum = parseFloat(value);
-    const target = ing.cantidadTarget * orden.cantidad;
-    const min = target * (1 + ing.toleranciaMin / 100);
-    const max = target * (1 + ing.toleranciaMax / 100);
-    const warningRange = (max - min) * 0.1;
-
-    if (pesoNum < min) setPesoStatus("low");
-    else if (pesoNum > max) setPesoStatus("high");
-    else if (pesoNum < min + warningRange || pesoNum > max - warningRange) setPesoStatus("warning");
-    else setPesoStatus("ok");
+    if (!Number.isFinite(pesoNum)) {
+      setPesoStatus("none");
+      return;
+    }
+    setRegistroError("");
+    setPesoStatus(evaluarPeso(pesoNum, ing.rango));
   }
 
   async function handleConfirmPeso() {
@@ -178,24 +179,17 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
     if (!ing || !orden || !peso || registrando || !fase) return;
     setRegistrando(true);
 
-    const target = ing.cantidadTarget * orden.cantidad;
-    const min = target * (1 + ing.toleranciaMin / 100);
-    const max = target * (1 + ing.toleranciaMax / 100);
     const pesoNum = parseFloat(peso);
-    const toleranciaOk = pesoNum >= min && pesoNum <= max;
+    setRegistroError("");
 
     const res = await fetch(`/api/dispensado/registrar`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ordenId: orden.id,
-        faseId: fase.id,
+        ingredienteId: ing.id,
         loteId: scannedLoteId,
-        cantidadTarget: target,
         cantidadReal: pesoNum,
-        toleranciaOk,
-        paso: ing.orden,
-        materialNombre: ing.materialNombre,
       }),
     });
 
@@ -215,6 +209,11 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
         setShowFirma(true);
         loadOrden();
       }
+    } else {
+      // El servidor es quien decide (tolerancia, lote, orden de pasos): se muestra su motivo.
+      const data = await res.json().catch(() => null);
+      setRegistroError(data?.error || "No se pudo registrar el pesaje. Intenta de nuevo.");
+      loadOrden();
     }
     setRegistrando(false);
   }
@@ -259,9 +258,9 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
 
   const currentFase = getCurrentFase();
   const ing = getCurrentIngrediente();
-  const target = ing ? ing.cantidadTarget * orden.cantidad : 0;
-  const min = ing ? target * (1 + ing.toleranciaMin / 100) : 0;
-  const max = ing ? target * (1 + ing.toleranciaMax / 100) : 0;
+  const target = ing ? ing.rango.target : 0;
+  const min = ing ? ing.rango.min : 0;
+  const max = ing ? ing.rango.max : 0;
 
   // Overall progress
   const totalIngredientes = orden.fases.reduce((sum, f) => sum + f.ingredientes.length, 0);
@@ -298,7 +297,6 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
         {orden.fases.map((fase, idx) => {
           const isSigned = !!fase.firma;
           const isActive = idx === currentPhaseIdx && !allCompleted;
-          const isFuture = idx > currentPhaseIdx || (allCompleted && !isSigned);
           const faseCompleted = fase.ingredientes.filter((i) => i.dispensado).length;
           const faseTotal = fase.ingredientes.length;
 
@@ -572,6 +570,12 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
                         </div>
                       )}
 
+                      {registroError && (
+                        <div role="alert" className="mb-4 p-3 rounded-lg border-2 border-red-500 bg-red-50 text-red-700 text-sm font-medium">
+                          {registroError}
+                        </div>
+                      )}
+
                       <button
                         onClick={handleConfirmPeso}
                         disabled={!peso || pesoStatus === "none" || pesoStatus === "low" || pesoStatus === "high" || registrando}
@@ -618,7 +622,7 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
                           <span className="text-gray-400 ml-auto">
                             {step.dispensado && step.dispensadoReal !== undefined
                               ? `${step.dispensadoReal} ${step.materialUnidad}`
-                              : `${(step.cantidadTarget * orden.cantidad).toFixed(3)} ${step.materialUnidad}`}
+                              : `${step.rango.target.toFixed(3)} ${step.materialUnidad}`}
                           </span>
                         </div>
                       ))}

@@ -1,0 +1,4 @@
+# /etc/sudoers.d/pharmaweigh-deploy — el usuario `deploy` solo puede correr el wrapper.
+# Se instala con `bash deploy/instalar_wrapper.sh` (valida con visudo -c antes).
+deploy ALL=(root) NOPASSWD: /usr/local/sbin/pharmaweigh-deploy
+Defaults:deploy !requiretty

@@ -8,32 +8,44 @@ interface AuditEntry {
   entidad: string;
   entidadId: string;
   detalles: string;
-  usuarioNombre: string;
-  usuarioRol: string;
+  /** Los eventos sin usuario (login fallido) pueden venir nulos. */
+  usuarioNombre: string | null;
+  usuarioRol: string | null;
+  ip: string | null;
   timestamp: string;
 }
+
+const SIN_USUARIO = "(sin identificar)";
 
 export default function AuditoriaPage() {
   const [entries, setEntries] = useState<AuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [filtroAccion, setFiltroAccion] = useState("");
   const [filtroUsuario, setFiltroUsuario] = useState("");
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    let cancelado = false;
+    async function cargar() {
+      const res = await fetch("/api/auditoria");
+      const data = await res.json().catch(() => null);
+      if (cancelado) return;
+      if (Array.isArray(data)) setEntries(data);
+      else setError(data?.error || "No se pudo cargar la bitácora");
+      setLoading(false);
+    }
+    cargar();
+    return () => { cancelado = true; };
+  }, []);
 
-  async function loadData() {
-    setLoading(true);
-    const res = await fetch("/api/auditoria");
-    setEntries(await res.json());
-    setLoading(false);
-  }
+  const nombreDe = (e: AuditEntry) => e.usuarioNombre || SIN_USUARIO;
 
   const acciones = [...new Set(entries.map((e) => e.accion))].sort();
-  const usuarios = [...new Set(entries.map((e) => e.usuarioNombre))].sort();
+  const usuarios = [...new Set(entries.map(nombreDe))].sort();
 
   const filtered = entries.filter((e) => {
     if (filtroAccion && e.accion !== filtroAccion) return false;
-    if (filtroUsuario && e.usuarioNombre !== filtroUsuario) return false;
+    if (filtroUsuario && nombreDe(e) !== filtroUsuario) return false;
     return true;
   });
 
@@ -44,6 +56,10 @@ export default function AuditoriaPage() {
     CREAR_RECETA: "bg-purple-100 text-purple-700",
     CREAR_ORDEN: "bg-indigo-100 text-indigo-700",
     RECEPCION_LOTE: "bg-teal-100 text-teal-700",
+    LOGIN_FALLIDO: "bg-red-100 text-red-700",
+    FIRMA_RECHAZADA: "bg-red-100 text-red-700",
+    CREAR_USUARIO: "bg-blue-100 text-blue-700",
+    FIRMAR_FASE: "bg-green-200 text-green-800",
     CAMBIAR_ESTADO_LOTE: "bg-yellow-100 text-yellow-700",
     DISPENSAR: "bg-green-100 text-green-700",
     FIRMAR_DISPENSADO: "bg-green-200 text-green-800",
@@ -78,6 +94,12 @@ export default function AuditoriaPage() {
         <span className="text-sm text-gray-400 self-center">{filtered.length} registros</span>
       </div>
 
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">
+          {error}
+        </div>
+      )}
+
       {loading ? (
         <div className="text-center py-12 text-gray-400">Cargando...</div>
       ) : (
@@ -89,6 +111,7 @@ export default function AuditoriaPage() {
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Usuario</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Acción</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Entidad</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">IP</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Detalles</th>
               </tr>
             </thead>
@@ -102,8 +125,8 @@ export default function AuditoriaPage() {
                       {new Date(e.timestamp).toLocaleString("es-MX")}
                     </td>
                     <td className="px-4 py-3">
-                      <p className="text-sm font-medium">{e.usuarioNombre}</p>
-                      <p className="text-xs text-gray-400">{e.usuarioRol}</p>
+                      <p className={`text-sm font-medium ${e.usuarioNombre ? "" : "text-gray-400 italic"}`}>{nombreDe(e)}</p>
+                      <p className="text-xs text-gray-400">{e.usuarioRol || "—"}</p>
                     </td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${accionColor[e.accion] || "bg-gray-100 text-gray-700"}`}>
@@ -111,6 +134,7 @@ export default function AuditoriaPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">{e.entidad}</td>
+                    <td className="px-4 py-3 text-xs font-mono text-gray-500 whitespace-nowrap">{e.ip || "—"}</td>
                     <td className="px-4 py-3 text-xs text-gray-500 max-w-xs truncate">
                       {Object.entries(detalles).map(([k, v]) => `${k}: ${v}`).join(", ")}
                     </td>
@@ -118,7 +142,7 @@ export default function AuditoriaPage() {
                 );
               })}
               {filtered.length === 0 && (
-                <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400">No hay registros de auditoría</td></tr>
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">No hay registros de auditoría</td></tr>
               )}
             </tbody>
           </table>

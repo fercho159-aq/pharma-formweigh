@@ -1,56 +1,55 @@
+import { asc, eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { query, generateId, registrarAuditoria } from "@/lib/db";
-import { getSession } from "@/lib/auth";
 
-export async function GET() {
-  const recetas = await query(`
-    SELECT r.*, COUNT(DISTINCT f.id) as "numFases", COUNT(i.id) as "numIngredientes"
-    FROM recetas r
-    LEFT JOIN fases f ON f."recetaId" = r.id
-    LEFT JOIN ingredientes i ON i."recetaId" = r.id
-    GROUP BY r.id, r.codigo, r.nombre, r.version, r.descripcion, r.rendimiento, r."unidadRendimiento", r.activa, r."createdAt", r."updatedAt"
-    ORDER BY r.nombre
-  `);
-  return NextResponse.json(recetas);
-}
+import { db } from "@/db";
+import { fases, ingredientes, materiales, recetas } from "@/db/schema";
+import { ruta } from "@/lib/api";
+import { registrarAuditoria } from "@/lib/auditoria";
+import { ErrorDominio } from "@/lib/dominio/errores";
+import { esquemaCrearReceta } from "@/lib/esquemas";
 
-export async function POST(request: Request) {
-  const user = await getSession();
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  if (!["ADMIN", "SUPERVISOR", "DESARROLLO"].includes(user.rol)) return NextResponse.json({ error: "Solo desarrollo, supervisor o admin pueden crear recetas" }, { status: 403 });
+export const GET = ruta({ permiso: "recetas.ver" }, async () => {
+  const lista = await db
+    .select({
+      id: recetas.id,
+      codigo: recetas.codigo,
+      nombre: recetas.nombre,
+      version: recetas.version,
+      descripcion: recetas.descripcion,
+      rendimiento: recetas.rendimiento,
+      unidadRendimiento: recetas.unidadRendimiento,
+      activa: recetas.activa,
+      createdAt: recetas.createdAt,
+      updatedAt: recetas.updatedAt,
+      numFases: sql<number>`(select count(*)::int from fases f where f.receta_id = ${recetas.id})`,
+      numIngredientes: sql<number>`(select count(*)::int from ingredientes i where i.receta_id = ${recetas.id})`,
+    })
+    .from(recetas)
+    .orderBy(asc(recetas.nombre));
+  return NextResponse.json(lista);
+});
 
-  const data = await request.json();
-  const id = generateId();
-
-  try {
-    await query(
-      `INSERT INTO recetas (id, codigo, nombre, descripcion, rendimiento, "unidadRendimiento")
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [id, data.codigo, data.nombre, data.descripcion || null, data.rendimiento, data.unidadRendimiento]
-    );
-
+export const POST = ruta({ permiso: "recetas.crear", esquema: esquemaCrearReceta }, async ({ usuario, datos, ip }) => {
+  const id = await db.transaction(async (tx) => {
+    const [alta] = await tx
+      .insert(recetas)
+      .values({ codigo: datos.codigo, nombre: datos.nombre, descripcion: datos.descripcion, rendimiento: datos.rendimiento, unidadRendimiento: datos.unidadRendimiento })
+      .returning({ id: recetas.id });
     let totalIngredientes = 0;
-    for (const [faseIndex, fase] of (data.fases || []).entries()) {
-      const faseId = generateId();
-      await query(
-        `INSERT INTO fases (id, "recetaId", nombre, orden, instrucciones) VALUES ($1, $2, $3, $4, $5)`,
-        [faseId, id, fase.nombre, faseIndex + 1, fase.instrucciones || null]
-      );
-      for (const ing of fase.ingredientes || []) {
-        const ingId = generateId();
-        await query(
-          `INSERT INTO ingredientes (id, "recetaId", "faseId", "materialId", orden, "cantidadTarget", "toleranciaMin", "toleranciaMax", instrucciones, peligroso)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-          [ingId, id, faseId, ing.materialId, ing.orden, ing.cantidadTarget, ing.toleranciaMin, ing.toleranciaMax, ing.instrucciones || null, ing.peligroso ? true : false]
-        );
+    for (const [indice, fase] of datos.fases.entries()) {
+      const [altaFase] = await tx
+        .insert(fases)
+        .values({ recetaId: alta!.id, nombre: fase.nombre, orden: indice + 1, instrucciones: fase.instrucciones })
+        .returning({ id: fases.id });
+      for (const ing of fase.ingredientes) {
+        const [material] = await tx.select({ id: materiales.id }).from(materiales).where(eq(materiales.id, ing.materialId));
+        if (!material) throw new ErrorDominio("Un ingrediente usa un material que no existe.", "MATERIAL_NO_ENCONTRADO", 404);
+        await tx.insert(ingredientes).values({ recetaId: alta!.id, faseId: altaFase!.id, ...ing });
         totalIngredientes++;
       }
     }
-
-    await registrarAuditoria(user.id, "CREAR_RECETA", "recetas", id, { nombre: data.nombre, codigo: data.codigo, fases: data.fases?.length || 0, ingredientes: totalIngredientes });
-    return NextResponse.json({ id });
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : "Error";
-    return NextResponse.json({ error: msg }, { status: 400 });
-  }
-}
+    await registrarAuditoria({ usuarioId: usuario.id, accion: "CREAR_RECETA", entidad: "recetas", entidadId: alta!.id, ip, detalles: { nombre: datos.nombre, codigo: datos.codigo, fases: datos.fases.length, ingredientes: totalIngredientes } }, tx);
+    return alta!.id;
+  });
+  return NextResponse.json({ id });
+});

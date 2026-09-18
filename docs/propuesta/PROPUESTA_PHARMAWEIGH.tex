@@ -1,0 +1,719 @@
+% !TEX program = xelatex
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================
+% DATOS DEL CLIENTE  <-- cambiar aqui y recompilar
+% ============================================================
+\newcommand{\clienteCorto}{\PENDIENTE{cliente}{nombre corto}}
+\newcommand{\clienteLargo}{\PENDIENTE{cliente}{razón social}}
+\newcommand{\fechaProp}{\PENDIENTE{Fernando}{fecha}}
+\newcommand{\demoURL}{pharmaweigh.appsoluciones.duckdns.org}
+\newcommand{\tarifa}{\PENDIENTE{Fernando}{tarifa}}
+\newcommand{\docTipo}{PharmaWeigh}
+\newcommand{\docPrefijo}{PROPUESTA}
+
+\input{maw_comun}
+
+% ============================================================
+% HORAS POR RENGLON --- PENDIENTE de autorizacion de Fernando
+% ------------------------------------------------------------
+% Para activar los calculos:
+%   1) \cifrasDefinidastrue
+%   2) \def\tarifaNum{900}  (o la tarifa que Fernando autorice)
+%   3) sustituir cada 0 por las horas del renglon
+% Los subtotales, el total y la mensualidad se recalculan solos.
+% ============================================================
+% \cifrasDefinidastrue
+\def\tarifaNum{0}
+
+% 01 Base, autenticacion y roles
+\def\hAa{0}\def\hAb{0}\def\hAc{0}\def\hAd{0}
+% 02 Inventario, materiales y lotes
+\def\hBa{0}\def\hBb{0}\def\hBc{0}\def\hBd{0}
+% 03 Recetas por fases
+\def\hCa{0}\def\hCb{0}\def\hCc{0}
+% 04 Ordenes de produccion
+\def\hDa{0}\def\hDb{0}\def\hDc{0}
+% 05 Dispensado guiado: semaforo y codigo de barras
+\def\hEa{0}\def\hEb{0}\def\hEc{0}\def\hEd{0}\def\hEe{0}
+% 06 Firma electronica por fase
+\def\hFa{0}\def\hFb{0}\def\hFc{0}
+% 07 Bitacora de auditoria
+\def\hGa{0}\def\hGb{0}
+% 08 Etiquetas y codigos de barras
+\def\hHa{0}\def\hHb{0}
+% 09 Despliegue, respaldo y operacion
+\def\hIa{0}\def\hIb{0}\def\hIc{0}\def\hId{0}
+% 10 Manuales y capacitacion
+\def\hJa{0}\def\hJb{0}\def\hJc{0}
+% 11 Puesta en marcha con datos del cliente
+\def\hKa{0}\def\hKb{0}\def\hKc{0}\def\hKd{0}
+% Mensualidad (horas recurrentes) e infraestructura
+\def\hMa{0}\def\hMb{0}\def\hMc{0}
+\def\infraMes{0}\def\respaldoMes{0}
+% Opcionales
+\def\hOa{0}\def\hOb{0}\def\hOc{0}\def\hOd{0}
+
+% Subtotales por bloque (sumas listas)
+\def\sA{\hAa+\hAb+\hAc+\hAd}
+\def\sB{\hBa+\hBb+\hBc+\hBd}
+\def\sC{\hCa+\hCb+\hCc}
+\def\sD{\hDa+\hDb+\hDc}
+\def\sE{\hEa+\hEb+\hEc+\hEd+\hEe}
+\def\sF{\hFa+\hFb+\hFc}
+\def\sG{\hGa+\hGb}
+\def\sH{\hHa+\hHb}
+\def\sI{\hIa+\hIb+\hIc+\hId}
+\def\sJ{\hJa+\hJb+\hJc}
+\def\sK{\hKa+\hKb+\hKc+\hKd}
+\def\sTOTAL{\sA+\sB+\sC+\sD+\sE+\sF+\sG+\sH+\sI+\sJ+\sK}
+
+\begin{document}
+
+\tituloCot{PharmaWeigh --- control de dispensado y pesaje}
+
+\noindent\RaggedRight{\small\color{gristexto}Cliente: \textbf{\clienteLargo} \quad\textbar\quad Preparado por: \textbf{MAW Soluciones} \quad\textbar\quad Demo en vivo: \href{https://\demoURL}{\demoURL} \quad\textbar\quad Vigencia: 30 días naturales}
+
+\vspace{12pt}
+
+\noindent Estimado \PENDIENTE{cliente}{destinatario}:
+
+\vspace{6pt}
+
+\noindent \textbf{PharmaWeigh} controla el surtido y pesaje de materias primas en planta. El operario escanea el lote, el sistema verifica que sea el material correcto, aprobado y vigente, el operario captura el peso y un semáforo le dice si está dentro de tolerancia. Cada fase de la receta la cierra un supervisor con su firma electrónica. Todo queda en una bitácora. El sistema \textbf{está construido y desplegado}: se puede abrir hoy en el demo en vivo.
+
+\vspace{10pt}
+
+\begin{cajaPendiente}[Esta propuesta no está cerrada]
+Las horas, la tarifa, los importes, la mensualidad y las fechas \textbf{no están autorizados todavía}. Aparecen marcados con \PENDmini{} o con una etiqueta ámbar. El desglose de módulos sí es firme: corresponde a lo que el sistema hace hoy y es verificable en el demo. \textbf{No firmar ni enviar al cliente hasta que Fernando autorice las cifras.}
+\end{cajaPendiente}
+
+\vspace{10pt}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}X R{3.0cm} R{3.0cm}@{}}
+\toprule
+\textbf{Concepto} & \textbf{Pago único} & \textbf{Mensualidad} \\
+\midrule
+\rowcolor{grisfondo}\textbf{PharmaWeigh --- sistema completo y puesta en marcha} & \textbf{\IM{\sTOTAL}} & \textbf{\IM{\hMa+\hMb+\hMc}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{6pt}
+
+\noindent{\small\color{gristexto}Precios más IVA. La mensualidad inicia el mes siguiente a la puesta en marcha. El desglose renglón por renglón está en la sección 5.}
+
+\vspace{14pt}
+
+% ============================================================
+\needspace{12\baselineskip}
+\seccion{1. Qué hace el sistema}
+
+\noindent El dispensado ocurre en cuatro pasos, siempre en el mismo orden, y el sistema no deja saltarse ninguno:
+
+\vspace{10pt}
+
+\begin{cajaInfo}[Recorrido de un dispensado]
+\begin{center}
+\begin{tikzpicture}[
+    node distance=0.7cm and 0.45cm,
+    box/.style={rectangle, draw=#1, fill=#1!10, rounded corners=4pt,
+                minimum width=2.7cm, minimum height=0.95cm, font=\scriptsize, align=center, line width=0.8pt},
+    arrow/.style={-{Stealth[length=4pt]}, thick, gristexto!70}
+]
+\node[box=azulcom] (esc) {Escanear el lote\\(pistola o cámara)};
+\node[box=rojonota, right=of esc] (val) {Validar material,\\estado y caducidad};
+\node[box=ambarpend, right=of val] (pes) {Capturar peso\\con semáforo};
+\node[box=verdeok, right=of pes] (fir) {Firma del\\supervisor por fase};
+\node[box=grisbar, right=of fir] (bit) {Bitácora\\de auditoría};
+
+\draw[arrow] (esc) -- (val);
+\draw[arrow] (val) -- (pes);
+\draw[arrow] (pes) -- (fir);
+\draw[arrow] (fir) -- (bit);
+\end{tikzpicture}
+\end{center}
+\end{cajaInfo}
+
+\vspace{12pt}
+
+\noindent\textbf{\color{azulcom}Lo que el sistema impide}
+\begin{itemize}[leftmargin=16pt, itemsep=4pt, topsep=4pt]
+    \item \textbf{Usar el material equivocado.} Al escanear el lote, el sistema compara el material del lote contra el que pide la receta y rechaza el que no corresponde.
+    \item \textbf{Usar material no liberado.} Solo acepta lotes en estado \textbf{APROBADO}. Un lote en cuarentena o rechazado no se puede dispensar.
+    \item \textbf{Usar material caducado.} Compara la fecha de caducidad del lote contra la fecha del día y lo rechaza si ya venció.
+    \item \textbf{Pesar fuera de tolerancia.} El semáforo se pone \textbf{rojo} y el botón de confirmar queda deshabilitado si el peso está por debajo del mínimo o por encima del máximo de la receta.
+    \item \textbf{Cerrar una fase sin supervisor.} La firma exige correo y contraseña de un usuario con rol SUPERVISOR, CALIDAD o ADMIN; el operario no puede firmar su propio trabajo.
+\end{itemize}
+
+\vspace{8pt}
+
+\noindent\textbf{\color{azulcom}Lo que el sistema registra}
+\begin{itemize}[leftmargin=16pt, itemsep=4pt, topsep=4pt]
+    \item Cada dispensado: orden, fase, lote, material, cantidad objetivo, \textbf{cantidad real pesada}, si quedó dentro de tolerancia, operario y paso.
+    \item Cada firma de fase: quién firmó, qué fase, de qué orden y en qué momento.
+    \item Cada acción del sistema en una \textbf{bitácora} consultable con filtros por acción y por usuario.
+    \item El descuento de existencia del lote al momento de dispensar, y su paso automático a \textbf{AGOTADO} cuando llega a cero.
+\end{itemize}
+
+\vspace{14pt}
+
+% ============================================================
+\needspace{14\baselineskip}
+\seccion{2. Los módulos y quién entra a cada uno}
+
+\noindent Siete roles con menú y permisos distintos: \textbf{ADMIN}, \textbf{SUPERVISOR}, \textbf{OPERARIO}, \textbf{DESARROLLO}, \textbf{CALIDAD}, \textbf{ALMACÉN} y \textbf{AUDITOR}. Cada rol ve solo los módulos que le tocan.
+
+\vspace{8pt}
+
+\noindent
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}L{3.2cm} X L{3.6cm}@{}}
+\toprule
+\textbf{Módulo} & \textbf{Qué hace} & \textbf{Quién entra} \\
+\midrule
+Tablero & Órdenes del día, avance por fases y actividad reciente. & Todos los roles \\
+Órdenes & Alta de la orden con receta, lote de producto, cantidad y prioridad; estados pendiente, en proceso, dispensado, completada y cancelada. & Admin, supervisor, calidad, operario, auditor \\
+Dispensado & Flujo guiado paso a paso: escaneo, validación, peso con semáforo y firma por fase. & Admin, supervisor, calidad, operario, auditor \\
+Recetas & Formulaciones por fases ordenadas, con instrucciones, ingredientes, cantidad objetivo, tolerancia mínima y máxima en \% y marca de material peligroso. & Admin, supervisor, desarrollo, calidad, auditor \\
+Inventario & Materiales con código y unidad; lotes con proveedor, caducidad, existencia y estado (cuarentena, aprobado, rechazado, agotado). & Admin, supervisor, almacén, calidad, auditor \\
+Auditoría & Bitácora de acciones con usuario, rol, entidad, detalle y fecha, con filtros. & Admin, supervisor, calidad, auditor \\
+Usuarios & Alta de usuarios, asignación de rol y activación o baja. & Admin \\
+Códigos de barras & Generación e impresión de etiquetas de lotes, materiales y gafetes de usuario. & Admin, supervisor, almacén, operario \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\vspace{14pt}
+
+% ============================================================
+\needspace{12\baselineskip}
+\seccion{3. Qué está hecho y qué no}
+
+\noindent Esta sección existe para que nadie compre lo que no hay.
+
+\vspace{6pt}
+
+\noindent
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}L{5.2cm} X@{}}
+\toprule
+\textbf{Tema} & \textbf{Situación real} \\
+\midrule
+Firma electrónica & \textbf{Construida.} Es firma por contraseña: el supervisor se identifica con su correo y su contraseña para cerrar cada fase, y la firma queda ligada a la fase, la orden y la hora. \\
+Bitácora de auditoría & \textbf{Construida.} Cada acción se inserta como un registro nuevo; la aplicación no ofrece editar ni borrar registros de bitácora. \\
+Validación normativa & \textbf{No está hecha.} El sistema \emph{no} está validado (CSV, IQ/OQ/PQ) ni certificado contra 21 CFR Part 11 ni NOM-059. Tiene funciones \textbf{orientadas a} ese tipo de control --- firma por usuario, trazabilidad, bitácora, control de caducidad y de estado de lote ---, pero la validación es un proyecto aparte y hoy está \textbf{fuera de alcance} (ver sección 5.5). \\
+Conexión con báscula & \textbf{No existe.} El peso se captura a mano en la pantalla. La lectura automática desde báscula está cotizada como opcional en la sección 5.5. \\
+Pruebas automatizadas & \textbf{En construcción.} Hay pruebas unitarias de las reglas de negocio (tolerancias, estados de lote, permisos por rol) en el código; el número y la cobertura \PENDIENTE{Fernando}{cifra verificada} antes de afirmarlos ante el cliente. No hay prueba de punta a punta automatizada. \\
+Hardware & \textbf{No incluido.} Tabletas, lectores de código de barras y básculas los pone el cliente. \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\vspace{14pt}
+
+% ============================================================
+\needspace{12\baselineskip}
+\seccion{4. Lo que falta para empezar son decisiones y cuentas del cliente}
+
+\noindent El sistema no tiene pendientes de desarrollo para operar con el alcance de la sección 2. Lo que falta son \textbf{decisiones, datos y cuentas de \clienteCorto}:
+
+\vspace{6pt}
+
+\noindent
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}L{4.8cm} X@{}}
+\toprule
+\textbf{Insumo} & \textbf{Por qué se necesita} \\
+\midrule
+Catálogo de materias primas & Código, nombre y unidad de cada material. Es la base del inventario y de las recetas. \\
+Formulaciones autorizadas & Recetas vigentes con sus fases, ingredientes, cantidad objetivo y \textbf{tolerancias en \%}. Sin la tolerancia aprobada por el cliente, el semáforo no tiene contra qué comparar. \\
+Lotes en piso & Número de lote, proveedor, existencia, fecha de caducidad y estado de liberación de cada lote que entra al sistema. \\
+Materiales peligrosos & Cuáles se marcan como peligrosos, para que la pantalla lo advierta al operario. \\
+Usuarios y roles & Nombre, correo y rol de cada persona. Define quién puede dispensar y \textbf{quién puede firmar}. \\
+Quién firma & Confirmación por escrito de qué puestos de \clienteCorto\ quedan como SUPERVISOR o CALIDAD, que son los que cierran fase. \\
+Etiquetado de lotes & Si los lotes ya traen código de barras del proveedor o si se imprimen las etiquetas del sistema. \\
+Equipo en planta & Tabletas o PC por estación de pesaje y lector de código de barras; el sistema corre en navegador. \\
+Responsable del proyecto & Una persona de \clienteCorto\ con facultades para aprobar recetas, tolerancias y la puesta en marcha. \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\vspace{8pt}
+
+\begin{cajaNota}
+\textbf{\color{azulcom}La puesta en marcha se entrega dispensando, no configurada.} Con los insumos completos, MAW Soluciones carga materiales, recetas y usuarios reales, imprime las etiquetas, y ejecuta \textbf{una orden real de punta a punta} en planta --- escaneo, pesaje con semáforo y firma de todas las fases --- antes de dar por arrancado el sistema. Después acompaña la primera semana de operación.
+\end{cajaNota}
+
+\vspace{8pt}
+
+\noindent Duración de la puesta en marcha: \PENDIENTE{Fernando}{plazo}. No se promete una fecha antes de que Fernando la autorice y el cliente entregue los insumos.
+
+\vspace{14pt}
+
+% ============================================================
+\needspace{10\baselineskip}
+\seccion{5. Inversión --- cómo se construye cada peso}
+
+\noindent Ningún precio de esta propuesta es un número redondo elegido a criterio. Todos salen de la misma fórmula:
+
+\vspace{8pt}
+
+\begin{center}
+{\large\bfseries\color{azulcom}Precio del entregable \;=\; Horas de ingeniería \;$\times$\; MXN \tarifa/hora}
+\end{center}
+
+\vspace{8pt}
+
+\noindent La tarifa por hora es única para el sistema, la puesta en marcha, la mensualidad y cualquier alcance adicional. Eso significa que:
+
+\begin{itemize}[leftmargin=16pt, itemsep=3pt, topsep=4pt]
+    \item Un bloque cuesta más que otro \textbf{solo porque lleva más horas}, no porque se le asignó otro margen.
+    \item Cualquier alcance que se agregue se cotiza con la misma regla, sin renegociar la tarifa.
+    \item El precio se puede auditar contra el mercado: en México, el desarrollo a la medida de este perfil se cotiza entre \textbf{MXN 900 y MXN 1,400 por hora}. MAW se ubica en la parte baja de esa banda porque el sistema \textbf{reutiliza componentes ya probados} en otros proyectos de MAW: autenticación, roles, despliegue en contenedores y respaldos.
+\end{itemize}
+
+\vspace{8pt}
+
+\begin{cajaPendiente}[Tarifa y horas]
+\PENDIENTE{Fernando}{tarifa por hora} \quad \PENDIENTE{Fernando}{horas de cada bloque 01--11}\\[4pt]
+Las tablas que siguen tienen la estructura y las fórmulas listas: al capturar la tarifa y las horas, los subtotales, el total y la mensualidad se calculan solos.
+\end{cajaPendiente}
+
+\vspace{12pt}
+
+\needspace{14\baselineskip}
+\subseccion{5.1 El sistema construido}
+
+\noindent Las horas de cada bloque cubren diseño, modelo de datos, desarrollo, interfaz y verificación.
+
+\vspace{6pt}
+
+\noindent
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}X R{2.0cm} R{2.4cm}@{}}
+\toprule
+\textbf{01 --- Base, autenticación y roles} & \textbf{Horas} & \textbf{Importe} \\
+\midrule
+Arquitectura, modelo de datos y migraciones & \HR{\hAa} & \IM{\hAa} \\
+Acceso con correo y contraseña, sesión y cierre de sesión & \HR{\hAb} & \IM{\hAb} \\
+Siete roles con menú y permisos verificados en el servidor & \HR{\hAc} & \IM{\hAc} \\
+Identidad visual de la aplicación y componentes de interfaz & \HR{\hAd} & \IM{\hAd} \\
+\midrule
+\rowcolor{grisfondo}\textbf{Subtotal bloque 01} & \textbf{\HR{\sA}} & \textbf{\IM{\sA}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{8pt}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}X R{2.0cm} R{2.4cm}@{}}
+\toprule
+\textbf{02 --- Inventario, materiales y lotes} & \textbf{Horas} & \textbf{Importe} \\
+\midrule
+Catálogo de materiales con código y unidad & \HR{\hBa} & \IM{\hBa} \\
+Recepción de lotes: proveedor, existencia y caducidad & \HR{\hBb} & \IM{\hBb} \\
+Estados de lote: cuarentena, aprobado, rechazado y agotado & \HR{\hBc} & \IM{\hBc} \\
+Descuento de existencia al dispensar y paso automático a agotado & \HR{\hBd} & \IM{\hBd} \\
+\midrule
+\rowcolor{grisfondo}\textbf{Subtotal bloque 02} & \textbf{\HR{\sB}} & \textbf{\IM{\sB}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{8pt}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}X R{2.0cm} R{2.4cm}@{}}
+\toprule
+\textbf{03 --- Recetas por fases} & \textbf{Horas} & \textbf{Importe} \\
+\midrule
+Receta con código, versión, rendimiento y unidad & \HR{\hCa} & \IM{\hCa} \\
+Fases ordenadas con instrucciones para el operario & \HR{\hCb} & \IM{\hCb} \\
+Ingredientes con cantidad objetivo, tolerancia mín./máx. y marca de peligroso & \HR{\hCc} & \IM{\hCc} \\
+\midrule
+\rowcolor{grisfondo}\textbf{Subtotal bloque 03} & \textbf{\HR{\sC}} & \textbf{\IM{\sC}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{8pt}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}X R{2.0cm} R{2.4cm}@{}}
+\toprule
+\textbf{04 --- Órdenes de producción} & \textbf{Horas} & \textbf{Importe} \\
+\midrule
+Alta de orden con receta, lote de producto, cantidad y prioridad & \HR{\hDa} & \IM{\hDa} \\
+Estados de la orden y avance por fases & \HR{\hDb} & \IM{\hDb} \\
+Tablero con órdenes del día y actividad reciente & \HR{\hDc} & \IM{\hDc} \\
+\midrule
+\rowcolor{grisfondo}\textbf{Subtotal bloque 04} & \textbf{\HR{\sD}} & \textbf{\IM{\sD}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{8pt}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}X R{2.0cm} R{2.4cm}@{}}
+\toprule
+\textbf{05 --- Dispensado guiado: semáforo y código de barras} & \textbf{Horas} & \textbf{Importe} \\
+\midrule
+Lectura del código de barras con pistola USB o cámara del dispositivo & \HR{\hEa} & \IM{\hEa} \\
+Validación del lote: material correcto, aprobado, vigente y con existencia & \HR{\hEb} & \IM{\hEb} \\
+Semáforo de pesaje con bloqueo fuera de tolerancia & \HR{\hEc} & \IM{\hEc} \\
+Avance paso a paso por ingrediente y por fase & \HR{\hEd} & \IM{\hEd} \\
+Registro del dispensado con cantidad objetivo y cantidad real & \HR{\hEe} & \IM{\hEe} \\
+\midrule
+\rowcolor{grisfondo}\textbf{Subtotal bloque 05} & \textbf{\HR{\sE}} & \textbf{\IM{\sE}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{8pt}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}X R{2.0cm} R{2.4cm}@{}}
+\toprule
+\textbf{06 --- Firma electrónica por fase} & \textbf{Horas} & \textbf{Importe} \\
+\midrule
+Firma con correo y contraseña del supervisor, restringida por rol & \HR{\hFa} & \IM{\hFa} \\
+Registro de la firma ligado a la fase, la orden y la hora & \HR{\hFb} & \IM{\hFb} \\
+Cierre automático de la orden al firmarse todas las fases & \HR{\hFc} & \IM{\hFc} \\
+\midrule
+\rowcolor{grisfondo}\textbf{Subtotal bloque 06} & \textbf{\HR{\sF}} & \textbf{\IM{\sF}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{8pt}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}X R{2.0cm} R{2.4cm}@{}}
+\toprule
+\textbf{07 --- Bitácora de auditoría} & \textbf{Horas} & \textbf{Importe} \\
+\midrule
+Registro de cada acción con usuario, rol, entidad, detalle y fecha & \HR{\hGa} & \IM{\hGa} \\
+Consulta con filtros por acción y por usuario & \HR{\hGb} & \IM{\hGb} \\
+\midrule
+\rowcolor{grisfondo}\textbf{Subtotal bloque 07} & \textbf{\HR{\sG}} & \textbf{\IM{\sG}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{8pt}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}X R{2.0cm} R{2.4cm}@{}}
+\toprule
+\textbf{08 --- Etiquetas y códigos de barras} & \textbf{Horas} & \textbf{Importe} \\
+\midrule
+Generación de códigos de barras de lotes y materiales & \HR{\hHa} & \IM{\hHa} \\
+Hojas de etiquetas y gafetes de usuario para imprimir & \HR{\hHb} & \IM{\hHb} \\
+\midrule
+\rowcolor{grisfondo}\textbf{Subtotal bloque 08} & \textbf{\HR{\sH}} & \textbf{\IM{\sH}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{8pt}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}X R{2.0cm} R{2.4cm}@{}}
+\toprule
+\textbf{09 --- Despliegue, respaldo y operación} & \textbf{Horas} & \textbf{Importe} \\
+\midrule
+Servidor de MAW, contenedores de aplicación y base de datos & \HR{\hIa} & \IM{\hIa} \\
+Dominio, certificado TLS y publicación automática & \HR{\hIb} & \IM{\hIb} \\
+Respaldo diario de la base de datos con retención de 14 días & \HR{\hIc} & \IM{\hIc} \\
+Manual de operación técnica & \HR{\hId} & \IM{\hId} \\
+\midrule
+\rowcolor{grisfondo}\textbf{Subtotal bloque 09} & \textbf{\HR{\sI}} & \textbf{\IM{\sI}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{8pt}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}X R{2.0cm} R{2.4cm}@{}}
+\toprule
+\textbf{10 --- Manuales y capacitación} & \textbf{Horas} & \textbf{Importe} \\
+\midrule
+Manuales en PDF por rol, con capturas de pantalla & \HR{\hJa} & \IM{\hJa} \\
+Video demostrativo de operación & \HR{\hJb} & \IM{\hJb} \\
+Capacitación a operarios, supervisores y administrador & \HR{\hJc} & \IM{\hJc} \\
+\midrule
+\rowcolor{grisfondo}\textbf{Subtotal bloque 10} & \textbf{\HR{\sJ}} & \textbf{\IM{\sJ}} \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\vspace{12pt}
+
+\needspace{14\baselineskip}
+\subseccion{5.2 La puesta en marcha con datos del cliente}
+
+\noindent
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}X R{2.0cm} R{2.4cm}@{}}
+\toprule
+\textbf{11 --- Puesta en marcha} & \textbf{Horas} & \textbf{Importe} \\
+\midrule
+Carga de materiales, lotes y usuarios reales & \HR{\hKa} & \IM{\hKa} \\
+Captura de las formulaciones autorizadas con sus tolerancias & \HR{\hKb} & \IM{\hKb} \\
+Impresión de etiquetas y prueba de lectura con el equipo de planta & \HR{\hKc} & \IM{\hKc} \\
+Orden real de punta a punta en planta y acompañamiento de la primera semana & \HR{\hKd} & \IM{\hKd} \\
+\midrule
+\rowcolor{grisfondo}\textbf{Subtotal bloque 11} & \textbf{\HR{\sK}} & \textbf{\IM{\sK}} \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\vspace{10pt}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}X R{2.6cm} R{3.0cm}@{}}
+\toprule
+\textbf{Cierre de PharmaWeigh} & \textbf{Horas} & \textbf{Importe} \\
+\midrule
+01 --- Base, autenticación y roles & \HR{\sA} & \IM{\sA} \\
+02 --- Inventario, materiales y lotes & \HR{\sB} & \IM{\sB} \\
+03 --- Recetas por fases & \HR{\sC} & \IM{\sC} \\
+04 --- Órdenes de producción & \HR{\sD} & \IM{\sD} \\
+05 --- Dispensado guiado & \HR{\sE} & \IM{\sE} \\
+06 --- Firma electrónica por fase & \HR{\sF} & \IM{\sF} \\
+07 --- Bitácora de auditoría & \HR{\sG} & \IM{\sG} \\
+08 --- Etiquetas y códigos de barras & \HR{\sH} & \IM{\sH} \\
+09 --- Despliegue, respaldo y operación & \HR{\sI} & \IM{\sI} \\
+10 --- Manuales y capacitación & \HR{\sJ} & \IM{\sJ} \\
+11 --- Puesta en marcha & \HR{\sK} & \IM{\sK} \\
+\midrule
+\rowcolor{grisfondo}\textbf{TOTAL PHARMAWEIGH} & \textbf{\HR{\sTOTAL}} & \textbf{\IM{\sTOTAL}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{10pt}
+
+\begin{cajaTotal}
+\begin{center}
+{\Large\bfseries\color{verdeok}\HR{\sTOTAL} horas $\times$ MXN \tarifa/hora \;=\; \IM{\sTOTAL}}\\[4pt]
+{\small\color{gristexto}Precio cerrado, más IVA. \PENDIENTE{Fernando}{importe con letra}}
+\end{center}
+\end{cajaTotal}
+
+\vspace{12pt}
+
+\needspace{16\baselineskip}
+\subseccion{5.3 La mensualidad}
+
+\noindent La mensualidad no es una cuota de licencia: es \textbf{infraestructura pagada más horas de trabajo recurrente}, a la misma tarifa.
+
+\vspace{6pt}
+
+\noindent
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}X C{2.4cm} R{2.4cm}@{}}
+\toprule
+\textbf{Mensualidad de PharmaWeigh} & \textbf{Base} & \textbf{Importe} \\
+\midrule
+Servidor, base de datos, certificado TLS y monitoreo & Infraestructura & \MXN{\infraMes} \\
+Respaldo diario de la base con retención de 14 días & Infraestructura & \MXN{\respaldoMes} \\
+Soporte al administrador y ajustes menores & \HR{\hMa} h & \IM{\hMa} \\
+Altas de materiales, lotes y usuarios a solicitud & \HR{\hMb} h & \IM{\hMb} \\
+Actualizaciones de seguridad y dependencias & \HR{\hMc} h & \IM{\hMc} \\
+\midrule
+\rowcolor{grisfondo}\textbf{MENSUALIDAD} & \textbf{\HR{\hMa+\hMb+\hMc} h + infra} & \textbf{\PENDIENTE{Fernando}{mensualidad}} \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\vspace{6pt}
+
+\noindent{\small\color{gristexto}No hay cobro por usuario, por orden, por lote ni por volumen de producción. El sistema se hospeda en el servidor de MAW Soluciones, con base de datos PostgreSQL propia del proyecto.}
+
+\vspace{12pt}
+
+\needspace{12\baselineskip}
+\subseccion{5.4 Forma de pago}
+
+\noindent Dos pagos, el segundo amarrado a un \textbf{hecho verificable}, no a una fecha:
+
+\vspace{6pt}
+
+\noindent
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}C{2.2cm} C{1.3cm} X R{2.6cm}@{}}
+\toprule
+\textbf{Momento} & \textbf{\%} & \textbf{Qué libera el pago} & \textbf{Importe} \\
+\midrule
+Firma & 50\% & Contra la firma. MAW entrega el acceso de administrador de \clienteCorto\ e inicia la puesta en marcha al recibir los insumos de la sección 4. & \IM{(\sTOTAL)*0.5} \\
+Arranque & 50\% & \textbf{Una orden de producción real dispensada de punta a punta en planta}: lotes escaneados, pesos dentro de tolerancia y todas las fases firmadas por el supervisor de \clienteCorto. & \IM{(\sTOTAL)*0.5} \\
+\midrule
+\rowcolor{grisfondo}\textbf{Total} & \textbf{100\%} & \textbf{Sistema dispensando en planta} & \textbf{\IM{\sTOTAL}} \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\vspace{8pt}
+
+\noindent A partir del \textbf{mes siguiente al arranque} corre la mensualidad. Desembolso del primer año:
+
+\vspace{6pt}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}X R{3.4cm}@{}}
+\toprule
+\textbf{Concepto} & \textbf{Importe} \\
+\midrule
+Implementación (pago único) & \IM{\sTOTAL} \\
+Operación: 12 mensualidades & \PENDIENTE{Fernando}{12 $\times$ mensualidad} \\
+\midrule
+Costo de los años siguientes: 12 mensualidades & \PENDIENTE{Fernando}{12 $\times$ mensualidad} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{12pt}
+
+\needspace{14\baselineskip}
+\subseccion{5.5 Servicios opcionales y alcance fuera de esta propuesta}
+
+\noindent No forman parte del precio. Se contratan cuando \clienteCorto\ lo decida, con la misma tarifa:
+
+\vspace{6pt}
+
+\noindent
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}X R{1.6cm} R{2.2cm} R{2.2cm}@{}}
+\toprule
+\textbf{Opcional} & \textbf{Horas} & \textbf{Pago único} & \textbf{Mensual} \\
+\midrule
+\textbf{Lectura directa de la báscula:} hoy el peso se captura a mano. Este alcance conecta la báscula por USB o serie para que el peso entre solo. Requiere confirmar marca, modelo e interfaz de las básculas de \clienteCorto. & \HR{\hOa} & \IM{\hOa} & \PENDmini \\
+\textbf{Validación del sistema (CSV):} protocolos IQ/OQ/PQ, matriz de trazabilidad y evidencia documental para soportar una auditoría. Se cotiza contra el plan maestro de validación de \clienteCorto. & \PENDmini & \PENDIENTE{cliente}{alcance} & --- \\
+\textbf{Ampliación de la cobertura de pruebas} y prueba automatizada de punta a punta del dispensado, con reporte de cobertura entregable. & \HR{\hOb} & \IM{\hOb} & --- \\
+\textbf{Integración con el ERP} de \clienteCorto\ para órdenes y existencias. Requiere confirmar el ERP y su interfaz. & \PENDmini & \PENDIENTE{cliente}{ERP} & \PENDmini \\
+\textbf{Notificaciones por correo} de órdenes, lotes por caducar y firmas pendientes. & \HR{\hOc} & \IM{\hOc} & \PENDmini \\
+\textbf{Dominio propio} de \clienteCorto\ con certificado TLS. & \HR{\hOd} & \IM{\hOd} & --- \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\vspace{6pt}
+
+\noindent{\small\color{gristexto}Los costos de terceros corren por cuenta de \clienteCorto: el registro anual del dominio, el proveedor de envío de correo, las básculas, los lectores de código de barras, las tabletas y las impresoras de etiquetas.}
+
+\vspace{14pt}
+
+% ============================================================
+\needspace{14\baselineskip}
+\seccion{6. Punto de equilibrio --- en órdenes dispensadas}
+
+\noindent El retorno de PharmaWeigh se mide en \textbf{lo que cuesta un error de dispensado}: un lote de producto reprocesado o rechazado, más la materia prima perdida y el tiempo de planta. Con dos datos de \clienteCorto\ el cálculo sale sin supuestos:
+
+\vspace{6pt}
+
+\noindent
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}L{6.0cm} X@{}}
+\toprule
+\textbf{Dato} & \textbf{Fuente} \\
+\midrule
+Costo promedio de un lote reprocesado o rechazado & \PENDIENTE{cliente}{costo por lote} \\
+Lotes con desviación de pesaje al año & \PENDIENTE{cliente}{desviaciones/año} \\
+Órdenes de producción al mes & \PENDIENTE{cliente}{órdenes/mes} \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\vspace{8pt}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}X R{3.6cm} R{3.6cm}@{}}
+\toprule
+\textbf{Qué se cubre} & \textbf{Lotes reprocesados que se evitan} & \textbf{Costo por orden dispensada} \\
+\midrule
+La mensualidad & \PENDmini & \PENDmini \\
+La implementación & \PENDmini & \PENDmini \\
+\bottomrule
+\end{tabularx}
+
+\vspace{6pt}
+
+\noindent{\small\color{gristexto}Cifras antes de IVA. Este cuadro se llena con los datos de \clienteCorto: no se estiman por MAW. La fórmula es: lotes que se evitan $=$ importe $\div$ costo promedio del lote reprocesado; costo por orden $=$ importe $\div$ órdenes al mes.}
+
+\vspace{14pt}
+
+% ============================================================
+\needspace{12\baselineskip}
+\seccion{7. Resumen de cifras}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}X C{2.2cm} R{2.6cm} R{2.6cm}@{}}
+\toprule
+\textbf{Concepto} & \textbf{Horas} & \textbf{Único} & \textbf{Mensual} \\
+\midrule
+Sistema construido --- bloques 01 a 10 & \HR{\sTOTAL-(\sK)} & \IM{\sTOTAL-(\sK)} & --- \\
+Puesta en marcha --- bloque 11 & \HR{\sK} & \IM{\sK} & --- \\
+Operación mensual & \HR{\hMa+\hMb+\hMc} & --- & \PENDmini \\
+\midrule
+\rowcolor{grisfondo}\textbf{PHARMAWEIGH} & \textbf{\HR{\sTOTAL}} & \textbf{\IM{\sTOTAL}} & \textbf{\PENDmini} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{10pt}
+
+\begin{cajaTotal}
+\begin{center}
+{\Large\bfseries\color{verdeok}INVERSIÓN: \IM{\sTOTAL} (implementación) $+$ \PENDIENTE{Fernando}{mensualidad}}\\[4pt]
+{\small\color{gristexto}Precios más IVA. La mensualidad corre a partir del mes siguiente al arranque.}
+\end{center}
+\end{cajaTotal}
+
+\vspace{14pt}
+
+% ============================================================
+\needspace{16\baselineskip}
+\begin{cajaNota}
+\textbf{\color{azulcom}Lo que hay que saber antes de firmar}
+\begin{itemize}[leftmargin=14pt, itemsep=3pt, topsep=4pt]
+    \item \textbf{Los datos son de \clienteCorto.} Materiales, lotes, recetas, órdenes, dispensados, firmas y bitácora son propiedad del cliente y se tratan de forma confidencial. Al terminar el servicio mensual se entrega un \textbf{respaldo completo de la base de datos sin costo}.
+    \item \textbf{La propiedad intelectual del software es de MAW Soluciones.} El cliente recibe una \textbf{licencia de uso} no exclusiva e intransferible mientras el contrato esté vigente, sin límite de usuarios ni de estaciones. La licencia no incluye el código fuente.
+    \item \textbf{El alcance adicional se cotiza a la misma tarifa}, con la fórmula de la sección 5 y autorización por escrito. Los parámetros que la aplicación ya permite editar --- materiales, recetas, tolerancias, lotes y usuarios --- los cambia el cliente sin costo.
+    \item \textbf{El sistema no está validado ni certificado.} No hay CSV, ni IQ/OQ/PQ, ni certificación 21 CFR Part 11 o NOM-059. Tiene funciones orientadas a ese control, y la validación se cotiza aparte (sección 5.5).
+    \item \textbf{El peso se captura a mano.} La lectura directa desde báscula no está construida y es un opcional.
+    \item \textbf{El hardware no está incluido.} Tabletas, lectores, básculas e impresoras de etiquetas los pone el cliente.
+    \item \textbf{Las tolerancias y las recetas las autoriza el cliente.} MAW carga lo que el área de calidad de \clienteCorto\ apruebe por escrito; el sistema aplica esos parámetros y no los define.
+    \item Todos los precios son \textbf{más IVA (16\%)}.
+    \item Vigencia de la propuesta: \textbf{30 días naturales} a partir de la fecha de emisión.
+\end{itemize}
+\end{cajaNota}
+
+\vspace{14pt}
+
+% ============================================================
+\needspace{12\baselineskip}
+\seccion{Empecemos}
+
+\noindent PharmaWeigh sustituye el registro en papel del área de pesaje por un flujo que verifica el lote antes de abrirlo, bloquea el peso fuera de tolerancia y exige firma de supervisor para cerrar cada fase. El sistema ya está construido y desplegado: se puede revisar pantalla por pantalla antes de firmar.
+
+\vspace{6pt}
+
+\noindent \textbf{Pruebe el sistema en el demo en vivo} y, cuando esté listo, arrancamos. Para iniciar basta con aprobar esta propuesta, realizar el \textbf{50\%} y entregar los insumos de la sección 4.
+
+\vspace{8pt}
+
+\begin{center}
+\begin{tcolorbox}[colback=azulcom, colframe=azulcom, rounded corners, width=13cm, boxrule=1pt, left=8pt, right=8pt, top=8pt, bottom=8pt]
+\begin{center}
+{\large\bfseries\color{white}Ver demo --- \href{https://\demoURL}{\color{white}\demoURL}}
+\end{center}
+\end{tcolorbox}
+\end{center}
+
+\vspace{14pt}
+
+\noindent\begin{minipage}{\linewidth}
+\begin{center}
+{\color{azulcom}\rule{7cm}{1.2pt}}\\[10pt]
+{\normalsize\bfseries Preparado para:}\\[4pt]
+{\Large\bfseries\color{azulcom}\clienteLargo}\\[10pt]
+{\normalsize\bfseries De parte de:}\\[4pt]
+{\Large\bfseries\color{azulcom}MAW Soluciones}\\[4pt]
+{\small\color{gristexto}\fechaProp}
+\end{center}
+\end{minipage}
+
+\end{document}

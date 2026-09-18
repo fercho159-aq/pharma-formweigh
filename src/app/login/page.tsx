@@ -15,19 +15,23 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await res.json();
-    if (data.ok) {
-      window.location.href = "/";
-      return;
-    } else {
-      setError(data.error || "Credenciales inválidas");
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.ok) {
+        router.push("/");
+        router.refresh();
+        return;
+      }
+      setError(data?.error || "Credenciales inválidas");
+    } catch {
+      setError("No se pudo conectar con el servidor. Intenta de nuevo.");
     }
     setLoading(false);
   }
@@ -59,7 +63,8 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
-              placeholder="admin@pharma.com"
+              placeholder="tu.correo@empresa.com"
+              autoComplete="username"
               required
             />
           </div>
@@ -71,7 +76,8 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
-              placeholder="••••••"
+              placeholder="••••••••••"
+              autoComplete="current-password"
               required
             />
           </div>
@@ -85,14 +91,9 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-xs text-gray-500 font-semibold mb-2">Usuarios de prueba:</p>
-          <div className="space-y-1 text-xs text-gray-600">
-            <p><strong>Admin:</strong> admin@pharma.com / admin123</p>
-            <p><strong>Supervisor:</strong> supervisor@pharma.com / super123</p>
-            <p><strong>Operario:</strong> operario@pharma.com / oper123</p>
-          </div>
-        </div>
+        <p className="mt-6 text-center text-xs text-gray-400">
+          ¿Sin acceso? Solicita tu cuenta al administrador del sistema.
+        </p>
       </div>
     </div>
   );

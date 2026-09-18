@@ -1,35 +1,36 @@
+import { asc, eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { query, generateId, registrarAuditoria } from "@/lib/db";
-import { getSession } from "@/lib/auth";
 
-export async function GET() {
-  const materiales = await query(`
-    SELECT m.*,
-      COALESCE(SUM(CASE WHEN l.estado = 'APROBADO' THEN l.cantidad ELSE 0 END), 0) as "stockActual",
-      COUNT(CASE WHEN l.estado IN ('APROBADO', 'CUARENTENA') THEN 1 END) as "lotesActivos"
-    FROM materiales m
-    LEFT JOIN lotes l ON l."materialId" = m.id
-    WHERE m.activo = true
-    GROUP BY m.id, m.codigo, m.nombre, m.descripcion, m.unidad, m."stockMinimo", m.activo
-    ORDER BY m.nombre
-  `);
-  return NextResponse.json(materiales);
-}
+import { db } from "@/db";
+import { materiales } from "@/db/schema";
+import { ruta } from "@/lib/api";
+import { registrarAuditoria } from "@/lib/auditoria";
+import { esquemaCrearMaterial } from "@/lib/esquemas";
 
-export async function POST(request: Request) {
-  const user = await getSession();
-  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  if (!["ADMIN", "SUPERVISOR", "ALMACEN"].includes(user.rol)) return NextResponse.json({ error: "Solo almacén, supervisor o admin pueden crear materiales" }, { status: 403 });
+export const GET = ruta({ permiso: "inventario.ver" }, async () => {
+  const lista = await db
+    .select({
+      id: materiales.id,
+      codigo: materiales.codigo,
+      nombre: materiales.nombre,
+      descripcion: materiales.descripcion,
+      unidad: materiales.unidad,
+      stockMinimo: materiales.stockMinimo,
+      activo: materiales.activo,
+      stockActual: sql<number>`coalesce((select sum(l.cantidad) from lotes l where l.material_id = ${materiales.id} and l.estado = 'APROBADO'), 0)::float8`,
+      lotesActivos: sql<number>`(select count(*)::int from lotes l where l.material_id = ${materiales.id} and l.estado in ('APROBADO','CUARENTENA'))`,
+    })
+    .from(materiales)
+    .where(eq(materiales.activo, true))
+    .orderBy(asc(materiales.nombre));
+  return NextResponse.json(lista);
+});
 
-  const data = await request.json();
-  const id = generateId();
-
-  await query(
-    'INSERT INTO materiales (id, codigo, nombre, descripcion, unidad, "stockMinimo") VALUES ($1, $2, $3, $4, $5, $6)',
-    [id, data.codigo, data.nombre, data.descripcion || null, data.unidad, data.stockMinimo || 0]
-  );
-
-  await registrarAuditoria(user.id, "CREAR_MATERIAL", "materiales", id, { nombre: data.nombre, codigo: data.codigo });
-
+export const POST = ruta({ permiso: "inventario.crearMaterial", esquema: esquemaCrearMaterial }, async ({ usuario, datos, ip }) => {
+  const id = await db.transaction(async (tx) => {
+    const [alta] = await tx.insert(materiales).values(datos).returning({ id: materiales.id });
+    await registrarAuditoria({ usuarioId: usuario.id, accion: "CREAR_MATERIAL", entidad: "materiales", entidadId: alta!.id, ip, detalles: { nombre: datos.nombre, codigo: datos.codigo } }, tx);
+    return alta!.id;
+  });
   return NextResponse.json({ id });
-}
+});

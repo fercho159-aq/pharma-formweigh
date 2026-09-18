@@ -1,0 +1,57 @@
+# PharmaWeigh en maw-vps: app + Postgres 16 propios. Nginx del host hace TLS.
+# Variables: /opt/pharmaweigh/.env (root, 600).
+#
+# NO hay `build:` a propósito: el VPS tiene ~1 GiB de RAM libre y no aguanta un
+# `next build`. La imagen `pharmaweigh:latest` llega ya construida desde Actions
+# y el wrapper la mete con `docker load`. Ver deploy/deploy_remoto.sh.
+#
+# Los `mem_limit` son obligatorios: sin ellos Postgres + Node se comen el swap
+# y tumban el box entero (manual MAW §6, "reglas de convivencia en el VPS").
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    # Postgres afinado para caber en 256 MiB. 30 conexiones sobran para un solo
+    # contenedor de app; subirlas obliga a subir shared_buffers y el mem_limit.
+    command:
+      - postgres
+      - -c
+      - shared_buffers=64MB
+      - -c
+      - max_connections=30
+      - -c
+      - work_mem=2MB
+      - -c
+      - maintenance_work_mem=32MB
+    mem_limit: 256m
+    environment:
+      POSTGRES_DB: pharmaweigh
+      POSTGRES_USER: pharma
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?definir en .env}
+      TZ: America/Mexico_City
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pharma -d pharmaweigh"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Sin `ports`: la BD solo existe dentro de la red de Docker.
+
+  app:
+    image: pharmaweigh:latest
+    restart: unless-stopped
+    mem_limit: 384m
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://pharma:${POSTGRES_PASSWORD}@db:5432/pharmaweigh
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?definir en .env}
+      TZ: America/Mexico_City
+    ports:
+      # Solo loopback; nginx termina TLS. 3062 porque 3060 es Club MP y 3061 Treca.
+      - "127.0.0.1:${APP_PORT:-3062}:3000"
+
+volumes:
+  pgdata:

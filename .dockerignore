@@ -1,0 +1,22 @@
+# Lo que NUNCA entra al contexto de build (mantiene la imagen y el tar chicos).
+.git/
+.github/
+node_modules/
+.next/
+.vercel/
+coverage/
+docs/
+deploy/
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+.claude/
+.cursor/
+.devin/
+.agents/
+gh
+README.md
+PLAN.md

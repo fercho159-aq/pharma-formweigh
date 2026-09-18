@@ -337,19 +337,21 @@ export default function InventarioCliente({ rol }: { rol: string }) {
                     </span>
                   </td>
                   {puedeCambiarEstado && (
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-4 py-3 text-center min-w-[21rem] whitespace-nowrap">
                       {l.estado === "CUARENTENA" && puedeLiberar && (
                         <div className="flex gap-1 justify-center">
-                          <button
-                            onClick={() => handleCambiarEstadoLote(l.id, "APROBADO")}
-                            className="text-green-600 hover:bg-green-50 px-2 py-1 rounded text-xs font-medium cursor-pointer"
-                          >
-                            Aprobar
-                          </button>
+                          {confirmandoRechazo !== l.id && (
+                            <button
+                              onClick={() => handleCambiarEstadoLote(l.id, "APROBADO")}
+                              className="text-green-600 hover:bg-green-50 px-2 py-1 rounded text-xs font-medium cursor-pointer"
+                            >
+                              Aprobar
+                            </button>
+                          )}
                           {/* RECHAZADO es un estado final: se confirma en dos pasos dentro de la fila. */}
                           {confirmandoRechazo === l.id ? (
-                            <span className="inline-flex items-center gap-1 text-xs">
-                              <span className="text-red-700 font-semibold">¿Confirmar rechazo?</span>
+                            <span className="inline-flex items-center gap-1 text-xs whitespace-nowrap">
+                              <span className="text-red-700 font-semibold whitespace-nowrap">¿Rechazar {l.numero}?</span>
                               <button
                                 onClick={() => { setConfirmandoRechazo(null); handleCambiarEstadoLote(l.id, "RECHAZADO"); }}
                                 className="bg-red-600 text-white hover:bg-red-700 px-2 py-1 rounded font-medium cursor-pointer"

@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import BarcodeInput from "@/components/barcode-input";
-import { BARRA_VERDE_FIN, BARRA_VERDE_INICIO, evaluarPeso, posicionEnBarra } from "@/lib/dominio/tolerancia";
+import { BARRA_AMBAR_ANCHO, BARRA_VERDE_FIN, BARRA_VERDE_INICIO, evaluarPeso, posicionEnBarra } from "@/lib/dominio/tolerancia";
 
 interface Ingrediente {
   id: string;
@@ -530,6 +530,9 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
                               {/* Rojo bajo · verde (tolerancia, tercio central) · rojo alto */}
                               <div className="absolute left-0 top-0 h-full bg-red-300" style={{ width: `${BARRA_VERDE_INICIO}%` }} />
                               <div className="absolute top-0 h-full bg-green-400" style={{ left: `${BARRA_VERDE_INICIO}%`, width: `${BARRA_VERDE_FIN - BARRA_VERDE_INICIO}%` }} />
+                              {/* Ámbar: 10 % exterior de la tolerancia — mismas zonas que el semáforo */}
+                              <div className="absolute top-0 h-full bg-yellow-300" style={{ left: `${BARRA_VERDE_INICIO}%`, width: `${BARRA_AMBAR_ANCHO}%` }} />
+                              <div className="absolute top-0 h-full bg-yellow-300" style={{ left: `${BARRA_VERDE_FIN - BARRA_AMBAR_ANCHO}%`, width: `${BARRA_AMBAR_ANCHO}%` }} />
                               <div className="absolute right-0 top-0 h-full bg-red-300" style={{ width: `${100 - BARRA_VERDE_FIN}%` }} />
                               {/* Marker for current weight */}
                               <div

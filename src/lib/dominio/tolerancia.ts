@@ -55,6 +55,8 @@ export function evaluarPeso(peso: number, rango: RangoPesaje): EstadoPesaje {
  */
 export const BARRA_VERDE_INICIO = 100 / 3;
 export const BARRA_VERDE_FIN = 200 / 3;
+/** Ancho en la barra de cada franja ámbar: el mismo 10 % exterior que usa `evaluarPeso`. */
+export const BARRA_AMBAR_ANCHO = (BARRA_VERDE_FIN - BARRA_VERDE_INICIO) * 0.1;
 
 export function posicionEnBarra(peso: number, rango: RangoPesaje): number {
   const min = aDiezmilesimas(rango.min);

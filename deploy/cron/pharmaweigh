@@ -1,0 +1,10 @@
+# /etc/cron.d/pharmaweigh — cron del host. Horarios en America/Mexico_City.
+# Se instala con `bash deploy/instalar_wrapper.sh`.
+# PharmaWeigh no tiene tareas HTTP programadas: lo único que corre aquí es el respaldo.
+CRON_TZ=America/Mexico_City
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Respaldo diario de la BD a las 03:40, retención 14 días en /opt/backups/pharmaweigh.
+# 03:40 y no 03:30 para no empalmarse con el respaldo de Club Mini Precios (RAM justa).
+40 3 * * * root /usr/local/sbin/pharmaweigh-respaldo

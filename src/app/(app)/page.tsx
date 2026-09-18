@@ -1,139 +1,25 @@
-import { getSession } from "@/lib/auth";
-import { query, queryOne } from "@/lib/db";
 import Link from "next/link";
+
+import { tienePermiso } from "@/lib/auth/permisos";
+import { getSession } from "@/lib/auth/sesion";
+import { datosDashboard, ultimaAuditoria as cargarUltimaAuditoria } from "@/lib/servicios/tablero";
 
 export default async function DashboardPage() {
   const user = await getSession();
-
-  const ordenesPendientes = await queryOne("SELECT COUNT(*) as c FROM ordenes_produccion WHERE estado = 'PENDIENTE'") as { c: string };
-  const ordenesEnProceso = await queryOne("SELECT COUNT(*) as c FROM ordenes_produccion WHERE estado = 'EN_PROCESO'") as { c: string };
-  const ordenesCompletadas = await queryOne("SELECT COUNT(*) as c FROM ordenes_produccion WHERE estado IN ('DISPENSADO', 'COMPLETADA')") as { c: string };
-  const totalMateriales = await queryOne("SELECT COUNT(*) as c FROM materiales WHERE activo = true") as { c: string };
-  const lotesCuarentena = await queryOne("SELECT COUNT(*) as c FROM lotes WHERE estado = 'CUARENTENA'") as { c: string };
-  const lotesPorCaducar = await queryOne(`SELECT COUNT(*) as c FROM lotes WHERE estado = 'APROBADO' AND "fechaCaducidad" <= now() + interval '30 days'`) as { c: string };
-  const recetasActivas = await queryOne("SELECT COUNT(*) as c FROM recetas WHERE activa = true") as { c: string };
-  const dispensadosHoy = await queryOne("SELECT COUNT(*) as c FROM dispensados WHERE date(timestamp) = CURRENT_DATE") as { c: string };
-
-  // Active processes with phase info
-  const procesosActivos = await query(`
-    SELECT op.id, op.numero, op.estado, op."loteProducto", op."createdAt", op."recetaId",
-      r.nombre as "recetaNombre"
-    FROM ordenes_produccion op
-    JOIN recetas r ON op."recetaId" = r.id
-    WHERE op.estado IN ('EN_PROCESO', 'PENDIENTE')
-    ORDER BY
-      CASE op.estado WHEN 'EN_PROCESO' THEN 0 ELSE 1 END,
-      op.prioridad DESC, op."createdAt" ASC
-    LIMIT 6
-  `) as Array<{ id: string; numero: string; estado: string; loteProducto: string; createdAt: string; recetaId: string; recetaNombre: string }>;
-
-  // Get fases and firmas for active processes
-  const recetaIds = [...new Set(procesosActivos.map((p) => p.recetaId))];
-  const ordenIds = procesosActivos.map((p) => p.id);
-
-  let fasesMap: Record<string, Array<{ id: string; nombre: string; orden: number }>> = {};
-  let firmasMap: Record<string, Set<string>> = {};
-
-  if (recetaIds.length > 0) {
-    const placeholders = recetaIds.map((_, i) => `$${i + 1}`).join(",");
-    const fases = await query(
-      `SELECT id, "recetaId", nombre, orden FROM fases WHERE "recetaId" IN (${placeholders}) ORDER BY orden`,
-      recetaIds
-    ) as Array<{ id: string; recetaId: string; nombre: string; orden: number }>;
-    for (const f of fases) {
-      if (!fasesMap[f.recetaId]) fasesMap[f.recetaId] = [];
-      fasesMap[f.recetaId].push({ id: f.id, nombre: f.nombre, orden: f.orden });
-    }
-  }
-
-  if (ordenIds.length > 0) {
-    const placeholders = ordenIds.map((_, i) => `$${i + 1}`).join(",");
-    const firmas = await query(
-      `SELECT "ordenId", "faseId" FROM firmas_fase WHERE "ordenId" IN (${placeholders})`,
-      ordenIds
-    ) as Array<{ ordenId: string; faseId: string }>;
-    for (const f of firmas) {
-      if (!firmasMap[f.ordenId]) firmasMap[f.ordenId] = new Set();
-      firmasMap[f.ordenId].add(f.faseId);
-    }
-  }
-
-  // Build enriched active processes
-  const procesosEnriquecidos = procesosActivos.map((p) => {
-    const fases = fasesMap[p.recetaId] || [];
-    const firmas = firmasMap[p.id] || new Set<string>();
-    const numFases = fases.length;
-    const numFirmadas = fases.filter((f) => firmas.has(f.id)).length;
-
-    // Determine current phase (first unsigned)
-    const currentFase = fases.find((f) => !firmas.has(f.id));
-    const currentFaseLabel = currentFase
-      ? `Fase ${currentFase.orden}/${numFases}: ${currentFase.nombre}`
-      : numFases > 0 ? "Todas las fases firmadas" : "Sin fases";
-
-    const progressPercent = numFases > 0 ? Math.round((numFirmadas / numFases) * 100) : 0;
-
-    return { ...p, numFases, numFirmadas, currentFaseLabel, progressPercent };
-  });
-
-  // Recent orders with phase info
-  const ultimasOrdenes = await query(`
-    SELECT op.id, op.numero, op.estado, op."loteProducto", op."createdAt", op."recetaId",
-      r.nombre as "recetaNombre"
-    FROM ordenes_produccion op
-    JOIN recetas r ON op."recetaId" = r.id
-    ORDER BY op."createdAt" DESC LIMIT 5
-  `) as Array<{ id: string; numero: string; recetaNombre: string; estado: string; createdAt: string; loteProducto: string; recetaId: string }>;
-
-  // Enrich recent orders with phase info too
-  const recentRecetaIds = [...new Set(ultimasOrdenes.map((o) => o.recetaId))];
-  const recentOrdenIds = ultimasOrdenes.map((o) => o.id);
-
-  if (recentRecetaIds.length > 0) {
-    const placeholders = recentRecetaIds.map((_, i) => `$${i + 1}`).join(",");
-    const fases = await query(
-      `SELECT id, "recetaId", nombre, orden FROM fases WHERE "recetaId" IN (${placeholders}) ORDER BY orden`,
-      recentRecetaIds
-    ) as Array<{ id: string; recetaId: string; nombre: string; orden: number }>;
-    for (const f of fases) {
-      if (!fasesMap[f.recetaId]) fasesMap[f.recetaId] = [];
-      // Avoid duplicates
-      if (!fasesMap[f.recetaId].some((x) => x.id === f.id)) {
-        fasesMap[f.recetaId].push({ id: f.id, nombre: f.nombre, orden: f.orden });
-      }
-    }
-  }
-
-  if (recentOrdenIds.length > 0) {
-    const placeholders = recentOrdenIds.map((_, i) => `$${i + 1}`).join(",");
-    const firmas = await query(
-      `SELECT "ordenId", "faseId" FROM firmas_fase WHERE "ordenId" IN (${placeholders})`,
-      recentOrdenIds
-    ) as Array<{ ordenId: string; faseId: string }>;
-    for (const f of firmas) {
-      if (!firmasMap[f.ordenId]) firmasMap[f.ordenId] = new Set();
-      firmasMap[f.ordenId].add(f.faseId);
-    }
-  }
-
-  const ultimasOrdenesEnriquecidas = ultimasOrdenes.map((o) => {
-    const fases = fasesMap[o.recetaId] || [];
-    const firmas = firmasMap[o.id] || new Set<string>();
-    const numFases = fases.length;
-    const numFirmadas = fases.filter((f) => firmas.has(f.id)).length;
-    const currentFase = fases.find((f) => !firmas.has(f.id));
-    const currentFaseLabel = currentFase
-      ? `Fase ${currentFase.orden}/${numFases}: ${currentFase.nombre}`
-      : numFases > 0 ? "Completado" : "";
-    return { ...o, numFases, numFirmadas, currentFaseLabel };
-  });
-
-  const ultimaAuditoria = await query(`
-    SELECT a.*, u.nombre as "usuarioNombre"
-    FROM auditoria a
-    JOIN usuarios u ON a."usuarioId" = u.id
-    ORDER BY a.timestamp DESC LIMIT 8
-  `) as Array<{ id: string; accion: string; entidad: string; usuarioNombre: string; timestamp: string }>;
+  const {
+    ordenesPendientes,
+    ordenesEnProceso,
+    ordenesCompletadas,
+    totalMateriales,
+    lotesCuarentena,
+    lotesPorCaducar,
+    recetasActivas,
+    dispensadosHoy,
+    procesosEnriquecidos,
+    ultimasOrdenesEnriquecidas,
+  } = await datosDashboard();
+  // La bitácora solo se muestra a los roles que pueden consultarla.
+  const ultimaAuditoria = tienePermiso(user?.rol, "auditoria.ver") ? await cargarUltimaAuditoria() : [];
 
   const estadoColor: Record<string, string> = {
     PENDIENTE: "bg-yellow-100 text-yellow-800",

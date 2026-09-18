@@ -1,0 +1,270 @@
+% !TEX program = xelatex
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================
+% DATOS DEL CLIENTE  <-- cambiar aqui y recompilar
+% ============================================================
+\newcommand{\clienteCorto}{\PENDIENTE{cliente}{nombre corto}}
+\newcommand{\clienteLargo}{\PENDIENTE{cliente}{razón social}}
+\newcommand{\destinatario}{\PENDIENTE{cliente}{destinatario}}
+\newcommand{\fechaProp}{\PENDIENTE{Fernando}{fecha}}
+\newcommand{\demoURL}{pharmaweigh.appsoluciones.duckdns.org}
+\newcommand{\tarifa}{\PENDIENTE{Fernando}{tarifa}}
+\newcommand{\docTipo}{Resumen Ejecutivo}
+\newcommand{\docPrefijo}{PROPUESTA}
+
+\input{maw_comun}
+
+% ============================================================
+% Mismas macros de cifras que la propuesta.
+% ============================================================
+% \cifrasDefinidastrue
+\def\tarifaNum{0}
+
+\def\hAa{0}\def\hAb{0}\def\hAc{0}\def\hAd{0}
+\def\hBa{0}\def\hBb{0}\def\hBc{0}\def\hBd{0}
+\def\hCa{0}\def\hCb{0}\def\hCc{0}
+\def\hDa{0}\def\hDb{0}\def\hDc{0}
+\def\hEa{0}\def\hEb{0}\def\hEc{0}\def\hEd{0}\def\hEe{0}
+\def\hFa{0}\def\hFb{0}\def\hFc{0}
+\def\hGa{0}\def\hGb{0}
+\def\hHa{0}\def\hHb{0}
+\def\hIa{0}\def\hIb{0}\def\hIc{0}\def\hId{0}
+\def\hJa{0}\def\hJb{0}\def\hJc{0}
+\def\hKa{0}\def\hKb{0}\def\hKc{0}\def\hKd{0}
+\def\hMa{0}\def\hMb{0}\def\hMc{0}
+
+\def\sA{\hAa+\hAb+\hAc+\hAd}
+\def\sB{\hBa+\hBb+\hBc+\hBd}
+\def\sC{\hCa+\hCb+\hCc}
+\def\sD{\hDa+\hDb+\hDc}
+\def\sE{\hEa+\hEb+\hEc+\hEd+\hEe}
+\def\sF{\hFa+\hFb+\hFc}
+\def\sG{\hGa+\hGb}
+\def\sH{\hHa+\hHb}
+\def\sI{\hIa+\hIb+\hIc+\hId}
+\def\sJ{\hJa+\hJb+\hJc}
+\def\sK{\hKa+\hKb+\hKc+\hKd}
+\def\sTOTAL{\sA+\sB+\sC+\sD+\sE+\sF+\sG+\sH+\sI+\sJ+\sK}
+
+\begin{document}
+
+\tituloCot{PharmaWeigh}
+
+\noindent\RaggedRight{\small\color{gristexto}Cliente: \textbf{\clienteLargo} \quad\textbar\quad Preparado por: \textbf{MAW Soluciones} \quad\textbar\quad Demo en vivo: \href{https://\demoURL}{\demoURL} \quad\textbar\quad Vigencia: 30 días naturales}
+
+\vspace{4pt}
+
+\noindent{\small\color{gristexto}Este documento resume la \textbf{Propuesta PharmaWeigh}. El desglose completo de horas, bloques y condiciones está en la propuesta; los términos legales, en el contrato.}
+
+\vspace{6pt}
+
+\noindent{\small\color{ambarpend!80!black}\textbf{Borrador interno:} las cifras y los datos del cliente van marcados en ámbar porque no están autorizados. El contenido funcional sí es firme.}
+
+\vspace{6pt}
+
+\noindent Estimado \destinatario:
+
+\vspace{6pt}
+
+% ------------------------------------------------------------
+\seccion{El problema}
+
+\noindent En el área de pesaje, el error caro no es el peso mal tomado: es el que nadie detiene a tiempo. Un lote equivocado, en cuarentena, caducado o un gramaje fuera de tolerancia se descubre cuando el producto ya está mezclado. El papel deja constancia del error; no lo evita.
+
+\vspace{7pt}
+
+% ------------------------------------------------------------
+\seccion{La solución --- un sistema ya construido}
+
+\noindent \textbf{PharmaWeigh} controla el surtido y pesaje de materias primas. El operario no avanza si algo no cuadra:
+
+\vspace{6pt}
+
+\noindent
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}>{\bfseries\color{azulcom}}p{4.0cm} X@{}}
+\toprule
+Escanea el lote & Con pistola de código de barras o con la cámara del dispositivo. \\
+\midrule
+El sistema verifica & Que el lote sea del material que pide la receta, que su estado sea \textbf{APROBADO}, que no esté caducado y que alcance la cantidad. Si algo falla, no deja continuar. \\
+\midrule
+Pesa con semáforo & Verde dentro de tolerancia, ámbar cerca del límite, rojo fuera. Con rojo, el botón de confirmar queda \textbf{deshabilitado}. \\
+\midrule
+Firma el supervisor & Cada fase de la receta se cierra con el correo y la contraseña de un supervisor o de calidad. El operario no firma su propio trabajo. \\
+\midrule
+Todo queda asentado & Peso objetivo contra peso real, lote usado, quién dispensó, quién firmó y a qué hora, en una bitácora consultable. \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\vspace{6pt}
+
+\begin{cajaInfo}[Ya funciona --- no hay desarrollo por delante]
+El sistema está \textbf{construido y desplegado}, con siete roles diferenciados (admin, supervisor, operario, desarrollo, calidad, almacén y auditor), inventario con estados de lote y caducidad, recetas por fases con tolerancias, órdenes de producción, dispensado guiado, firma por fase, bitácora, generación de etiquetas de código de barras, respaldo diario y manuales por rol. Se puede revisar pantalla por pantalla hoy en \href{https://\demoURL}{\demoURL}.
+\end{cajaInfo}
+
+\vspace{7pt}
+
+% ------------------------------------------------------------
+\needspace{14\baselineskip}
+\seccion{Lo que este sistema no es}
+
+\noindent Conviene decirlo antes que después:
+
+\vspace{4pt}
+
+\noindent
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}L{4.6cm} X@{}}
+\toprule
+\textbf{No está validado} & No hay CSV ni protocolos IQ/OQ/PQ, ni certificación 21 CFR Part 11 o NOM-059. El sistema tiene funciones \textbf{orientadas} a ese control --- firma por usuario, trazabilidad, bitácora, control de caducidad y de estado de lote --- pero la validación es un proyecto aparte y se cotiza por separado. \\
+\midrule
+\textbf{No lee la báscula} & El peso se captura a mano en la pantalla. La lectura automática desde báscula está cotizada como opcional. \\
+\midrule
+\textbf{No incluye hardware} & Tabletas, lectores, básculas e impresoras de etiquetas los pone \clienteCorto. \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\vspace{7pt}
+
+% ------------------------------------------------------------
+\needspace{14\baselineskip}
+\seccion{Lo que falta es de su lado}
+
+\noindent No hay pendientes de desarrollo. Lo que falta para operar son \textbf{decisiones y datos de \clienteCorto}:
+
+\vspace{4pt}
+
+\noindent
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}X X@{}}
+\toprule
+\textbullet{} Catálogo de materias primas & \textbullet{} Lotes en piso con caducidad y estado \\
+\textbullet{} Formulaciones y \textbf{tolerancias autorizadas} por calidad & \textbullet{} Usuarios, roles y quién queda facultado para firmar \\
+\textbullet{} Materiales que se marcan como peligrosos & \textbullet{} Tabletas y lectores por estación de pesaje \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\vspace{6pt}
+
+\noindent{\small\color{gristexto}Con eso, MAW Soluciones carga los datos, imprime las etiquetas y ejecuta \textbf{una orden de producción real de punta a punta} en planta --- escaneo, pesaje y firma de todas las fases --- antes de dar por arrancado el sistema. Después acompaña la primera semana.}
+
+\vspace{7pt}
+
+% ------------------------------------------------------------
+\needspace{14\baselineskip}
+\seccion{Inversión}
+
+\noindent Todo precio sale de la misma fórmula: \textbf{horas de ingeniería $\times$ MXN \tarifa/hora}, en la parte baja del rango de mercado (MXN 900--1,400/h) porque el sistema reutiliza componentes ya probados de MAW. \textbf{Precio cerrado}: lo construido se puede revisar antes de firmar.
+
+\vspace{6pt}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}X C{2.0cm} R{2.8cm} R{3.0cm}@{}}
+\toprule
+\textbf{Concepto} & \textbf{Horas} & \textbf{Pago único} & \textbf{Mensualidad} \\
+\midrule
+Sistema construido --- bloques 01 a 10 & \HR{\sTOTAL-(\sK)} & \IM{\sTOTAL-(\sK)} & --- \\
+Puesta en marcha con datos reales & \HR{\sK} & \IM{\sK} & --- \\
+Operación: servidor, respaldos, soporte y actualizaciones & \HR{\hMa+\hMb+\hMc} & --- & \PENDmini \\
+\midrule
+\rowcolor{grisfondo}\textbf{PHARMAWEIGH} & \textbf{\HR{\sTOTAL}} & \textbf{\IM{\sTOTAL}} & \textbf{\PENDmini} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{6pt}
+
+\begin{cajaTotal}
+\begin{center}
+{\Large\bfseries\color{verdeok}\IM{\sTOTAL} implementación \;$+$\; \PENDIENTE{Fernando}{mensualidad}}\\[4pt]
+{\small\color{gristexto}Más IVA. La mensualidad inicia el mes siguiente al arranque. Sin cobro por usuario, por estación, por orden ni por volumen.}
+\end{center}
+\end{cajaTotal}
+
+\vspace{6pt}
+
+\noindent\textbf{Forma de pago} --- dos pagos, el segundo amarrado a un hecho verificable:
+
+\vspace{4pt}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}C{1.8cm} C{1.2cm} X R{2.6cm}@{}}
+\toprule
+\textbf{Momento} & \textbf{\%} & \textbf{Libera el pago} & \textbf{Importe} \\
+\midrule
+Firma & 50\% & Acceso de administrador y puesta en marcha en curso & \IM{(\sTOTAL)*0.5} \\
+Arranque & 50\% & Una orden real dispensada y firmada en planta & \IM{(\sTOTAL)*0.5} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{6pt}
+
+\noindent{\small\color{gristexto}\textbf{Opcionales}, con la misma tarifa: lectura directa desde báscula, validación del sistema (CSV, IQ/OQ/PQ), ampliación de la cobertura de pruebas, integración con ERP, notificaciones por correo y dominio propio. Importes en la sección 5.5 de la propuesta.}
+
+\vspace{7pt}
+
+% ------------------------------------------------------------
+\needspace{12\baselineskip}
+\seccion{Por qué conviene --- punto de equilibrio}
+
+\noindent El retorno se mide en lotes que no se reprocesan. La tabla se llena con dos datos del cliente, no con estimaciones de MAW:
+
+\vspace{4pt}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}X R{3.6cm} R{3.6cm}@{}}
+\toprule
+\textbf{Qué se cubre} & \textbf{Lotes reprocesados que se evitan} & \textbf{Costo por orden dispensada} \\
+\midrule
+La mensualidad & \PENDmini & \PENDmini \\
+La implementación & \PENDmini & \PENDmini \\
+\bottomrule
+\end{tabularx}
+
+\vspace{6pt}
+
+\noindent{\small\color{gristexto}Datos requeridos: \PENDIENTE{cliente}{costo por lote} \quad \PENDIENTE{cliente}{órdenes/mes}}
+
+\vspace{7pt}
+
+% ------------------------------------------------------------
+\needspace{10\baselineskip}
+\begin{cajaNota}
+\textbf{\color{azulcom}Lo que hay que saber antes de firmar}
+\begin{itemize}[leftmargin=14pt, itemsep=2pt, topsep=4pt]
+    \item Materiales, lotes, formulaciones, órdenes, dispensados, firmas y bitácora son \textbf{propiedad de \clienteCorto}; al terminar el servicio se entrega respaldo completo sin costo.
+    \item La \textbf{propiedad intelectual del software es de MAW Soluciones}; el cliente recibe licencia de uso mientras el contrato esté vigente, sin límite de usuarios ni de estaciones.
+    \item Alcance adicional se cotiza con la \textbf{misma tarifa} de MXN \tarifa/hora.
+    \item El sistema \textbf{no está validado ni certificado}, y \textbf{no lee la báscula}. Ambas cosas son opcionales cotizables.
+    \item Las tolerancias y las recetas las autoriza el área de calidad de \clienteCorto; el sistema las aplica, no las define.
+\end{itemize}
+\end{cajaNota}
+
+\vspace{7pt}
+
+% ------------------------------------------------------------
+\needspace{8\baselineskip}
+\seccion{Siguiente paso}
+
+\noindent Abrir el demo y recorrer un dispensado completo. Si convence, aprobar la propuesta, firmar el contrato, realizar el \textbf{50\%} y entregar el catálogo de materiales y las formulaciones autorizadas.
+
+\vspace{8pt}
+
+\begin{center}
+\begin{tcolorbox}[colback=azulcom, colframe=azulcom, rounded corners, width=13cm, boxrule=1pt, left=6pt, right=6pt, top=6pt, bottom=6pt]
+\begin{center}
+{\bfseries\color{white}Ver demo --- \href{https://\demoURL}{\color{white}\demoURL}}
+\end{center}
+\end{tcolorbox}
+\end{center}
+
+\vspace{4pt}
+
+\begin{center}
+{\small\bfseries Preparado para:} {\bfseries\color{azulcom}\clienteLargo} \quad {\small\bfseries De parte de:} {\bfseries\color{azulcom}MAW Soluciones} \quad {\footnotesize\color{gristexto}\fechaProp}
+\end{center}
+
+\end{document}

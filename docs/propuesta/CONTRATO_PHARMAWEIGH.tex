@@ -1,0 +1,593 @@
+% !TEX program = xelatex
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================
+% DATOS DE LAS PARTES  <-- cambiar aqui y recompilar
+% ============================================================
+% --- Cliente
+\newcommand{\clienteCorto}{\PENDIENTE{cliente}{nombre corto}}
+\newcommand{\clienteLargo}{\PENDIENTE{cliente}{razón social}}
+\newcommand{\clienteRFC}{\PENDIENTE{cliente}{RFC}}
+\newcommand{\clienteDomicilio}{\PENDIENTE{cliente}{domicilio fiscal}}
+\newcommand{\clienteRep}{\PENDIENTE{cliente}{representante legal}}
+\newcommand{\clienteCorreo}{\PENDIENTE{cliente}{correo}}
+% --- Prestador
+\newcommand{\prestadorLargo}{MAW SOLUCIONES}
+\newcommand{\prestadorRFC}{\PENDIENTE{Fernando}{RFC de MAW}}
+\newcommand{\prestadorDomicilio}{\PENDIENTE{Fernando}{domicilio fiscal de MAW}}
+\newcommand{\prestadorRep}{\PENDIENTE{Fernando}{representante legal}}
+\newcommand{\prestadorCorreo}{solucionesmaw@gmail.com}
+% --- Contrato
+\newcommand{\fechaProp}{\PENDIENTE{Fernando}{fecha}}
+\newcommand{\fechaFirma}{\_\_\_\_ de \_\_\_\_\_\_\_\_\_\_\_\_ de \_\_\_\_\_\_}
+\newcommand{\ciudadFirma}{\PENDIENTE{Fernando}{ciudad de firma}}
+\newcommand{\demoURL}{pharmaweigh.appsoluciones.duckdns.org}
+\newcommand{\tarifa}{\PENDIENTE{Fernando}{tarifa}}
+\newcommand{\docTipo}{Contrato de Prestación de Servicios}
+\newcommand{\docPrefijo}{CONTRATO}
+
+\input{maw_comun}
+
+% ============================================================
+% HORAS E IMPORTES --- mismas macros y mismos valores que la
+% propuesta. Al autorizarse, se copian de PROPUESTA_PHARMAWEIGH.tex
+% ============================================================
+% \cifrasDefinidastrue
+\def\tarifaNum{0}
+
+\def\hAa{0}\def\hAb{0}\def\hAc{0}\def\hAd{0}
+\def\hBa{0}\def\hBb{0}\def\hBc{0}\def\hBd{0}
+\def\hCa{0}\def\hCb{0}\def\hCc{0}
+\def\hDa{0}\def\hDb{0}\def\hDc{0}
+\def\hEa{0}\def\hEb{0}\def\hEc{0}\def\hEd{0}\def\hEe{0}
+\def\hFa{0}\def\hFb{0}\def\hFc{0}
+\def\hGa{0}\def\hGb{0}
+\def\hHa{0}\def\hHb{0}
+\def\hIa{0}\def\hIb{0}\def\hIc{0}\def\hId{0}
+\def\hJa{0}\def\hJb{0}\def\hJc{0}
+\def\hKa{0}\def\hKb{0}\def\hKc{0}\def\hKd{0}
+\def\hMa{0}\def\hMb{0}\def\hMc{0}
+\def\infraMes{0}\def\respaldoMes{0}
+\def\hOa{0}\def\hOb{0}\def\hOc{0}\def\hOd{0}
+
+\def\sA{\hAa+\hAb+\hAc+\hAd}
+\def\sB{\hBa+\hBb+\hBc+\hBd}
+\def\sC{\hCa+\hCb+\hCc}
+\def\sD{\hDa+\hDb+\hDc}
+\def\sE{\hEa+\hEb+\hEc+\hEd+\hEe}
+\def\sF{\hFa+\hFb+\hFc}
+\def\sG{\hGa+\hGb}
+\def\sH{\hHa+\hHb}
+\def\sI{\hIa+\hIb+\hIc+\hId}
+\def\sJ{\hJa+\hJb+\hJc}
+\def\sK{\hKa+\hKb+\hKc+\hKd}
+\def\sTOTAL{\sA+\sB+\sC+\sD+\sE+\sF+\sG+\sH+\sI+\sJ+\sK}
+
+% Numeración de cláusulas (con \label/\ref para referencias cruzadas)
+\newcounter{clausula}
+\renewcommand{\theclausula}{\Roman{clausula}}
+\newcommand{\clausula}[1]{%
+    \refstepcounter{clausula}%
+    \vspace{10pt}%
+    \noindent{\bfseries\color{azulcom}\theclausula.\ #1}\par
+    \vspace{4pt}%
+}
+\newcounter{anexo}
+\newcommand{\anexo}[1]{%
+    \stepcounter{anexo}%
+    \clearpage
+    \seccion{Anexo \Alph{anexo} --- #1}
+}
+\setlist[enumerate,1]{leftmargin=22pt, itemsep=3pt, topsep=3pt, label=\arabic*.}
+\setlist[enumerate,2]{leftmargin=18pt, itemsep=2pt, topsep=2pt, label=\alph*)}
+
+\begin{document}
+
+\tituloCot{PharmaWeigh}
+
+\noindent\RaggedRight{\small\color{gristexto}Licencia de uso, implementación y operación del sistema \textbf{PharmaWeigh} \quad\textbar\quad Referencia: Propuesta MAW Soluciones, \fechaProp}
+
+\vspace{10pt}
+
+\begin{cajaPendiente}[Borrador --- no firmar]
+Este contrato refleja la propuesta \textbf{PROPUESTA\_PHARMAWEIGH}. Los datos de las partes, la tarifa, los importes, la mensualidad y los plazos están marcados como pendientes y \textbf{requieren autorización de Fernando} (tarifa, precio, forma de pago y contrato) o confirmación del cliente. No se firma con marcas ámbar en el documento.
+\end{cajaPendiente}
+
+\vspace{12pt}
+
+\noindent\textbf{CONTRATO DE PRESTACIÓN DE SERVICIOS DE LICENCIA DE USO, IMPLEMENTACIÓN Y OPERACIÓN DE SOFTWARE} que celebran, por una parte, \textbf{\prestadorLargo}, representada en este acto por \textbf{\prestadorRep}, a quien en lo sucesivo se le denominará \textbf{``EL PRESTADOR''}; y por la otra, \textbf{\clienteLargo}, representada por \textbf{\clienteRep}, a quien en lo sucesivo se le denominará \textbf{``EL CLIENTE''}; y cuando se haga referencia a ambas, \textbf{``LAS PARTES''}; al tenor de las siguientes declaraciones y cláusulas.
+
+\vspace{14pt}
+
+% ============================================================
+\seccion{Declaraciones}
+
+\noindent\textbf{I. Declara EL PRESTADOR, por conducto de su representante:}
+\begin{enumerate}
+    \item Que es una persona legalmente constituida conforme a las leyes de los Estados Unidos Mexicanos, con Registro Federal de Contribuyentes \textbf{\prestadorRFC} y domicilio en \textbf{\prestadorDomicilio}.
+    \item Que su representante cuenta con facultades suficientes para obligarla en los términos de este contrato, mismas que no le han sido revocadas ni limitadas.
+    \item Que se dedica al desarrollo de software, integración de sistemas y operación de plataformas en servidor, y cuenta con la experiencia, el personal y los recursos técnicos para prestar los servicios objeto de este contrato.
+    \item Que es titular de los derechos sobre el sistema denominado \textbf{``PharmaWeigh''}, el cual se encuentra construido y desplegado en ambiente de demostración en \href{https://\demoURL}{\demoURL}, y que lo licencia a EL CLIENTE en los términos aquí pactados.
+    \item Que \textbf{declara expresamente} que PharmaWeigh \textbf{no se encuentra validado} conforme a un plan maestro de validación (CSV, IQ/OQ/PQ) ni certificado respecto de 21 CFR Part 11, NOM-059-SSA1 ni ninguna otra disposición regulatoria, y que dicha validación no forma parte de LOS SERVICIOS salvo que se contrate por separado conforme al Anexo C.
+\end{enumerate}
+
+\vspace{6pt}
+
+\noindent\textbf{II. Declara EL CLIENTE, por conducto de su representante:}
+\begin{enumerate}
+    \item Que es una persona legalmente constituida conforme a las leyes de los Estados Unidos Mexicanos, con Registro Federal de Contribuyentes \textbf{\clienteRFC} y domicilio en \textbf{\clienteDomicilio}.
+    \item Que su representante cuenta con facultades suficientes para obligarla en los términos de este contrato.
+    \item Que conoce la propuesta comercial de EL PRESTADOR de fecha \fechaProp, ha revisado el sistema en el ambiente de demostración y desea contratar los servicios descritos en ella.
+    \item Que conoce y acepta la declaración I.5 de EL PRESTADOR sobre el estado de validación del sistema, y que es responsable de determinar si PharmaWeigh, en el estado en que se entrega, es apto para los procesos regulados que EL CLIENTE decida operar con él.
+    \item Que es el titular y responsable de las formulaciones, tolerancias, especificaciones de materiales y criterios de liberación de lotes que se carguen en el sistema.
+\end{enumerate}
+
+\vspace{6pt}
+
+\noindent\textbf{III. Declaran LAS PARTES:}
+\begin{enumerate}
+    \item Que se reconocen mutuamente la personalidad con la que comparecen y que en la celebración de este contrato no existe error, dolo, mala fe ni lesión.
+    \item Que los Anexos A (Alcance), B (Puesta en marcha), C (Contraprestación) y D (Niveles de servicio) forman parte integrante de este contrato. En caso de contradicción entre el cuerpo del contrato y un anexo, prevalece el cuerpo del contrato.
+\end{enumerate}
+
+\vspace{10pt}
+
+\noindent Expuesto lo anterior, LAS PARTES otorgan las siguientes:
+
+\vspace{14pt}
+
+% ============================================================
+\seccion{Cláusulas}
+
+\needspace{5\baselineskip}\clausula{Objeto}\label{cl:objeto}
+\noindent EL PRESTADOR se obliga a prestar a EL CLIENTE, y EL CLIENTE a pagar, los siguientes servicios (en adelante, \textbf{``LOS SERVICIOS''}):
+\begin{enumerate}
+    \item \textbf{Implementación:} la licencia de uso del sistema \textbf{PharmaWeigh} conforme al alcance del Anexo A, y su puesta en producción con los materiales, formulaciones, lotes y usuarios de EL CLIENTE conforme al Anexo B (en adelante, la \textbf{``Puesta en Marcha''}).
+    \item \textbf{Operación mensual:} el hospedaje, respaldo, monitoreo, mantenimiento y soporte del sistema a partir de la Puesta en Marcha, conforme a los niveles de servicio del Anexo D.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Vigencia}\label{cl:vigencia}
+\begin{enumerate}
+    \item Este contrato surte efectos a partir de la fecha de su firma.
+    \item La \textbf{Puesta en Marcha} tiene una duración estimada de \PENDIENTE{Fernando}{plazo} contada a partir de la \textbf{Fecha de Inicio} definida en la cláusula \ref{cl:inicio}.
+    \item La \textbf{etapa de operación mensual} inicia el primer día del mes siguiente a la fecha de Puesta en Marcha y tiene una vigencia inicial de \textbf{doce (12) meses}, renovable automáticamente por periodos iguales salvo aviso por escrito de cualquiera de LAS PARTES con al menos treinta (30) días naturales de anticipación al vencimiento.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Contraprestación}\label{cl:contraprestacion}
+\begin{enumerate}
+    \item Por la implementación, EL CLIENTE pagará a EL PRESTADOR la cantidad de \textbf{\IM{\sTOTAL} MXN} (\PENDIENTE{Fernando}{importe con letra}) más el Impuesto al Valor Agregado, en dos pagos conforme al Anexo C.
+    \item Por la operación mensual, EL CLIENTE pagará a EL PRESTADOR la cantidad de \PENDIENTE{Fernando}{mensualidad} más IVA por cada mes de servicio, pagaderos por adelantado dentro de los primeros cinco (5) días naturales de cada mes.
+    \item La mensualidad no depende del número de usuarios, estaciones de pesaje, órdenes de producción, lotes ni del volumen producido.
+    \item Todos los precios se construyen a razón de \textbf{MXN \tarifa\ por hora de ingeniería}. Esta tarifa se mantiene fija durante la Puesta en Marcha y durante la vigencia inicial de la operación mensual, y es la que se aplicará a los servicios opcionales del Anexo C y a cualquier alcance adicional que LAS PARTES acuerden por escrito.
+    \item A partir de la primera renovación de la operación mensual, EL PRESTADOR podrá actualizar la mensualidad y la tarifa horaria una vez al año, como máximo conforme a la variación anual del Índice Nacional de Precios al Consumidor, previo aviso por escrito con treinta (30) días de anticipación.
+    \item Los pagos se realizarán mediante transferencia electrónica a la cuenta que EL PRESTADOR indique por escrito. EL PRESTADOR emitirá el Comprobante Fiscal Digital por Internet correspondiente a cada pago.
+    \item Los pagos no realizados en la fecha pactada causarán un interés moratorio del \textbf{2\% mensual} sobre el saldo insoluto, sin perjuicio de lo dispuesto en la cláusula \ref{cl:terminacion}.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Alcance y entregables}\label{cl:alcance}
+\begin{enumerate}
+    \item El alcance de LOS SERVICIOS es el descrito en el \textbf{Anexo A}, que corresponde al sistema tal como se encuentra en el ambiente de demostración a la fecha de firma. Todo lo que no esté expresamente incluido en dicho anexo se considera fuera de alcance.
+    \item Quedan expresamente \textbf{fuera de alcance}, y se cotizarán por separado con la tarifa de la cláusula \ref{cl:contraprestacion}: (a) la validación del sistema (CSV, IQ/OQ/PQ), la calificación de equipos y cualquier entregable documental para auditorías regulatorias; (b) la certificación o adecuación específica a 21 CFR Part 11, NOM-059-SSA1 o normas equivalentes; (c) la \textbf{lectura automática del peso desde básculas}, ya que el peso se captura manualmente en la interfaz; (d) integraciones con ERP, LIMS, MES o cualquier sistema de terceros; (e) la ampliación de la cobertura de pruebas automatizadas y la prueba automatizada de punta a punta del dispensado; (f) notificaciones por correo, mensajería o WhatsApp; (g) módulos o pantallas adicionales; (h) aplicaciones móviles nativas; (i) el hardware de planta: tabletas, computadoras, lectores de código de barras, básculas e impresoras de etiquetas.
+    \item No se consideran cambios de alcance las altas y ediciones que el sistema ya permite desde su interfaz --- materiales, lotes, recetas, fases, ingredientes, tolerancias, órdenes y usuarios ---, las cuales EL CLIENTE puede realizar por sí mismo sin costo.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Fecha de Inicio y condiciones para la Puesta en Marcha}\label{cl:inicio}
+\noindent La \textbf{Fecha de Inicio} será el día hábil siguiente a aquel en que se cumplan \textbf{todas} las condiciones siguientes:
+\begin{enumerate}
+    \item La firma de este contrato por ambas PARTES.
+    \item La recepción del primer pago del 50\% previsto en el Anexo C.
+    \item La entrega por EL CLIENTE de los insumos del \textbf{Anexo B}, apartado B.1, incluyendo las formulaciones y tolerancias autorizadas por su área de calidad.
+\end{enumerate}
+\noindent El retraso de EL CLIENTE en entregar cualquiera de los insumos desplaza en la misma medida los plazos de EL PRESTADOR, sin responsabilidad para éste. Si transcurren \textbf{treinta (30) días naturales} desde la firma sin que EL CLIENTE haya entregado los insumos, y EL PRESTADOR se lo ha requerido por escrito al menos una vez, el segundo pago del Anexo C será exigible y la operación mensual iniciará el primer día del mes siguiente, aun cuando la Puesta en Marcha no haya ocurrido.
+
+\needspace{5\baselineskip}\clausula{Aceptación de la Puesta en Marcha}\label{cl:aceptacion}
+\begin{enumerate}
+    \item Concluida la Puesta en Marcha, EL PRESTADOR notificará por escrito a EL CLIENTE que el sistema está en producción, con evidencia de la \textbf{orden de producción real dispensada de punta a punta} descrita en el Anexo B.
+    \item EL CLIENTE contará con \textbf{cinco (5) días hábiles} para notificar por escrito, en su caso, las no conformidades respecto del Anexo A.
+    \item EL PRESTADOR corregirá las no conformidades procedentes sin costo y en un plazo razonable, reiniciándose entonces un periodo de tres (3) días hábiles de verificación.
+    \item Si EL CLIENTE no notifica no conformidades en el plazo, o dispensa con el sistema una orden de producción distinta de la de prueba, la Puesta en Marcha se tendrá por \textbf{aceptada} y se liberará el segundo pago del Anexo C.
+    \item No constituyen no conformidad las solicitudes de funcionalidad no descrita en el Anexo A, las cuales se tramitarán como orden de cambio.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Obligaciones de EL PRESTADOR}\label{cl:oblprestador}
+\begin{enumerate}
+    \item Prestar LOS SERVICIOS con la diligencia, calidad y profesionalismo propios de la industria, con personal calificado bajo su exclusiva dirección y responsabilidad.
+    \item Realizar la Puesta en Marcha conforme al Anexo B, sujeto a la cláusula \ref{cl:inicio}.
+    \item Mantener el sistema en operación conforme a los niveles de servicio del Anexo D durante la etapa de operación mensual.
+    \item Realizar \textbf{respaldos diarios} de la base de datos con retención mínima de catorce (14) días, y pruebas periódicas de restauración.
+    \item Cargar las formulaciones, tolerancias y especificaciones \textbf{tal como EL CLIENTE las autorice por escrito}, sin modificarlas, y entregar constancia de la carga para su verificación.
+    \item Resguardar las credenciales y la información de EL CLIENTE con acceso restringido, utilizarlas exclusivamente para prestar LOS SERVICIOS y no almacenarlas fuera de la infraestructura dedicada al servicio.
+    \item Informar a EL CLIENTE de cualquier incidente de seguridad que afecte su información en un plazo no mayor a setenta y dos (72) horas a partir de que tenga conocimiento.
+    \item Designar un responsable del proyecto como punto único de contacto.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Obligaciones de EL CLIENTE}\label{cl:oblcliente}
+\begin{enumerate}
+    \item Pagar la contraprestación en los términos pactados.
+    \item Entregar oportunamente los insumos del Anexo B y la información, aclaraciones y aprobaciones que EL PRESTADOR le requiera, en un plazo no mayor a cinco (5) días hábiles por requerimiento.
+    \item Designar un \textbf{responsable del proyecto} con facultades para aprobar formulaciones, tolerancias y la Puesta en Marcha.
+    \item \textbf{Autorizar por escrito} las formulaciones, las tolerancias de pesaje, los materiales marcados como peligrosos y los criterios de liberación de lotes que se carguen en el sistema, así como cualquier cambio posterior a ellos.
+    \item Designar qué puestos ejercen los roles con facultad de \textbf{firma electrónica} (SUPERVISOR, CALIDAD y ADMIN) y mantener actualizada esa designación conforme a sus altas y bajas de personal.
+    \item Administrar las contraseñas de su personal con diligencia, y hacer saber a sus usuarios que la contraseña constituye su firma dentro del sistema y es personal e intransferible.
+    \item Proveer y mantener el hardware de planta: tabletas o computadoras por estación, lectores de código de barras, básculas, impresoras de etiquetas y la red local.
+    \item Mantener en el sistema la información de lotes, existencias, caducidades y estados de liberación correcta y actualizada, ya que el sistema valida contra lo que esté capturado.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Estado regulatorio del sistema}\label{cl:regulatorio}
+\begin{enumerate}
+    \item PharmaWeigh incorpora funciones \textbf{orientadas} al control de procesos regulados: identificación de usuario por correo y contraseña, roles con permisos diferenciados, firma electrónica por fase restringida a los roles autorizados, bitácora de acciones, control de estado y caducidad de lotes y registro del peso objetivo contra el peso real dispensado.
+    \item \textbf{Dichas funciones no constituyen una certificación ni una validación.} EL PRESTADOR no declara ni garantiza que el sistema cumpla 21 CFR Part 11, NOM-059-SSA1, Anexo 11 de la UE ni normativa equivalente, ni que se encuentre validado conforme a un plan maestro de validación.
+    \item La decisión de utilizar el sistema como registro en procesos regulados, así como la validación, calificación y la conservación de registros que la normativa le exija, son responsabilidad exclusiva de EL CLIENTE.
+    \item Si EL CLIENTE requiere la validación del sistema, ésta se contrata conforme al Anexo C y se ejecuta contra el plan maestro de validación de EL CLIENTE.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Datos de producción y su interpretación}\label{cl:datosprod}
+\begin{enumerate}
+    \item El sistema registra el peso que el operario captura manualmente. \textbf{No lee la báscula}, por lo que no verifica que el valor capturado corresponda al peso realmente medido.
+    \item El semáforo de pesaje compara el valor capturado contra la cantidad objetivo y las tolerancias que EL CLIENTE haya autorizado, e impide confirmar el dispensado cuando el valor queda fuera de ellas.
+    \item La validación del lote --- material correcto, estado aprobado, caducidad vigente y existencia suficiente --- se realiza contra la información que EL CLIENTE tenga capturada en el sistema.
+    \item EL PRESTADOR responde de que estas verificaciones operen conforme al Anexo A, y no de la veracidad de los datos que EL CLIENTE o su personal capturen.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Propiedad intelectual}\label{cl:pi}
+\begin{enumerate}
+    \item \textbf{Sistema.} PharmaWeigh, su código fuente, arquitectura, modelos de datos, interfaces, documentación y todas las mejoras y adaptaciones desarrolladas al amparo de este contrato --- incluyendo las específicas para EL CLIENTE --- son y permanecerán \textbf{propiedad exclusiva de EL PRESTADOR}, quien conserva todos los derechos patrimoniales sobre ellos en términos de la Ley Federal del Derecho de Autor.
+    \item \textbf{Licencia de uso.} EL PRESTADOR otorga a EL CLIENTE una licencia \textbf{no exclusiva, intransferible y revocable} para usar el sistema en la operación de sus áreas de pesaje y dispensado durante la vigencia de este contrato, sin límite de usuarios ni de estaciones. La licencia no autoriza a EL CLIENTE a sublicenciar, revender, descompilar, ni a acceder al código fuente.
+    \item \textbf{Información de EL CLIENTE.} Toda la información cargada, capturada o generada en el sistema por cuenta de EL CLIENTE --- materiales, lotes, formulaciones, tolerancias, órdenes de producción, dispensados, pesos registrados, firmas electrónicas, bitácora de auditoría y cualquier derivado de ella --- es y permanecerá \textbf{propiedad exclusiva de EL CLIENTE}. EL PRESTADOR sólo la tratará para prestar LOS SERVICIOS.
+    \item \textbf{Confidencialidad de la formulación.} Las formulaciones, tolerancias y especificaciones de EL CLIENTE se consideran secreto industrial y quedan sujetas a la cláusula \ref{cl:confidencialidad} sin límite temporal mientras conserven ese carácter.
+    \item \textbf{Marcas.} La marca, nombre comercial e identidad visual de EL CLIENTE son de EL CLIENTE, y las de PharmaWeigh y MAW Soluciones son de EL PRESTADOR. Ninguna de LAS PARTES adquiere derecho alguno sobre las marcas de la otra. EL PRESTADOR podrá mencionar a EL CLIENTE como cliente en su material comercial, sin revelar información confidencial, salvo que EL CLIENTE se oponga por escrito.
+    \item \textbf{Componentes de terceros.} El sistema utiliza componentes de código abierto (entre otros, Node.js, Next.js y PostgreSQL) sujetos a sus propias licencias, que EL PRESTADOR declara cumplir.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Confidencialidad}\label{cl:confidencialidad}
+\begin{enumerate}
+    \item LAS PARTES se obligan a mantener en estricta confidencialidad toda la información técnica, comercial, financiera y operativa de la otra a la que tengan acceso con motivo de este contrato, a no divulgarla a terceros y a utilizarla exclusivamente para los fines aquí pactados.
+    \item No se considera confidencial la información que sea del dominio público sin culpa de la parte receptora, que ésta ya conociera lícitamente, o que deba revelarse por mandato de autoridad competente, en cuyo caso se avisará previamente a la otra parte.
+    \item Esta obligación subsiste por \textbf{cinco (5) años} posteriores a la terminación del contrato, y sin límite temporal respecto de las formulaciones y especificaciones de EL CLIENTE. Su incumplimiento da lugar al pago de los daños y perjuicios que se causen.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Protección de datos personales}\label{cl:datos}
+\begin{enumerate}
+    \item El sistema trata datos personales del personal de EL CLIENTE, entre otros: nombre, correo electrónico, rol y el registro de las acciones y firmas de cada usuario. Respecto de ellos, EL CLIENTE actúa como \textbf{responsable} y EL PRESTADOR como \textbf{encargado} en términos de la Ley Federal de Protección de Datos Personales en Posesión de los Particulares y su Reglamento.
+    \item EL PRESTADOR tratará los datos personales únicamente conforme a las instrucciones de EL CLIENTE, implementará las medidas de seguridad administrativas, técnicas y físicas razonables, guardará confidencialidad, no los transferirá a terceros salvo subencargados necesarios para el hospedaje previamente informados, y los suprimirá o devolverá al término del contrato.
+    \item EL CLIENTE es responsable de informar a su personal el tratamiento de sus datos dentro del sistema, incluido el registro nominal de sus acciones y firmas.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Garantía y soporte}\label{cl:garantia}
+\begin{enumerate}
+    \item EL PRESTADOR garantiza que el sistema funcionará conforme al Anexo A. Los defectos reportados durante la vigencia del contrato se corregirán sin costo adicional como parte de la operación mensual.
+    \item La garantía no cubre fallas derivadas de: (a) información incorrecta o incompleta capturada por EL CLIENTE, incluidas formulaciones, tolerancias, caducidades y estados de lote; (b) uso indebido del sistema o de las credenciales; (c) modificaciones realizadas por personas ajenas a EL PRESTADOR; (d) fallas del hardware, la red local o la conectividad de EL CLIENTE; (e) lecturas erróneas de código de barras por etiquetas dañadas, mal impresas o de terceros con formatos no acordados.
+    \item EL PRESTADOR \textbf{no garantiza} resultado alguno de calidad, rendimiento o cumplimiento regulatorio del producto que EL CLIENTE fabrique con apoyo del sistema.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Limitación de responsabilidad}\label{cl:limitacion}
+\begin{enumerate}
+    \item La responsabilidad total acumulada de EL PRESTADOR frente a EL CLIENTE por cualquier causa derivada de este contrato no excederá el monto efectivamente pagado por EL CLIENTE durante los \textbf{doce (12) meses} anteriores al hecho que la origine.
+    \item Ninguna de LAS PARTES será responsable frente a la otra por lucro cesante, pérdida de negocio, pérdida de datos no atribuible a incumplimiento de la obligación de respaldo, ni por daños indirectos o consecuenciales, incluidos el costo de lotes reprocesados, rechazados o retirados del mercado.
+    \item Las limitaciones anteriores no aplican en caso de dolo, negligencia grave, incumplimiento de las obligaciones de confidencialidad, de protección de datos o de propiedad intelectual, ni en los supuestos en que la ley no permita limitarlas.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Terminación}\label{cl:terminacion}
+\begin{enumerate}
+    \item \textbf{Por incumplimiento.} Cualquiera de LAS PARTES podrá rescindir este contrato, sin necesidad de declaración judicial, si la otra incumple una obligación sustancial y no la subsana dentro de los quince (15) días naturales siguientes al requerimiento por escrito. Tratándose de falta de pago, EL PRESTADOR podrá además \textbf{suspender} LOS SERVICIOS a partir del décimo día de mora, previo aviso, sin que ello constituya incumplimiento de su parte.
+    \item \textbf{Por conveniencia antes de la Puesta en Marcha.} EL CLIENTE podrá terminar el contrato antes de la Puesta en Marcha mediante aviso por escrito. El primer pago del Anexo C \textbf{no será reembolsable}, por corresponder a un sistema ya construido y puesto a su disposición; el segundo pago no se causará.
+    \item \textbf{Por conveniencia durante la operación.} Concluida la vigencia inicial de doce meses, cualquiera de LAS PARTES podrá terminar la operación mensual mediante aviso por escrito con treinta (30) días naturales de anticipación, sin penalidad.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Efectos de la terminación y devolución de información}\label{cl:efectos}
+\begin{enumerate}
+    \item Al terminar el contrato por cualquier causa, EL PRESTADOR entregará a EL CLIENTE, \textbf{sin costo} y dentro de los quince (15) días naturales siguientes, un \textbf{respaldo completo} de la base de datos en formato estándar (volcado SQL y/o archivos CSV), incluyendo dispensados, firmas y bitácora de auditoría.
+    \item EL PRESTADOR mantendrá el sistema accesible en modo de sólo lectura para los administradores durante esos quince (15) días para facilitar la transición, siempre que EL CLIENTE esté al corriente en sus pagos.
+    \item Transcurridos treinta (30) días naturales desde la entrega del respaldo, EL PRESTADOR eliminará de manera segura la información de EL CLIENTE, salvo la que deba conservar por obligación legal, y así lo certificará por escrito a solicitud de EL CLIENTE. EL CLIENTE es responsable de conservar sus registros por el plazo que su normativa le exija.
+    \item La terminación no libera a LAS PARTES de las obligaciones de pago devengadas ni de las de confidencialidad, protección de datos y propiedad intelectual.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Relación entre LAS PARTES}\label{cl:relacion}
+\noindent EL PRESTADOR presta LOS SERVICIOS con elementos propios y personal bajo su exclusiva dirección, por lo que no existe relación laboral alguna entre EL CLIENTE y el personal de EL PRESTADOR, ni viceversa. Cada parte responde de sus obligaciones laborales, fiscales y de seguridad social y se obliga a sacar en paz y a salvo a la otra de cualquier reclamación al respecto.
+
+\needspace{5\baselineskip}\clausula{Caso fortuito o fuerza mayor}\label{cl:fuerza}
+\noindent Ninguna de LAS PARTES será responsable por el incumplimiento de sus obligaciones --- salvo las de pago --- cuando éste se deba a caso fortuito o fuerza mayor, incluyendo fallas generalizadas de proveedores de infraestructura, de energía o de telecomunicaciones ajenas a su control. La parte afectada lo notificará a la otra dentro de los cinco (5) días siguientes y los plazos se suspenderán mientras subsista el impedimento. Si éste excede de sesenta (60) días, cualquiera de LAS PARTES podrá dar por terminado el contrato conforme a la cláusula \ref{cl:terminacion}.
+
+\needspace{5\baselineskip}\clausula{Disposiciones generales}\label{cl:generales}
+\begin{enumerate}
+    \item \textbf{Cesión.} Ninguna de LAS PARTES podrá ceder los derechos y obligaciones de este contrato sin consentimiento previo y por escrito de la otra, salvo a una sociedad de su mismo grupo, con aviso previo.
+    \item \textbf{Subcontratación.} EL PRESTADOR podrá subcontratar servicios de infraestructura y, previo aviso, tareas específicas de desarrollo, permaneciendo en todo caso como único responsable frente a EL CLIENTE.
+    \item \textbf{Modificaciones.} Toda modificación a este contrato o a sus anexos deberá constar por escrito y estar firmada por ambas PARTES. Se aceptan las firmas electrónicas y los acuerdos intercambiados por correo electrónico entre los representantes designados para las órdenes de cambio.
+    \item \textbf{Notificaciones.} Las notificaciones se harán por escrito en los domicilios señalados en las declaraciones, o por correo electrónico a \texttt{\prestadorCorreo} y \clienteCorreo, surtiendo efectos al día hábil siguiente de su envío con acuse.
+    \item \textbf{Acuerdo total.} Este contrato y sus anexos constituyen el acuerdo íntegro entre LAS PARTES y sustituyen cualquier negociación o comunicación previa. La propuesta comercial de \fechaProp\ se incorpora únicamente como referencia para la interpretación del alcance.
+    \item \textbf{Nulidad parcial.} Si alguna cláusula fuere declarada nula, las demás conservarán plena validez.
+    \item \textbf{Títulos.} Los títulos de las cláusulas son de referencia y no afectan su interpretación.
+\end{enumerate}
+
+\needspace{5\baselineskip}\clausula{Legislación aplicable y jurisdicción}\label{cl:jurisdiccion}
+\noindent Para la interpretación y cumplimiento de este contrato, LAS PARTES se someten a las leyes federales de los Estados Unidos Mexicanos y a la jurisdicción de los tribunales competentes de \textbf{\ciudadFirma}, renunciando expresamente a cualquier otro fuero que pudiera corresponderles por razón de su domicilio presente o futuro.
+
+\vspace{16pt}
+
+\noindent Leído que fue por LAS PARTES y enteradas de su contenido y alcance legal, lo firman por duplicado en \ciudadFirma, el \textbf{\fechaFirma}.
+
+\vspace{36pt}
+
+\noindent\begin{minipage}[t]{0.48\linewidth}
+\centering
+{\color{azulcom}\rule{6.5cm}{0.8pt}}\\[4pt]
+{\bfseries\color{azulcom}``EL PRESTADOR''}\\[2pt]
+\prestadorLargo\\[2pt]
+{\small\color{gristexto}\prestadorRep}\\
+{\small\color{gristexto}Representante legal}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+{\color{azulcom}\rule{6.5cm}{0.8pt}}\\[4pt]
+{\bfseries\color{azulcom}``EL CLIENTE''}\\[2pt]
+\clienteLargo\\[2pt]
+{\small\color{gristexto}\clienteRep}\\
+{\small\color{gristexto}Representante legal}
+\end{minipage}
+
+\vspace{36pt}
+
+\noindent\begin{minipage}[t]{0.48\linewidth}
+\centering
+{\color{azulcom}\rule{6.5cm}{0.8pt}}\\[4pt]
+{\bfseries\color{azulcom}Testigo}\\[2pt]
+{\small\color{gristexto}Nombre y firma}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+{\color{azulcom}\rule{6.5cm}{0.8pt}}\\[4pt]
+{\bfseries\color{azulcom}Testigo}\\[2pt]
+{\small\color{gristexto}Nombre y firma}
+\end{minipage}
+
+% ============================================================
+% ANEXO A --- ALCANCE
+% ============================================================
+\anexo{Alcance del sistema}
+
+\noindent El sistema se entrega tal como se encuentra en \href{https://\demoURL}{\demoURL} a la fecha de firma, con el siguiente alcance.
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{A.1 Acceso y roles}
+\noindent Acceso con correo y contraseña. Siete roles con menú y permisos verificados en el servidor: \textbf{ADMIN}, \textbf{SUPERVISOR}, \textbf{OPERARIO}, \textbf{DESARROLLO}, \textbf{CALIDAD}, \textbf{ALMACÉN} y \textbf{AUDITOR}. Alta, edición, asignación de rol y baja de usuarios desde el módulo de usuarios, reservado al rol ADMIN.
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{A.2 Módulos}
+\noindent\footnotesize
+\begin{tabularx}{\linewidth}{@{}L{3.4cm} X@{}}
+\toprule
+\textbf{Módulo} & \textbf{Alcance funcional} \\
+\midrule
+Tablero & Órdenes del día, avance por fases de cada orden y actividad reciente. \\
+Inventario & Materiales con código, nombre y unidad. Lotes con número, proveedor, existencia, fecha de caducidad y estado: cuarentena, aprobado, rechazado o agotado. Cambio de estado registrado en bitácora. \\
+Recetas & Receta con código, nombre, versión, rendimiento y unidad. Fases ordenadas con instrucciones. Ingredientes por fase con cantidad objetivo, tolerancia mínima y máxima expresadas en porcentaje y marca de material peligroso. \\
+Órdenes & Alta con receta, lote de producto terminado, cantidad y prioridad. Estados: pendiente, en proceso, dispensado, completada y cancelada. Detalle con avance por fase. \\
+Dispensado & Flujo guiado descrito en A.3. \\
+Auditoría & Consulta de la bitácora con usuario, rol, acción, entidad, identificador, detalle y fecha, con filtros por acción y por usuario. \\
+Códigos de barras & Generación de códigos de barras de lotes y materiales, y de gafetes de usuario, en hojas listas para imprimir. \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{A.3 Flujo de dispensado}
+\noindent\footnotesize
+\begin{tabularx}{\linewidth}{@{}L{3.4cm} X@{}}
+\toprule
+\textbf{Paso} & \textbf{Funcionamiento} \\
+\midrule
+Escaneo del lote & Lectura del código de barras con pistola USB o con la cámara del dispositivo. También admite captura manual del número de lote. \\
+Validación & El sistema rechaza el lote si: no existe; es de un material distinto al que pide la receta; su estado no es \textbf{APROBADO}; su fecha de caducidad ya pasó; o su existencia es menor a la cantidad requerida. \\
+Pesaje & El operario captura el peso. El sistema calcula la cantidad objetivo como cantidad de la receta por el tamaño de la orden, y los límites mínimo y máximo con las tolerancias de la receta. \\
+Semáforo & \textbf{Verde} dentro de tolerancia; \textbf{ámbar} dentro de tolerancia pero cerca de un límite; \textbf{rojo} por debajo del mínimo o por encima del máximo. Con semáforo rojo el botón de confirmar queda \textbf{deshabilitado}. \\
+Registro & Se guarda orden, fase, lote, material, cantidad objetivo, cantidad real, si quedó dentro de tolerancia, operario y paso. Se descuenta la existencia del lote y, si llega a cero, el lote pasa a \textbf{AGOTADO}. \\
+Firma de fase & Al terminar los ingredientes de la fase, un usuario con rol SUPERVISOR, CALIDAD o ADMIN se identifica con su correo y contraseña. La firma queda ligada a la fase, a la orden y a la hora. \\
+Cierre de la orden & Cuando todas las fases de la receta están firmadas, la orden pasa a \textbf{DISPENSADO} y queda asentado en la bitácora. \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{A.4 Infraestructura}
+\noindent El sistema se hospeda en el servidor de EL PRESTADOR, en contenedores independientes para la aplicación y para su base de datos PostgreSQL. El acceso es por navegador, con dominio y certificado TLS. Respaldo diario de la base de datos con retención de catorce (14) días.
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{A.5 Documentación}
+\noindent Manuales en PDF por rol con capturas de pantalla, manual de operación técnica y video demostrativo de la operación.
+
+\vspace{8pt}
+\begin{cajaAviso}[Fuera de alcance del Anexo A]
+Validación del sistema (CSV, IQ/OQ/PQ) y certificación 21 CFR Part 11 o NOM-059; lectura automática del peso desde básculas; integraciones con ERP, LIMS o MES; ampliación de la cobertura de pruebas automatizadas; notificaciones por correo o mensajería; aplicaciones móviles nativas; y el hardware de planta. Ver cláusula \ref{cl:alcance} y Anexo C.5.
+\end{cajaAviso}
+
+% ============================================================
+% ANEXO B --- PUESTA EN MARCHA
+% ============================================================
+\anexo{Puesta en marcha}
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{B.1 Insumos a cargo de EL CLIENTE}
+\noindent
+\begin{tabularx}{\linewidth}{@{}L{5.0cm} X@{}}
+\toprule
+\textbf{Insumo} & \textbf{Detalle} \\
+\midrule
+Materiales & Código, nombre y unidad de cada materia prima. \\
+Formulaciones & Recetas vigentes con fases, instrucciones, ingredientes, cantidad objetivo y tolerancias, \textbf{autorizadas por escrito} por el área de calidad. \\
+Lotes & Número, proveedor, existencia, caducidad y estado de liberación de los lotes en piso. \\
+Materiales peligrosos & Listado de los que deben advertirse al operario. \\
+Usuarios y roles & Nombre, correo y rol de cada persona. \\
+Facultad de firma & Designación por escrito de los puestos con rol SUPERVISOR o CALIDAD. \\
+Etiquetado & Definición de si se usan las etiquetas del sistema o las del proveedor, y en este caso el formato del código. \\
+Equipo de planta & Tabletas o computadoras por estación, lectores de código de barras y red local operando. \\
+Responsable & Nombre y correo del responsable del proyecto y de los administradores. \\
+\bottomrule
+\end{tabularx}
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{B.2 Actividades a cargo de EL PRESTADOR}
+\noindent
+\begin{tabularx}{\linewidth}{@{}X C{2.2cm}@{}}
+\toprule
+\textbf{Actividad} & \textbf{Horas} \\
+\midrule
+Carga de materiales, lotes y usuarios reales & \HR{\hKa} \\
+Captura de las formulaciones autorizadas con sus tolerancias & \HR{\hKb} \\
+Impresión de etiquetas y prueba de lectura con el equipo de planta & \HR{\hKc} \\
+Orden real de punta a punta en planta y acompañamiento de la primera semana & \HR{\hKd} \\
+\midrule
+\rowcolor{grisfondo}\textbf{Total de la Puesta en Marcha} & \textbf{\HR{\sK}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{8pt}
+\begin{cajaNota}
+\textbf{\color{azulcom}Orden real de punta a punta.} Antes de dar por arrancado el sistema se ejecuta en planta una orden de producción real: se escanean los lotes, se dispensa cada ingrediente con el semáforo en verde o ámbar, se firma cada fase con el supervisor de EL CLIENTE y la orden queda cerrada. La evidencia de ese recorrido, más la bitácora correspondiente, acompaña la notificación de la cláusula \ref{cl:aceptacion}.
+\end{cajaNota}
+
+% ============================================================
+% ANEXO C --- CONTRAPRESTACION
+% ============================================================
+\anexo{Contraprestación y forma de pago}
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{C.1 Modelo de costeo}
+\noindent Precio del entregable $=$ horas de ingeniería $\times$ MXN \tarifa/hora. Tarifa única para la implementación, la operación, los opcionales y el alcance adicional.
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{C.2 Implementación}
+\noindent
+\begin{tabularx}{\linewidth}{@{}X C{2.0cm} R{3.0cm}@{}}
+\toprule
+\textbf{Concepto} & \textbf{Horas} & \textbf{Importe MXN} \\
+\midrule
+01 Base, autenticación y roles & \HR{\sA} & \IM{\sA} \\
+02 Inventario, materiales y lotes & \HR{\sB} & \IM{\sB} \\
+03 Recetas por fases & \HR{\sC} & \IM{\sC} \\
+04 Órdenes de producción & \HR{\sD} & \IM{\sD} \\
+05 Dispensado guiado: semáforo y código de barras & \HR{\sE} & \IM{\sE} \\
+06 Firma electrónica por fase & \HR{\sF} & \IM{\sF} \\
+07 Bitácora de auditoría & \HR{\sG} & \IM{\sG} \\
+08 Etiquetas y códigos de barras & \HR{\sH} & \IM{\sH} \\
+09 Despliegue, respaldo y operación & \HR{\sI} & \IM{\sI} \\
+10 Manuales y capacitación & \HR{\sJ} & \IM{\sJ} \\
+11 Puesta en marcha (Anexo B) & \HR{\sK} & \IM{\sK} \\
+\midrule
+\rowcolor{grisfondo}\textbf{PRECIO DE IMPLEMENTACIÓN} & \textbf{\HR{\sTOTAL}} & \textbf{\IM{\sTOTAL}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{C.3 Calendario de pagos de la implementación}
+\noindent
+\begin{tabularx}{\linewidth}{@{}C{1.8cm} C{1.2cm} X R{3.0cm}@{}}
+\toprule
+\textbf{Momento} & \textbf{\%} & \textbf{Condición que libera el pago} & \textbf{Importe MXN} \\
+\midrule
+Firma & 50\% & A la firma del contrato. Contra este pago EL PRESTADOR entrega el acceso de administrador e inicia la Puesta en Marcha al cumplirse la cláusula \ref{cl:inicio}. & \IM{(\sTOTAL)*0.5} \\
+Arranque & 50\% & Aceptación de la Puesta en Marcha conforme a la cláusula \ref{cl:aceptacion} --- orden real dispensada y firmada ---, o el supuesto de treinta días de la cláusula \ref{cl:inicio}. & \IM{(\sTOTAL)*0.5} \\
+\midrule
+\rowcolor{grisfondo}\textbf{Total} & \textbf{100\%} & & \textbf{\IM{\sTOTAL}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{C.4 Operación mensual}
+\noindent
+\begin{tabularx}{\linewidth}{@{}X C{2.4cm} R{3.0cm}@{}}
+\toprule
+\textbf{Mensualidad} & \textbf{Base} & \textbf{Importe MXN} \\
+\midrule
+Servidor, base de datos, certificado TLS y monitoreo & Infraestructura & \MXN{\infraMes} \\
+Respaldo diario de la base con retención de 14 días & Infraestructura & \MXN{\respaldoMes} \\
+Soporte al administrador y ajustes menores & \HR{\hMa} h & \IM{\hMa} \\
+Altas de materiales, lotes y usuarios a solicitud & \HR{\hMb} h & \IM{\hMb} \\
+Actualizaciones de seguridad y dependencias & \HR{\hMc} h & \IM{\hMc} \\
+\midrule
+\rowcolor{grisfondo}\textbf{MENSUALIDAD} & \textbf{\HR{\hMa+\hMb+\hMc} h $+$ infra} & \textbf{\PENDIENTE{Fernando}{mensualidad}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{4pt}
+\noindent{\small\color{gristexto}Inicia el primer día del mes siguiente a la Puesta en Marcha. Pagadera por adelantado dentro de los primeros cinco días naturales del mes. Las horas no utilizadas no se acumulan; las horas adicionales que EL CLIENTE solicite se facturan a MXN \tarifa/hora previa autorización por escrito.}
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{C.5 Servicios opcionales}
+\noindent Se contratan mediante orden de cambio firmada. Los costos de terceros (registro anual del dominio, proveedor de envío de correo, básculas, lectores, tabletas e impresoras de etiquetas) corren por cuenta de EL CLIENTE.
+
+\vspace{4pt}
+\noindent
+\begin{tabularx}{\linewidth}{@{}X C{1.6cm} R{2.4cm} R{2.4cm}@{}}
+\toprule
+\textbf{Servicio} & \textbf{Horas} & \textbf{Pago único} & \textbf{Mensual} \\
+\midrule
+Lectura directa del peso desde báscula & \HR{\hOa} & \IM{\hOa} & \PENDmini \\
+Validación del sistema (CSV, IQ/OQ/PQ) & \PENDmini & \PENDIENTE{cliente}{alcance} & --- \\
+Ampliación de cobertura de pruebas y prueba de punta a punta & \HR{\hOb} & \IM{\hOb} & --- \\
+Integración con ERP, LIMS o MES & \PENDmini & \PENDIENTE{cliente}{sistema} & \PENDmini \\
+Notificaciones por correo & \HR{\hOc} & \IM{\hOc} & \PENDmini \\
+Dominio propio de EL CLIENTE & \HR{\hOd} & \IM{\hOd} & --- \\
+\bottomrule
+\end{tabularx}
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{C.6 Todos los importes son más IVA (16\%)}
+
+% ============================================================
+% ANEXO D --- NIVELES DE SERVICIO
+% ============================================================
+\anexo{Niveles de servicio de la operación mensual}
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{D.1 Disponibilidad}
+\noindent
+\begin{tabularx}{\linewidth}{@{}L{5.0cm} X@{}}
+\toprule
+Disponibilidad objetivo & \textbf{99.5\%} mensual de la aplicación web, excluyendo mantenimientos programados. Es un objetivo de mejor esfuerzo sobre infraestructura de un solo servidor, no una garantía de alta disponibilidad redundante. \\
+Mantenimientos programados & Máximo 4 horas al mes, fuera del horario de producción que EL CLIENTE indique, avisados con 48 horas de anticipación. \\
+Medición & Monitoreo de EL PRESTADOR; bitácora disponible para EL CLIENTE a solicitud. \\
+Continuidad en planta & Si el sistema no está disponible, EL CLIENTE ejecuta su procedimiento alterno de registro. El sistema no sustituye dicho procedimiento. \\
+\bottomrule
+\end{tabularx}
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{D.2 Procesos automáticos}
+\noindent
+\begin{tabularx}{\linewidth}{@{}L{5.0cm} X@{}}
+\toprule
+Respaldo & Diario, de la base de datos completa, con retención de catorce (14) días y prueba de restauración al menos trimestral. \\
+Actualizaciones & Parches de seguridad del sistema operativo y de dependencias aplicados al menos mensualmente. \\
+Exclusiones & Fallas del hardware, la red local o la energía de EL CLIENTE, e información incorrecta capturada por su personal. \\
+\bottomrule
+\end{tabularx}
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{D.3 Soporte}
+\noindent
+\begin{tabularx}{\linewidth}{@{}L{2.0cm} X C{2.6cm} C{2.8cm}@{}}
+\toprule
+\textbf{Nivel} & \textbf{Definición} & \textbf{Respuesta} & \textbf{Resolución objetivo} \\
+\midrule
+Crítico & El sistema no está disponible, nadie puede ingresar, o no se puede dispensar ni firmar. & 2 horas hábiles & 8 horas hábiles \\
+Alto & Un módulo completo no funciona, o el escaneo o el semáforo fallan de forma sostenida. & 4 horas hábiles & 2 días hábiles \\
+Medio & Falla parcial de un módulo. & 1 día hábil & 5 días hábiles \\
+Bajo & Dudas de uso, altas de usuarios, materiales o lotes, ajustes menores. & 2 días hábiles & Según horas disponibles \\
+\bottomrule
+\end{tabularx}
+
+\vspace{4pt}
+\noindent{\small\color{gristexto}Horario de soporte: lunes a viernes de 9:00 a 18:00, hora del centro de México, excepto días festivos oficiales. Canal: correo a \texttt{\prestadorCorreo} y el medio adicional que LAS PARTES acuerden. El soporte se presta a los administradores de EL CLIENTE. Los tiempos de resolución son objetivos de mejor esfuerzo; el incumplimiento reiterado (tres meses consecutivos) da derecho a EL CLIENTE a una bonificación del 10\% de la mensualidad afectada.}
+
+\vspace{6pt}\needspace{4\baselineskip}\subseccion{D.4 Respaldos y seguridad}
+\noindent
+\begin{tabularx}{\linewidth}{@{}L{5.0cm} X@{}}
+\toprule
+Respaldos & Diarios, de la base de datos; retención mínima de 14 días; prueba de restauración al menos trimestral. \\
+Cifrado & Tráfico cifrado con TLS; contraseñas de usuarios almacenadas con algoritmo de derivación seguro. \\
+Accesos & Usuarios nominales; los módulos están restringidos por rol y la facultad de firma se limita a SUPERVISOR, CALIDAD y ADMIN. \\
+Bitácora & La aplicación no ofrece función alguna para editar ni eliminar registros de la bitácora de auditoría. \\
+Incidentes & Aviso a EL CLIENTE dentro de las 72 horas siguientes a la detección de un incidente de seguridad que afecte su información. \\
+\bottomrule
+\end{tabularx}
+
+\vspace{20pt}
+
+\noindent{\small\color{gristexto}Rúbricas de LAS PARTES en cada hoja de los anexos:}
+
+\vspace{14pt}
+\noindent\begin{minipage}[t]{0.48\linewidth}
+\centering
+{\color{azulcom}\rule{5.5cm}{0.6pt}}\\[2pt]
+{\small\bfseries\color{azulcom}EL PRESTADOR}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+{\color{azulcom}\rule{5.5cm}{0.6pt}}\\[2pt]
+{\small\bfseries\color{azulcom}EL CLIENTE}
+\end{minipage}
+
+\end{document}

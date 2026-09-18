@@ -1,0 +1,168 @@
+% ============================================================
+% maw_comun.tex --- preambulo compartido MAW Soluciones
+% Lo usan PROPUESTA, CONTRATO y RESUMEN_EJECUTIVO.
+% El documento debe definir ANTES del \input:
+%   \docTipo, \docPrefijo, \fechaProp, \tarifa, \demoURL,
+%   \clienteCorto, \clienteLargo
+% Compilar con xelatex (Montserrat via fontspec), dos pasadas.
+% ============================================================
+
+% ============================================================
+% PAQUETES
+% ============================================================
+\usepackage[spanish,es-tabla,es-noindentfirst]{babel}
+\usepackage{fontspec}
+\usepackage{montserrat}
+\renewcommand*\familydefault{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage[table]{xcolor}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{ragged2e}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage{needspace}
+\usepackage{fancyhdr}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, shapes.geometric, calc}
+
+\geometry{top=2cm, bottom=2cm, left=1.8cm, right=1.8cm}
+\setlength{\headheight}{26pt}
+\addtolength{\topmargin}{-14pt}
+
+\sisetup{group-separator={,}, group-minimum-digits=4, output-decimal-marker={.}}
+
+% ============================================================
+% COLORES --- MAW Soluciones / PharmaWeigh
+% (los mismos tokens que usa la app: src/app/globals.css)
+% ============================================================
+\definecolor{azulcom}{HTML}{1E40AF}    % acento principal (primary)
+\definecolor{doradocom}{HTML}{2563EB}   % filete y acento secundario (blue-600)
+\definecolor{grisbar}{HTML}{1E293B}     % slate-800: barra lateral de la app
+\definecolor{grisfondo}{HTML}{F1F5F9}   % slate-100: fondo de tablas
+\definecolor{gristexto}{HTML}{64748B}   % slate-500: texto secundario
+\definecolor{verdeok}{HTML}{16A34A}     % éxito / dentro de tolerancia
+\definecolor{ambarpend}{HTML}{D97706}   % advertencia / pendiente
+\definecolor{rojonota}{HTML}{DC2626}    % error / fuera de tolerancia
+\definecolor{tinta}{HTML}{0F172A}       % texto principal
+
+\hypersetup{colorlinks=true, linkcolor=azulcom, urlcolor=doradocom}
+
+% ============================================================
+% ENCABEZADO / PIE
+% ============================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\color{gristexto}\textbf{MAW Soluciones} \textbar{} \docTipo}
+\fancyhead[R]{\footnotesize\color{gristexto}\fechaProp}
+\fancyfoot[C]{\footnotesize\color{gristexto}\thepage}
+\renewcommand{\headrulewidth}{0.6pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{azulcom}\leaders\hrule height \headrulewidth\hfill}}
+
+% ============================================================
+% TITULOS Y CAJAS
+% ============================================================
+\newcommand{\tituloCot}[1]{%
+    \noindent{\LARGE\bfseries\color{azulcom}\docPrefijo{} \textbar{} #1}\par
+    \vspace{2pt}
+    {\color{doradocom}\rule{\linewidth}{1.8pt}}\par
+    \vspace{14pt}
+}
+
+\newcommand{\seccion}[1]{%
+    {\large\bfseries\color{azulcom}#1}\\[4pt]
+    {\color{doradocom}\rule{\linewidth}{1pt}}\par
+    \vspace{8pt}
+}
+
+\newcommand{\subseccion}[1]{%
+    \vspace{4pt}
+    \noindent{\bfseries\color{azulcom}#1}\par
+    \vspace{4pt}
+}
+
+\newtcolorbox{cajaNota}{
+    colback=grisfondo, colframe=gristexto!60, rounded corners,
+    boxrule=1pt, left=10pt, right=10pt, top=6pt, bottom=6pt
+}
+
+\newtcolorbox{cajaInfo}[1][]{
+    colback=azulcom!5, colframe=azulcom,
+    fonttitle=\bfseries\color{white}, colbacktitle=azulcom, title=#1,
+    rounded corners, boxrule=1pt, left=8pt, right=8pt, top=6pt, bottom=6pt
+}
+
+\newtcolorbox{cajaTotal}{
+    colback=verdeok!8, colframe=verdeok, rounded corners,
+    boxrule=1.5pt, left=10pt, right=10pt, top=10pt, bottom=10pt
+}
+
+\newtcolorbox{cajaAviso}[1][]{
+    colback=rojonota!6, colframe=rojonota,
+    fonttitle=\bfseries\color{white}, colbacktitle=rojonota, title=#1,
+    rounded corners, boxrule=1.2pt, left=8pt, right=8pt, top=6pt, bottom=6pt
+}
+
+% ============================================================
+% PENDIENTES --- nada que el cliente o Fernando no hayan
+% confirmado se escribe como cifra. Se marca y se ve.
+% ============================================================
+\newtcolorbox{cajaPendiente}[1][Pendiente de autorización]{
+    colback=ambarpend!8, colframe=ambarpend,
+    fonttitle=\bfseries\color{white}, colbacktitle=ambarpend, title=#1,
+    rounded corners, boxrule=1.2pt, left=8pt, right=8pt, top=6pt, bottom=6pt
+}
+
+% \PENDIENTE{quien}{que} --- marca visible en linea
+\newcommand{\PENDIENTE}[2]{%
+    {\setlength{\fboxsep}{2.5pt}%
+     \colorbox{ambarpend!20}{\color{ambarpend!80!black}\footnotesize\bfseries PENDIENTE (#1): #2}}%
+}
+
+% Version compacta para celdas de tabla
+\newcommand{\PENDmini}{%
+    {\setlength{\fboxsep}{2pt}%
+     \colorbox{ambarpend!20}{\color{ambarpend!80!black}\scriptsize\bfseries pend.}}%
+}
+
+% ============================================================
+% MOTOR DE CIFRAS
+% ------------------------------------------------------------
+% Mientras \cifrasDefinidas sea falso, toda hora e importe se
+% imprime como PENDIENTE. Para activar el documento:
+%   1. Fernando autoriza tarifa y horas.
+%   2. Se pone \cifrasDefinidastrue y se llenan \tarifaNum y
+%      los \def de horas de cada renglon.
+%   3. Los subtotales, el total, la mensualidad y el punto de
+%      equilibrio se calculan solos con estas macros.
+% ============================================================
+\newif\ifcifrasDefinidas
+\cifrasDefinidasfalse
+
+\providecommand{\tarifaNum}{0}     % MXN por hora de ingenieria (sin separadores)
+
+% \HR{expresion} --- horas (acepta sumas: \HR{\hAa+\hAb})
+\newcommand{\HR}[1]{\ifcifrasDefinidas\fpeval{#1}\else\PENDmini\fi}
+
+% \IM{expresion} --- importe = horas x tarifa
+\newcommand{\IM}[1]{\ifcifrasDefinidas\$\num{\fpeval{round((#1)*\tarifaNum,0)}}\else\PENDmini\fi}
+
+% \MXN{numero} --- importe literal ya autorizado (mensualidad, infra)
+\newcommand{\MXN}[1]{\ifcifrasDefinidas\$\num{#1}\else\PENDmini\fi}
+
+% \RAZON{a}{b} --- cociente redondeado hacia arriba (punto de equilibrio)
+\newcommand{\RAZON}[2]{\ifcifrasDefinidas\num{\fpeval{ceil((#1)/(#2))}}\else\PENDmini\fi}
+
+% ============================================================
+% TABLAS
+% ============================================================
+\newcolumntype{R}[1]{>{\RaggedLeft\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+
+\renewcommand{\arraystretch}{1.3}

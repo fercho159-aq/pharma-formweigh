@@ -1,0 +1,24 @@
+# Verificación en PRs y ramas distintas de main. El deploy (main) repite estos pasos.
+name: CI
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+        env:
+          # Valores de relleno: postgres-js no conecta hasta la primera consulta,
+          # así que el build nunca toca esta BD.
+          DATABASE_URL: postgres://build:build@127.0.0.1:5432/build
+          NEXT_PUBLIC_SITE_URL: https://pharmaweigh.appsoluciones.duckdns.org

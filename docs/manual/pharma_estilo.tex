@@ -1,11 +1,24 @@
 % Estilo compartido de los manuales de PharmaWeigh.
 % Cada manual lo carga con \input{pharma_estilo} y define antes
-% \manualTitulo, \manualPerfil, \manualRol.
-% Compilar con xelatex (fuentes por fontspec).
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
+% \manualTitulo, \manualPerfil, \manualRol, \usuarioNombre, \usuarioEmail.
+%
+% NINGÚN manual lleva contraseñas: las entrega el administrador por separado.
+% Compilar con xelatex (dos pasadas, por el índice) o con tectonic.
+% Fuentes por fontspec (OpenType, Unicode). Con `fontenc T1` + `lmodern` el motor
+% cae en las Type1 de 8 bits y la «¿» sale como «£» en negrita y en el índice.
+% Se nombran por ARCHIVO, no por nombre de familia: tectonic no tiene fontconfig
+% y no resuelve «Latin Modern Sans».
+% Tampoco se carga `inputenc`: con xelatex/tectonic el motor ya es UTF-8.
+\usepackage{fontspec}
+\setmainfont{lmroman10-regular.otf}[
+  BoldFont=lmroman10-bold.otf, ItalicFont=lmroman10-italic.otf,
+  BoldItalicFont=lmroman10-bolditalic.otf]
+\setsansfont{lmsans10-regular.otf}[
+  BoldFont=lmsans10-bold.otf, ItalicFont=lmsans10-oblique.otf,
+  BoldItalicFont=lmsans10-boldoblique.otf]
+\setmonofont{lmmono10-regular.otf}[
+  BoldFont=lmmonolt10-bold.otf, ItalicFont=lmmono10-italic.otf]
 \usepackage[spanish,es-tabla,es-noindentfirst]{babel}
-\usepackage{lmodern}
 \renewcommand*\familydefault{\sfdefault}
 \usepackage{geometry}
 \usepackage{graphicx}
@@ -55,14 +68,21 @@
     \color{pharmaazul}\leaders\hrule height \headrulewidth\hfill}}
 
 % ── Secciones ───────────────────────────────────────────────────────
+% \seccion/\subseccion son títulos propios (el número va escrito en el texto), así
+% que alimentan el índice a mano con \addcontentsline: sin esto \tableofcontents
+% imprime una página «Índice» vacía. \phantomsection le da a hyperref un destino.
+% \noindent en la regla: sin él, la sangría de babel-spanish la empuja 17 pt
+% fuera del margen y cada \seccion emite un Overfull \hbox.
 \newcommand{\seccion}[1]{%
     \vspace{4pt}
-    {\large\bfseries\color{tinta}#1}\par\vspace{2pt}
-    {\color{pharmaazul}\rule{\linewidth}{1.2pt}}\par
+    \phantomsection\addcontentsline{toc}{section}{#1}%
+    \noindent{\large\bfseries\color{tinta}#1}\par\vspace{2pt}
+    \noindent{\color{pharmaazul}\rule{\linewidth}{1.2pt}}\par
     \vspace{6pt}
 }
 \newcommand{\subseccion}[1]{%
     \vspace{8pt}
+    \phantomsection\addcontentsline{toc}{subsection}{#1}%
     \noindent{\bfseries\color{pharmaslate}#1}\par
     \vspace{3pt}
 }
@@ -104,6 +124,31 @@
 \newcommand{\campo}[1]{{\itshape\color{gristexto}#1}}
 \newcommand{\codigo}[1]{{\ttfamily\footnotesize\colorbox{grisfondo}{\color{tinta}\,#1\,}}}
 
+% Dirección del sistema. Si cambia el dominio, se cambia aquí y en los 7 manuales.
+\newcommand{\sistemaURL}{https://pharmaweigh.appsoluciones.duckdns.org}
+
+% Captura de pantalla con pie. \captura{archivo.png}{pie de foto}
+% El minipage mantiene imagen y pie en la misma página: sin él, el pie se queda
+% huérfano al principio de la página siguiente.
+\newcommand{\captura}[2]{%
+\begin{center}
+\begin{minipage}{\linewidth}\centering
+\fbox{\includegraphics[width=0.92\linewidth]{capturas/#1}}\\[3pt]
+{\footnotesize\color{gristexto}#2}
+\end{minipage}
+\end{center}}
+
+% Caja fija: el sistema no está validado. Va en los 7 manuales.
+\newcommand{\avisoValidacion}{%
+\begin{cajaNota}
+\footnotesize\textbf{Sobre normativa.} PharmaWeigh incluye funciones orientadas a la
+trazabilidad de un proceso de dispensado (bitácora inmutable, firma electrónica,
+control de tolerancias y de estados de lote). El sistema \textbf{no está validado}
+y este documento \textbf{no acredita} cumplimiento de 21 CFR Part 11, NOM-059 ni de
+ninguna otra norma. La validación, si se requiere, es un proyecto aparte a cargo
+de la planta.
+\end{cajaNota}}
+
 % Estados de lote
 \newcommand{\aprobado}{{\bfseries\color{pharmagreen}APROBADO}}
 \newcommand{\cuarentena}{{\bfseries\color{pharmayellow}CUARENTENA}}
@@ -140,9 +185,8 @@
     {\footnotesize\color{gristexto}Septiembre de 2026}\\[14pt]
     {\color{pharmaazul}\rule{0.4\linewidth}{1.2pt}}\\[20pt]
     \begin{cajaNota}
-    \footnotesize Este documento es confidencial y de uso interno.
-    Contiene credenciales personales de acceso al sistema.
-    No compartir ni reproducir sin autorización.
+    \footnotesize Documento de uso interno. \textbf{No contiene contraseñas:}
+    el administrador del sistema te entrega la tuya por separado y sólo tú debes conocerla.
     \end{cajaNota}
 \end{center}
 \newpage }
@@ -152,9 +196,32 @@
 \newcommand{\tablaAcceso}{%
 \noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.28\linewidth} X@{}}
 \toprule
-\textbf{URL del sistema} & \cd{https://pharma-formweigh.vercel.app} \\
+\textbf{Dirección} & \cd{\sistemaURL} \\
 \textbf{Tu usuario} & \cd{\usuarioEmail} \\
-\textbf{Tu contraseña} & \cd{\usuarioClave} \\
+\textbf{Tu contraseña} & La entrega el administrador. No está escrita en este manual. \\
 \textbf{Tu perfil} & \perfilTexto \\
 \bottomrule
 \end{tabularx}}
+
+% Bloque de acceso común a los 7 manuales: reglas de sesión y bloqueo.
+\newcommand{\reglasAcceso}{%
+\begin{enumerate}
+    \item Abre el navegador (Chrome o Edge) y ve a \cd{\sistemaURL}.
+    \item Escribe tu \campo{Email} y tu \campo{Contraseña}.
+    \item Pulsa \boton{Ingresar}.
+\end{enumerate}
+
+\vspace{4pt}
+Lo que debes saber de tu acceso:
+\begin{itemize}
+    \item La pantalla de entrada \textbf{no muestra usuarios ni contraseñas de ejemplo}.
+          Si no tienes cuenta, pídesela al administrador.
+    \item Si te equivocas, el sistema siempre responde lo mismo:
+          \cd{Credenciales inválidas}. No te dice si falló el correo o la contraseña.
+    \item A los \textbf{5 intentos fallidos} con el mismo correo, ese correo queda
+          \textbf{bloqueado 15 minutos}: \cd{Demasiados intentos fallidos. Espera 15 minutos
+          e inténtalo de nuevo.} No hay forma de desbloquearlo antes; se espera.
+    \item Tu sesión dura \textbf{24 horas}. Después tienes que volver a entrar.
+    \item Cada intento, acertado o fallido, queda en la bitácora con tu correo y la
+          dirección IP de la estación.
+\end{itemize}}

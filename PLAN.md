@@ -122,7 +122,7 @@ imagen construida en Actions, respaldo `pg_dump` diario con 14 días.
 | H0 Prototipo en Vercel + Neon | hecho (commits hasta `16179e1`) — **no apto para producción** |
 | H1 Núcleo seguro: datos, sesiones, permisos, reglas puras, transacciones, bitácora | hecho 2026-09-18 |
 | H2 Verificación: lint, typecheck, unitarias, build, E2E local | hecho 2026-09-18 (ver §12) |
-| H3 Deploy en maw-vps con CI, salud y respaldos | ver `docs/OPERACION.md` |
+| H3 Deploy en maw-vps con CI, salud y respaldos | hecho 2026-09-18: https://pharmaweigh.appsoluciones.duckdns.org (puerto 3062), primer respaldo verificado |
 | H4 Manuales actualizados, propuesta, contrato, resumen ejecutivo | documentos generados; cifras `PENDIENTE(Fernando)` |
 | H5 Respuestas del cliente a §13 → ajustes → piloto en planta | pendiente |
 

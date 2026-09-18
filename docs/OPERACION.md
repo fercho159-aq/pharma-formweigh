@@ -181,6 +181,21 @@ MAW §9): la restricción es la RAM, no el gusto.
 
 ---
 
+### Estado real de la instalación (2026-09-18)
+
+Hecha y verificada: grupo `pharmaweigh`, `/opt/pharmaweigh` con `.env` root 600 (la contraseña de Postgres se generó
+en el VPS con `openssl rand`; no existe copia fuera), wrapper + respaldo + cron + sudoers, vhost nginx con certificado
+de certbot, primer deploy por Actions en verde, primer `pg_dump` en `/opt/backups/pharmaweigh`.
+
+- **Llave de deploy:** par ed25519 propio de este repo (comentario `github-actions-pharmaweigh` en
+  `/home/deploy/.ssh/authorized_keys`). La privada solo vive en el secreto `VPS_SSH_KEY` de GitHub. Para rotarla:
+  generar otra, agregar la pública, actualizar el secreto y borrar la línea vieja.
+- **Credenciales de la demo:** `/opt/pharmaweigh/CREDENCIALES_DEMO.txt` (root, 600). Son las 7 contraseñas aleatorias
+  que imprimió `seed.mjs`; no están en el repo ni en ningún documento. Leerlas: `ssh maw-vps cat /opt/pharmaweigh/CREDENCIALES_DEMO.txt`.
+  Antes de un piloto con el cliente: crear sus usuarios reales con `crear-usuario.mjs` y desactivar los demo.
+- **Consumo medido:** app 43 MiB / 384, db 38 MiB / 256. El VPS quedó con swap 6.9/8 GB tras el `docker load`:
+  vigilar `free -h` (ver §7).
+
 ## 6. Respaldos y restauración
 
 - `pg_dump` diario a las **03:40** (`/etc/cron.d/pharmaweigh` →

@@ -152,7 +152,7 @@ Las horas, la tarifa, los importes, la mensualidad y las fechas \textbf{no está
 \begin{itemize}[leftmargin=16pt, itemsep=4pt, topsep=4pt]
     \item Cada dispensado: orden, fase, lote, material, cantidad objetivo, \textbf{cantidad real pesada}, si quedó dentro de tolerancia, operario y paso.
     \item Cada firma de fase: quién firmó, qué fase, de qué orden y en qué momento.
-    \item Cada acción del sistema en una \textbf{bitácora} consultable con filtros por acción y por usuario.
+    \item Cada acción del sistema en una \textbf{bitácora} consultable con filtros por acción y por usuario, con la IP de quien la ejecutó. La base de datos rechaza cualquier intento de modificarla o borrarla.
     \item El descuento de existencia del lote al momento de dispensar, y su paso automático a \textbf{AGOTADO} cuando llega a cero.
 \end{itemize}
 
@@ -201,10 +201,10 @@ Códigos de barras & Generación e impresión de etiquetas de lotes, materiales 
 \textbf{Tema} & \textbf{Situación real} \\
 \midrule
 Firma electrónica & \textbf{Construida.} Es firma por contraseña: el supervisor se identifica con su correo y su contraseña para cerrar cada fase, y la firma queda ligada a la fase, la orden y la hora. \\
-Bitácora de auditoría & \textbf{Construida.} Cada acción se inserta como un registro nuevo; la aplicación no ofrece editar ni borrar registros de bitácora. \\
+Bitácora de auditoría & \textbf{Construida e inmutable en la base de datos.} Cada asiento se escribe en la misma transacción que la operación que lo origina y guarda la dirección IP. Tres disparadores de PostgreSQL rechazan \texttt{UPDATE}, \texttt{DELETE} y \texttt{TRUNCATE} sobre la tabla: no es que la aplicación no ofrezca el botón, es que el motor no lo permite. \textbf{Límite honesto:} un superusuario de la base de datos podría desactivar los disparadores; no hay encadenado por hash ni copia en un tercero. \\
 Validación normativa & \textbf{No está hecha.} El sistema \emph{no} está validado (CSV, IQ/OQ/PQ) ni certificado contra 21 CFR Part 11 ni NOM-059. Tiene funciones \textbf{orientadas a} ese tipo de control --- firma por usuario, trazabilidad, bitácora, control de caducidad y de estado de lote ---, pero la validación es un proyecto aparte y hoy está \textbf{fuera de alcance} (ver sección 5.5). \\
 Conexión con báscula & \textbf{No existe.} El peso se captura a mano en la pantalla. La lectura automática desde báscula está cotizada como opcional en la sección 5.5. \\
-Pruebas automatizadas & \textbf{En construcción.} Hay pruebas unitarias de las reglas de negocio (tolerancias, estados de lote, permisos por rol) en el código; el número y la cobertura \PENDIENTE{Fernando}{cifra verificada} antes de afirmarlos ante el cliente. No hay prueba de punta a punta automatizada. \\
+Pruebas automatizadas & \textbf{Construidas.} \textbf{163 pruebas unitarias} de las reglas de negocio, sin base de datos: tolerancias, estados de lote, fases, cantidades y permisos por rol. Más una \textbf{prueba de punta a punta con 72 verificaciones} que corre contra la imagen de producción y cierra en verde. No hay pruebas de interfaz en navegador (ver sección 5.5). \\
 Hardware & \textbf{No incluido.} Tabletas, lectores de código de barras y básculas los pone el cliente. \\
 \bottomrule
 \end{tabularx}
@@ -583,7 +583,7 @@ Costo de los años siguientes: 12 mensualidades & \PENDIENTE{Fernando}{12 $\time
 \midrule
 \textbf{Lectura directa de la báscula:} hoy el peso se captura a mano. Este alcance conecta la báscula por USB o serie para que el peso entre solo. Requiere confirmar marca, modelo e interfaz de las básculas de \clienteCorto. & \HR{\hOa} & \IM{\hOa} & \PENDmini \\
 \textbf{Validación del sistema (CSV):} protocolos IQ/OQ/PQ, matriz de trazabilidad y evidencia documental para soportar una auditoría. Se cotiza contra el plan maestro de validación de \clienteCorto. & \PENDmini & \PENDIENTE{cliente}{alcance} & --- \\
-\textbf{Ampliación de la cobertura de pruebas} y prueba automatizada de punta a punta del dispensado, con reporte de cobertura entregable. & \HR{\hOb} & \IM{\hOb} & --- \\
+\textbf{Pruebas de interfaz en navegador:} el juego actual cubre las reglas y la API; esto agrega el recorrido del operario en pantalla, en el equipo real de planta. & \HR{\hOb} & \IM{\hOb} & --- \\
 \textbf{Integración con el ERP} de \clienteCorto\ para órdenes y existencias. Requiere confirmar el ERP y su interfaz. & \PENDmini & \PENDIENTE{cliente}{ERP} & \PENDmini \\
 \textbf{Notificaciones por correo} de órdenes, lotes por caducar y firmas pendientes. & \HR{\hOc} & \IM{\hOc} & \PENDmini \\
 \textbf{Dominio propio} de \clienteCorto\ con certificado TLS. & \HR{\hOd} & \IM{\hOd} & --- \\

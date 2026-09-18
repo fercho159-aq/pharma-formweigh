@@ -93,7 +93,7 @@ Pesa con semáforo & Verde dentro de tolerancia, ámbar cerca del límite, rojo 
 \midrule
 Firma el supervisor & Cada fase de la receta se cierra con el correo y la contraseña de un supervisor o de calidad. El operario no firma su propio trabajo. \\
 \midrule
-Todo queda asentado & Peso objetivo contra peso real, lote usado, quién dispensó, quién firmó y a qué hora, en una bitácora consultable. \\
+Todo queda asentado & Peso objetivo contra peso real, lote usado, quién dispensó, quién firmó, desde qué IP y a qué hora. La bitácora es \textbf{inmutable en la base de datos}: el motor rechaza modificarla o borrarla. \\
 \bottomrule
 \end{tabularx}
 \normalsize
@@ -101,7 +101,7 @@ Todo queda asentado & Peso objetivo contra peso real, lote usado, quién dispens
 \vspace{6pt}
 
 \begin{cajaInfo}[Ya funciona --- no hay desarrollo por delante]
-El sistema está \textbf{construido y desplegado}, con siete roles diferenciados (admin, supervisor, operario, desarrollo, calidad, almacén y auditor), inventario con estados de lote y caducidad, recetas por fases con tolerancias, órdenes de producción, dispensado guiado, firma por fase, bitácora, generación de etiquetas de código de barras, respaldo diario y manuales por rol. Se puede revisar pantalla por pantalla hoy en \href{https://\demoURL}{\demoURL}.
+El sistema está \textbf{construido y desplegado}, con siete roles diferenciados (admin, supervisor, operario, desarrollo, calidad, almacén y auditor), inventario con estados de lote y caducidad, recetas por fases con tolerancias, órdenes de producción, dispensado guiado, firma por fase, bitácora, generación de etiquetas de código de barras, respaldo diario y manuales por rol. Va con \textbf{163 pruebas automáticas} de las reglas de negocio y una \textbf{prueba de punta a punta de 72 verificaciones} que corre en verde contra la imagen de producción, incluidos los intentos de burlar el control: sesión falsificada, tolerancia alterada desde el navegador, doble clic en el pesaje y existencia negativa. Se puede revisar pantalla por pantalla hoy en \href{https://\demoURL}{\demoURL}.
 \end{cajaInfo}
 
 \vspace{7pt}
@@ -202,7 +202,7 @@ Arranque & 50\% & Una orden real dispensada y firmada en planta & \IM{(\sTOTAL)*
 
 \vspace{6pt}
 
-\noindent{\small\color{gristexto}\textbf{Opcionales}, con la misma tarifa: lectura directa desde báscula, validación del sistema (CSV, IQ/OQ/PQ), ampliación de la cobertura de pruebas, integración con ERP, notificaciones por correo y dominio propio. Importes en la sección 5.5 de la propuesta.}
+\noindent{\small\color{gristexto}\textbf{Opcionales}, con la misma tarifa: lectura directa desde báscula, validación del sistema (CSV, IQ/OQ/PQ), pruebas de interfaz en navegador, integración con ERP, notificaciones por correo y dominio propio. Importes en la sección 5.5 de la propuesta.}
 
 \vspace{7pt}
 

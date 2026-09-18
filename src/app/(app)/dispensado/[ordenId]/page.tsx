@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import BarcodeInput from "@/components/barcode-input";
-import { evaluarPeso } from "@/lib/dominio/tolerancia";
+import { BARRA_VERDE_FIN, BARRA_VERDE_INICIO, evaluarPeso, posicionEnBarra } from "@/lib/dominio/tolerancia";
 
 interface Ingrediente {
   id: string;
@@ -349,7 +349,7 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
           <h2 className="text-xl font-bold text-green-800 mb-2">Orden Completada</h2>
           <p className="text-green-600 mb-4">Todas las fases han sido dispensadas y firmadas correctamente.</p>
           <button onClick={() => router.push("/dispensado")} className="bg-green-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-800 cursor-pointer">
-            Volver a Ordenes
+            Volver a Órdenes
           </button>
         </div>
       ) : (
@@ -527,21 +527,20 @@ export default function DispensadoOrdenPage({ params }: { params: Promise<{ orde
                         {peso && (
                           <div className="max-w-md mx-auto">
                             <div className="relative h-6 bg-gray-200 rounded-full overflow-hidden">
-                              {/* Red zone low */}
-                              <div className="absolute left-0 top-0 h-full bg-red-300" style={{ width: `${(min / max) * 100}%` }} />
-                              {/* Green zone */}
-                              <div className="absolute top-0 h-full bg-green-400" style={{ left: `${(min / max) * 100}%`, width: `${((max - min) / max) * 100}%` }} />
+                              {/* Rojo bajo · verde (tolerancia, tercio central) · rojo alto */}
+                              <div className="absolute left-0 top-0 h-full bg-red-300" style={{ width: `${BARRA_VERDE_INICIO}%` }} />
+                              <div className="absolute top-0 h-full bg-green-400" style={{ left: `${BARRA_VERDE_INICIO}%`, width: `${BARRA_VERDE_FIN - BARRA_VERDE_INICIO}%` }} />
+                              <div className="absolute right-0 top-0 h-full bg-red-300" style={{ width: `${100 - BARRA_VERDE_FIN}%` }} />
                               {/* Marker for current weight */}
                               <div
                                 className="absolute top-0 h-full w-1 bg-black transition-all"
-                                style={{ left: `${Math.min(Math.max((parseFloat(peso) / (max * 1.1)) * 100, 0), 100)}%` }}
+                                style={{ left: `${Number.isFinite(parseFloat(peso)) ? posicionEnBarra(parseFloat(peso), ing.rango) : 0}%` }}
                               />
                             </div>
-                            <div className="flex justify-between text-xs text-gray-500 mt-1">
-                              <span>0</span>
-                              <span>{min.toFixed(2)}</span>
-                              <span className="font-bold">{target.toFixed(2)}</span>
-                              <span>{max.toFixed(2)}</span>
+                            <div className="relative h-4 text-xs text-gray-500 mt-1">
+                              <span className="absolute -translate-x-1/2" style={{ left: `${BARRA_VERDE_INICIO}%` }}>{min.toFixed(3)}</span>
+                              <span className="absolute -translate-x-1/2 font-bold" style={{ left: "50%" }}>{target.toFixed(3)}</span>
+                              <span className="absolute -translate-x-1/2" style={{ left: `${BARRA_VERDE_FIN}%` }}>{max.toFixed(3)}</span>
                             </div>
                           </div>
                         )}

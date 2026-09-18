@@ -32,6 +32,8 @@ interface OrdenDetalle {
   loteProducto: string;
   cantidad: number;
   estado: string;
+  /** Lo decide el servidor según el rol de la sesión. */
+  puedeDispensar?: boolean;
   createdAt: string;
   fases: FaseDetalle[];
 }
@@ -95,7 +97,7 @@ export default function OrdenDetallePage({ params }: { params: Promise<{ id: str
           <div><p className="text-xs text-gray-500">Fases firmadas</p><p className="font-medium">{fasesFirmadas}/{orden.fases.length}</p></div>
         </div>
 
-        {(orden.estado === "PENDIENTE" || orden.estado === "EN_PROCESO") && (
+        {orden.puedeDispensar && (orden.estado === "PENDIENTE" || orden.estado === "EN_PROCESO") && (
           <div className="mt-4">
             <Link href={`/dispensado/${orden.id}`} className="inline-block bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800">
               {completados > 0 ? "Continuar Dispensado" : "Iniciar Dispensado"}

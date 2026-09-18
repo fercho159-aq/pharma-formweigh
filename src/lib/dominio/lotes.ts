@@ -1,3 +1,4 @@
+import { formatearFecha } from "../fechas";
 import { aDiezmilesimas } from "./cantidades";
 import type { EstadoLote, Rol } from "./catalogos";
 import { ErrorDominio } from "./errores";
@@ -29,7 +30,7 @@ export function validarLoteParaDispensar(
   }
   if (lote.fechaCaducidad.getTime() < ahora.getTime()) {
     throw new ErrorDominio(
-      `Lote CADUCADO (${lote.fechaCaducidad.toLocaleDateString("es-MX")}). No se puede utilizar.`,
+      `Lote CADUCADO (${formatearFecha(lote.fechaCaducidad)}). No se puede utilizar.`,
       "LOTE_CADUCADO",
     );
   }

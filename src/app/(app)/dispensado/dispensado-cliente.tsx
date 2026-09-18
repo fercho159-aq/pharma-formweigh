@@ -209,8 +209,8 @@ export default function DispensadoCliente({ rol }: { rol: string }) {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Estacion de Dispensado</h1>
-        <p className="text-gray-500">Vista general de todas las ordenes y su progreso por fases</p>
+        <h1 className="text-2xl font-bold text-gray-900">Estación de Dispensado</h1>
+        <p className="text-gray-500">Vista general de todas las órdenes y su progreso por fases</p>
       </div>
 
       {error && (
@@ -222,7 +222,7 @@ export default function DispensadoCliente({ rol }: { rol: string }) {
       {loading ? (
         <div className="text-center py-12">
           <div className="inline-block w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
-          <p className="text-gray-400 mt-3">Cargando ordenes...</p>
+          <p className="text-gray-400 mt-3">Cargando órdenes...</p>
         </div>
       ) : ordenes.length === 0 ? (
         <div className="text-center py-16">
@@ -231,9 +231,9 @@ export default function DispensadoCliente({ rol }: { rol: string }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>
           </div>
-          <p className="text-gray-500 text-lg">No hay ordenes registradas</p>
+          <p className="text-gray-500 text-lg">No hay órdenes registradas</p>
           <Link href="/ordenes" className="text-blue-600 hover:underline text-sm mt-2 inline-block">
-            Crear una orden de produccion
+            Crear una orden de producción
           </Link>
         </div>
       ) : (

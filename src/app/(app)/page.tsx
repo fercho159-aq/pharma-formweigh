@@ -41,7 +41,7 @@ export default async function DashboardPage() {
         <Link href="/ordenes" className="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition-shadow">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm text-gray-500">Ordenes Pendientes</p>
+              <p className="text-sm text-gray-500">Órdenes Pendientes</p>
               <p className="text-3xl font-bold text-yellow-600 mt-1">{ordenesPendientes.c}</p>
             </div>
             <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
@@ -110,7 +110,7 @@ export default async function DashboardPage() {
           <p className="text-2xl font-bold mt-1">{ordenesCompletadas.c}</p>
         </div>
         <div className="bg-white rounded-xl shadow-sm border p-5">
-          <p className="text-sm text-gray-500 text-orange-600">Por Caducar (30 dias)</p>
+          <p className="text-sm text-gray-500 text-orange-600">Por Caducar (30 días)</p>
           <p className="text-2xl font-bold text-orange-600 mt-1">{lotesPorCaducar.c}</p>
         </div>
       </div>
@@ -171,12 +171,12 @@ export default async function DashboardPage() {
         {/* Recent Orders */}
         <div className="bg-white rounded-xl shadow-sm border">
           <div className="p-4 border-b flex justify-between items-center">
-            <h2 className="font-semibold text-gray-900">Ultimas Ordenes</h2>
+            <h2 className="font-semibold text-gray-900">Últimas Órdenes</h2>
             <Link href="/ordenes" className="text-sm text-blue-600 hover:underline">Ver todas</Link>
           </div>
           <div className="divide-y">
             {ultimasOrdenesEnriquecidas.length === 0 ? (
-              <p className="p-4 text-gray-400 text-sm">No hay ordenes registradas</p>
+              <p className="p-4 text-gray-400 text-sm">No hay órdenes registradas</p>
             ) : (
               ultimasOrdenesEnriquecidas.map((o) => (
                 <Link key={o.id} href={`/dispensado/${o.id}`} className="flex items-center justify-between p-4 hover:bg-gray-50 gap-3">

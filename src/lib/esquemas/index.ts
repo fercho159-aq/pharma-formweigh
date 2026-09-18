@@ -5,6 +5,7 @@
 import { z } from "zod";
 
 import { ESTADOS_LOTE, ROLES } from "@/lib/dominio/catalogos";
+import { fechaCalendarioADate } from "@/lib/fechas";
 
 const texto = (max: number) => z.string().trim().min(1, "requerido").max(max);
 const opcional = (max: number) =>
@@ -50,7 +51,11 @@ export const esquemaRecibirLote = z.object({
   numero: texto(60),
   materialId: idTexto,
   cantidad: cantidadPositiva,
-  fechaCaducidad: z.coerce.date(),
+  fechaCaducidad: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "formato AAAA-MM-DD")
+    .transform(fechaCalendarioADate)
+    .refine((d) => !Number.isNaN(d.getTime()), "fecha inválida"),
   proveedor: texto(160),
   certificado: opcional(200),
 });
